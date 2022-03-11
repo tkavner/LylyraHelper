@@ -1,0 +1,4 @@
+# Dash Code Flag Sequence Controller
+placements.entities.LylyraHelper/ChessBlock.tooltips.dashes=The number of dashes (Maximum 9, set to 0 for infinite) to stop moving after activation. If colour is Black, the block instead breaks and returns to its starting location if a dash happens while block is zero.
+placements.entities.LylyraHelper/ChessBlock.tooltips.type=Determines how the block moves. Rooks can only move orthogonally (ie Up, Left, Right), Bishops can only move diagonally (ie Down-Right, Up-Left), and queens can move both orthogonally and diagonally (ie Up, Down-Left). After being activated, all dashes both orthogonal and diagonal will move the block.
+placements.entities.LylyraHelper/ChessBlock.tooltips.Color=Determines what happens if the block stops or runs out of dashes. White blocks will no longer move on dash and instead shake in place. Black blocks will break and return to their starting location.

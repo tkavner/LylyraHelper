@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+
+<Sprites>
+
+    <bigcloud path="objects/LylyraHelper/bigCloud/" start="idle">
+        <Anim id="spawn" path="bigcloud" delay="0.1" frames="6-12" goto="idle"/>
+        <Loop id="idle" path="bigcloud" delay="0.1" frames="0"/>
+        <Anim id="fade" path="bigcloud" delay="0.1" frames="1-5"/>
+    </bigcloud>
+
+</Sprites>
