@@ -63,6 +63,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Ahorn\entities\cloudBlock.jl" />
     <None Include="Ahorn\entities\ChessBlock.jl" />
     <None Include="Ahorn\entities\bigCloud.jl" />
   </ItemGroup>
