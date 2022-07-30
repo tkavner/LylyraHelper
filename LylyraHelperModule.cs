@@ -31,6 +31,9 @@ namespace LylyraHelper.Entities
             base.LoadContent(firstLoad);
 
             _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
+            foreach (string s in _CustomEntitySpriteBank.SpriteData.Keys) {
+                Logger.Log("LylyraModule", s);
+            }
         }
     }
 }

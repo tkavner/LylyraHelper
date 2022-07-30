@@ -58,11 +58,14 @@
   <ItemGroup>
     <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\ChessBlock.cs" />
+    <Compile Include="Entities\StickyPaper.cs" />
     <Compile Include="Entities\CloudBlock.cs" />
+    <Compile Include="Entities\DashPaper.cs" />
     <Compile Include="LylyraHelperModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Ahorn\entities\dashPaper.jl" />
     <None Include="Ahorn\entities\cloudBlock.jl" />
     <None Include="Ahorn\entities\ChessBlock.jl" />
     <None Include="Ahorn\entities\bigCloud.jl" />
