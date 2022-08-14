@@ -13,10 +13,10 @@
         <Loop id="idleup" path="cutup" delay="0.1" frames="0-5"/>
     </scissorsup>
 
-    <scissorsright path="objects/LylyraHelper/scissors/" start="spawnright">
+    <scissors path="objects/LylyraHelper/scissors/" start="spawnright">
         <Loop id="spawnright" path="cutright" delay="0.1" frames="0"/>
         <Loop id="idleright" path="cutright" delay="0.1" frames="0-5"/>
-    </scissorsright>
+    </scissors>
 
     <scissorsleft path="objects/LylyraHelper/scissors/" start="spawnleft">
         <Loop id="spawnleft" path="cutleft" delay="0.1" frames="0"/>

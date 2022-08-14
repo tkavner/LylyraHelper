@@ -28,7 +28,7 @@ function Ahorn.render(ctx::Ahorn.Cairo.CairoContext, entity::DeathNote, room::Ma
     width = Int(get(entity.data, "width", 32))
     height = Int(get(entity.data, "height", 32))
 
-    Ahorn.drawRectangle(ctx, 0, 0, width, height)
+    Ahorn.drawRectangle(ctx, 0, 0, width, height, (0.7, 0.28, 0.0, 0.34), (1.0, 1.0, 1.0, 0.5))
 end
 
 end

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,11 +72,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 targetPos = nodes[1];
                 Position = moveStartPos;
 
-                sprite = LylyraHelperModule.SpriteBank.Create("scissors" + directionPath);
+                sprite = new Sprite(GFX.Game, "objects/LylyraHelper/scissors/");
+                sprite.AddLoop("spawn", "cut" + directionPath, 0.1F);
+                sprite.AddLoop("idle", "cut" + directionPath, 0.1F);
+                sprite.Play("spawn");
                 Add(sprite);
                 sprite.CenterOrigin();
                 sprite.Visible = true;
-                sprite.Play("spawn" + directionPath);
+                sprite.Play("spawn");
                 base.Collider = new ColliderList(new Circle(12f), new Hitbox(30F, 8f, -15f, -4f));
                 Add(new PlayerCollider(OnPlayer));
             }
@@ -108,7 +112,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         this.Position += (targetPos - moveStartPos).SafeNormalize() * 3;
                         sprite.CenterOrigin();
                         sprite.Visible = true;
-                        sprite.Play("idle" + directionPath);
+                        sprite.Play("idle");
                         if (!playedAudio)
                         {
                             Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
@@ -116,8 +120,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         }
                     }
 
-                    //get dash paper, check if colliding, if so add to list
+                    //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for sppeed)
                     foreach (DashPaper d in base.Scene.Tracker.GetEntities<DashPaper>())
+                    {
+                        if (this.CollideCheck(d)) Cutting.Add(d);
+                    }
+
+                    foreach (DashPaper d in base.Scene.Tracker.GetEntities<DeathNote>())
                     {
                         if (this.CollideCheck(d)) Cutting.Add(d);
                     }
@@ -145,7 +154,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             }
 
-
+            /** see documentation for Position Lerp for the mathematical proof of how this does what it does*/
             private Vector2 GetPositionLerp()
             {
                 var D = targetPos - moveStartPos;
@@ -229,7 +238,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private static int[][] holeEmpty = new int[][] { new int[] { 1, 1 } };
 
-        public DashPaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/cloudBlock/cloudblocknew")
+        public Type thisType;
+
+
+        public DashPaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew")
         : base(position)
         {
             base.Collider = new Hitbox(width, height);
@@ -269,6 +281,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     holeTexSplice[i, j] = holeTexturesUnsliced.GetSubtexture(new Rectangle(i * 8, j * 8, 8, 8));
                 }
             }
+            thisType = this.GetType();
         }
 
         public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, false)
@@ -320,32 +333,35 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     item2.groupOrigin = groupOrigin;
                 }
             }
-            int i = 0;
+            int i = 0;  
+            MethodInfo mi = this.GetType().GetMethod(nameof(DashPaper.CheckForSame)).MakeGenericMethod(new Type[] { thisType }); 
             for (float num5 = base.Left; num5 < base.Right; num5 += 8f)
             {
                 int j = 0;
                 for (float num6 = base.Top; num6 < base.Bottom; num6 += 8f)
                 {
-                    bool flag = CheckForSame(num5 - 8f, num6);
-                    bool flag2 = CheckForSame(num5 + 8f, num6);
-                    bool flag3 = CheckForSame(num5, num6 - 8f);
-                    bool flag4 = CheckForSame(num5, num6 + 8f);
+                    bool flag = (bool) mi.Invoke(this, new object[] { num5 - 8f, num6 });
+                    bool flag2 = (bool)mi.Invoke(this, new object[] { num5 + 8f, num6 });
+                    bool flag3 = (bool)mi.Invoke(this, new object[] { num5, num6 - 8f });
+                    bool flag4 = (bool)mi.Invoke(this, new object[] { num5, num6 + 8f });
+
                     if (flag && flag2 && flag3 && flag4)
                     {
                         //edge cases
-                        if (!CheckForSame(num5 + 8f, num6 - 8f)) //inverted corner (right top)
+                        if (!(bool)mi.Invoke(this, new object[] { num5 + 8f, num6 - 8f })) //inverted corner (right top)
                         {
+                            
                             SetImage(num5, num6, rightTopCornersInvert, i, j);
                         }
-                        else if (!CheckForSame(num5 - 8f, num6 - 8f)) //inverted corner (left top)
+                        else if (!(bool)mi.Invoke(this, new object[] { num5 - 8f, num6 - 8f })) //inverted corner (left top)
                         {
                             SetImage(num5, num6, leftTopCornersInvert, i, j);
                         }
-                        else if (!CheckForSame(num5 + 8f, num6 + 8f)) //inverted corner (right bottom)
+                        else if (!(bool)mi.Invoke(this, new object[] { num5 + 8f, num6 + 8f })) //inverted corner (right bottom)
                         {
                             SetImage(num5, num6, rightBottomCornersInvert, i, j);
                         }
-                        else if (!CheckForSame(num5 - 8f, num6 + 8f)) //inverted corner (left bottom)
+                        else if (!(bool)mi.Invoke(this, new object[] { num5 - 8f, num6 + 8f })) //inverted corner (left bottom)
                         {
                             SetImage(num5, num6, leftBottomCornersInvert, i, j);
                         }
@@ -413,9 +429,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             tiles[i, j][1] = selectedChoice[1];
         }
 
-        private bool CheckForSame(float x, float y)
+        public bool CheckForSame<T>(float x, float y) where T : DashPaper
         {
-            foreach (DashPaper entity in base.Scene.Tracker.GetEntities<DashPaper>())
+            foreach (DashPaper entity in base.Scene.Tracker.GetEntities<T>())
             {
                 if (entity.Collider.Collide(new Rectangle((int)x, (int)y, 8, 8)))
                 {
@@ -693,11 +709,33 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 }
 
             }
-
             return false;
         }
 
+        //really only used with the player so this should work?
+        public bool CollidePaper(Entity e)
+        {
+            Collider c = e.Collider;
+            Vector2 v1 = e.Position;
+            Vector2 v2 = e.Position + new Vector2(e.Width, 0);
+            Vector2 v3 = e.Position + new Vector2(e.Width, c.Height);
+            Vector2 v4 = e.Position + new Vector2(0, c.Height);
+            
+            return CollidePaperPoint(v1) || CollidePaperPoint(v2) || CollidePaperPoint(v3) || CollidePaperPoint(v4);
+        }
+
+        private bool CollidePaperPoint(Vector2 v)
+        {
+            int xTile = (int) (v.X - Position.X) / 8;
+            int yTile = (int) (v.Y - Position.Y) / 8;
+            if (xTile >= 0 && yTile >= 0 && xTile < (int) Width / 8 && yTile < (int) Width / 8)
+            {
+                return !skip[xTile, yTile];
+            }
+            return false;
+        }
     }
+
 }
 
 
