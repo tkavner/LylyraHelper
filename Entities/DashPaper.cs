@@ -18,7 +18,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
     [CustomEntity("LylyraHelper/DashPaper")]
     public class DashPaper : Entity
     {
-        class Hole
+        public class Hole
         {
             public float timer;
             public Vector2 position;
@@ -73,13 +73,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Position = moveStartPos;
 
                 sprite = new Sprite(GFX.Game, "objects/LylyraHelper/scissors/");
-                sprite.AddLoop("spawn", "cut" + directionPath, 0.1F);
+                sprite.AddLoop("spawn", "cut" + directionPath, 0.1F, new int[] { 0});
                 sprite.AddLoop("idle", "cut" + directionPath, 0.1F);
                 sprite.Play("spawn");
                 Add(sprite);
                 sprite.CenterOrigin();
                 sprite.Visible = true;
-                sprite.Play("spawn");
                 base.Collider = new ColliderList(new Circle(12f), new Hitbox(30F, 8f, -15f, -4f));
                 Add(new PlayerCollider(OnPlayer));
             }
@@ -87,8 +86,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             private void OnPlayer(Player player)
             {
-                player.Die((player.Position - Position).SafeNormalize());
-                Moving = false;
+                if(timeElapsed > 1)
+                {
+                    player.Die((player.Position - Position).SafeNormalize());
+                    Moving = false;
+                }
             }
 
             public override void Update()
@@ -247,6 +249,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.Collider = new Hitbox(width, height);
             Collidable = true;
             Visible = true;
+            
             Logger.Log("CloudBlock", "Initialized");
             Depth = Depths.BGDecals;
             skip = new bool[width / 8, height / 8];
@@ -414,8 +417,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 if (cooldownTimer <= 0)
                 {
-
-                    cooldownTimer = cloudCooldown;
                     Audio.Play("event:/char/madeline/jump");
                     SpawnCloud(direction);
                 }
@@ -551,7 +552,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        private void CutY(Hole h, Vector2 direction)
+        internal virtual void CutY(Hole h, Vector2 direction)
         {
             holes.Add(h);
             Vector2 v = h.position - Position;
@@ -580,7 +581,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         }
 
-        private void CutX(Hole h, Vector2 direction)
+        internal virtual void CutX(Hole h, Vector2 direction)
         {
             holes.Add(h);
             Vector2 v = h.position - Position;
@@ -643,34 +644,35 @@ namespace Celeste.Mod.LylyraHelper.Entities
             var session = SceneAs<Level>().Session;
             session.Inventory.Dashes = p.MaxDashes;
             p.Dashes = p.MaxDashes;
+            Vector2 gridPPosition = new Vector2(8 * (int)(p.Position.X / 8), 8 * (int)(p.Position.Y / 8));
             if (direction.X != 0)
             {
                 Vector2 xOnly = new Vector2(direction.X, 0);
-                var v1 = new Vector2(p.Position.X, Position.Y + Height);
-                var v2 = new Vector2(p.Position.X, Position.Y + 0);
+                var v1 = new Vector2(gridPPosition.X, Position.Y + Height);
+                var v2 = new Vector2(gridPPosition.X, Position.Y + 0);
                 Scissors s;
-                if (Vector2.DistanceSquared(v1, p.Position) > Vector2.DistanceSquared(v2, p.Position)) {
-                    s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, xOnly, p.Position);
+                if (Vector2.DistanceSquared(v1, p.Position) > Vector2.DistanceSquared(v2, gridPPosition)) {
+                    s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, xOnly, gridPPosition);
                 }
                 else
                 {
-                    s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, xOnly, p.Position);
+                    s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, xOnly, gridPPosition);
                 }
                 base.Scene.Add(s);
             }
             if (direction.Y != 0)
             {
                 Vector2 yOnly = new Vector2(0, direction.Y);
-                var v1 = new Vector2(Position.X + Width, p.Position.Y);
-                var v2 = new Vector2(Position.X, p.Position.Y);
+                var v1 = new Vector2(Position.X + Width, gridPPosition.Y);
+                var v2 = new Vector2(Position.X, gridPPosition.Y);
                 Scissors s;
-                if (Vector2.DistanceSquared(v1, p.Position) > Vector2.DistanceSquared(v2, p.Position))
+                if (Vector2.DistanceSquared(v1, gridPPosition) > Vector2.DistanceSquared(v2, gridPPosition))
                 {
-                    s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, yOnly, p.Position);
+                    s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, yOnly, gridPPosition);
                 }
                 else
                 {
-                    s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, yOnly, p.Position);
+                    s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, yOnly, gridPPosition);
                 }
                 base.Scene.Add(s);
             }
@@ -696,15 +698,25 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Player p = base.Scene.Tracker.GetEntity<Player>();
             if (this.CollideCheck<Player>())
             {
-                Vector2 v = (p.Position - this.Position) / 8;
-                int x = (int)Math.Round(v.X);
-                int y = (int)Math.Round(v.Y);
-                if (x >= 0 && y >= 0 && x < (int)Width / 8 && y < (int)Height / 8)
+
+                Vector2[] playerPointsToCheck = new Vector2[] { 
+                    (p.ExactPosition - this.Position), 
+                    (p.ExactPosition + new Vector2(p.Width, 0) - this.Position), 
+                    (p.ExactPosition + new Vector2(p.Width, -p.Height) - this.Position), 
+                    (p.ExactPosition + new Vector2(0, -p.Height) - this.Position) };
+                
+                foreach (Vector2 v in playerPointsToCheck)
                 {
-                    Logger.Log("CloudBlock", string.Format("x: {0}, y: {1} player: {2}, {3}", x, y, p.Position.X, p.Position.Y));
-                    if (!this.skip[x, y])
+                    int x = (int)v.X;
+                    int y = (int)v.Y;
+                    Logger.Log("CloudBlock", string.Format("x: {0}, y: {1} player: {2}, {3}", x, y, p.Width, p.Height));
+                    if (x >= 0 && y >= 0 && x < (int)Width && y < (int)Height) 
                     {
-                        return true;
+                        
+                        if (!this.skip[x / 8, y / 8])
+                        {
+                            return true;
+                        }
                     }
                 }
 
@@ -715,13 +727,27 @@ namespace Celeste.Mod.LylyraHelper.Entities
         //really only used with the player so this should work?
         public bool CollidePaper(Entity e)
         {
-            Collider c = e.Collider;
-            Vector2 v1 = e.Position;
-            Vector2 v2 = e.Position + new Vector2(e.Width, 0);
-            Vector2 v3 = e.Position + new Vector2(e.Width, c.Height);
-            Vector2 v4 = e.Position + new Vector2(0, c.Height);
-            
-            return CollidePaperPoint(v1) || CollidePaperPoint(v2) || CollidePaperPoint(v3) || CollidePaperPoint(v4);
+            Vector2[] playerPointsToCheck = new Vector2[] {
+                    (e.Position - this.Position),
+                    (e.Position + new Vector2(e.Width, 0) - this.Position),
+                    (e.Position + new Vector2(e.Width, -e.Height) - this.Position),
+                    (e.Position + new Vector2(0, -e.Height) - this.Position) };
+
+            foreach (Vector2 v in playerPointsToCheck)
+            {
+                int x = (int)v.X;
+                int y = (int)v.Y;
+                Logger.Log("CloudBlock", string.Format("x: {0}, y: {1} player: {2}, {3}", x, y, e.Width, e.Height));
+                if (x >= 0 && y >= 0 && x < (int)Width && y < (int)Height)
+                {
+
+                    if (!this.skip[x / 8, y / 8])
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private bool CollidePaperPoint(Vector2 v)
