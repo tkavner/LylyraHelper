@@ -11,16 +11,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
 {
     [Tracked]
     [CustomEntity("LylyraHelper/DeathNote")]
-    class DeathNote : DashPaper
+    class DeathNote : Paper
     {
         public DeathNote(EntityData data, Vector2 vector2) : base(data.Position + vector2, data.Width, data.Height, false, "objects/LylyraHelper/dashPaper/deathnote")
         {
-            Add(new PlayerCollider(OnPlayer));
             thisType = this.GetType();
         }
 
 
-        private void OnPlayer(Player player)
+        internal override void OnPlayer(Player player)
         {
             if (CollidePaper(player))
             {
