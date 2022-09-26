@@ -388,9 +388,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             return arr[0];
         }
-
-
-
+        
         public class Hole
         {
             public float timer;

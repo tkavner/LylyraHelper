@@ -17,8 +17,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
     [CustomEntity("LylyraHelper/DashPaper")]
     public class DashPaper : Paper
     {
-        
-
         public class Scissors : Entity
         {
             private List<Paper> Cutting = new List<Paper>();
@@ -145,36 +143,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             }
 
-            /** see documentation for Position Lerp for the mathematical proof of how this does what it does*/
-            private Vector2 GetPositionLerp()
-            {
-                var D = targetPos - moveStartPos;
-                var t = lerp / lerpTime;
-                var alpha = rampUpTime;
-                if (rampUpTime == 0)
-                {
-                    return (Vector2.Distance(targetPos, moveStartPos) / lerpTime) * D + moveStartPos;
-                }
-                else
-                {
-                    if (t >= alpha)
-                    {
-                        return (float)((2 * t - alpha) / (2 - alpha)) * D + moveStartPos;
-                    }
-                    else
-                    {
-                        return (float)(t * t / (alpha) / (2 - alpha)) * D + moveStartPos;
-                    }
-                }
-            }
         }
-
-        private static int[][] holeEmpty = new int[][] { new int[] { 1, 1 } };
 
         public DashPaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew")
         : base(position, width, height, safe, texture)
         {
-            
             thisType = this.GetType();
         }
 
@@ -204,43 +177,41 @@ namespace Celeste.Mod.LylyraHelper.Entities
             var session = SceneAs<Level>().Session;
             session.Inventory.Dashes = p.MaxDashes;
             p.Dashes = p.MaxDashes;
-            Vector2 gridPPosition = new Vector2(8 * (int)(p.Position.X / 8), 8 * (int)(p.Position.Y / 8));
+            Vector2 gridPosition = new Vector2(8 * (int)(p.Position.X / 8), 8 * (int)(p.Position.Y / 8));
 
             Vector2 xOnly = new Vector2(direction.X, 0);
             Vector2 yOnly = new Vector2(0, direction.Y);
             if (direction.Y != 0)
             {
-                var v1 = new Vector2(gridPPosition.X, Position.Y + Height);
-                var v2 = new Vector2(gridPPosition.X, Position.Y + 0);
+                var v1 = new Vector2(gridPosition.X, Position.Y + Height);
+                var v2 = new Vector2(gridPosition.X, Position.Y + 0);
                 Scissors s;
                 if (direction.Y < 0) {
-                    s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, yOnly, gridPPosition);
+                    s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, yOnly, gridPosition);
                 }
                 else
                 {
-                    s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, yOnly, gridPPosition);
+                    s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, yOnly, gridPosition);
                 }
                 base.Scene.Add(s);
             }
             if (direction.X != 0)
             {
-                var v1 = new Vector2(Position.X + Width, gridPPosition.Y);
-                var v2 = new Vector2(Position.X, gridPPosition.Y);
+                var v1 = new Vector2(Position.X + Width, gridPosition.Y);
+                var v2 = new Vector2(Position.X, gridPosition.Y);
                 Scissors s;
                 if (direction.X < 0)
                 {
-                    s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, xOnly, gridPPosition);
+                    s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, xOnly, gridPosition);
                 }
                 else
                 {
-                    s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, xOnly, gridPPosition);
+                    s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, xOnly, gridPosition);
                 }
                 base.Scene.Add(s);
             }
             Logger.Log("DashPaper", "Spawning Scissors!");
         }
-
-        //
 
         public bool CanCloudSpawn()
         {
@@ -273,7 +244,4 @@ namespace Celeste.Mod.LylyraHelper.Entities
         }
 
     }
-
 }
-
-
