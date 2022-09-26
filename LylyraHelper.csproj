@@ -61,6 +61,7 @@
     <Compile Include="Entities\DeathNote.cs" />
     <Compile Include="Entities\CloudBlock.cs" />
     <Compile Include="Entities\DashPaper.cs" />
+    <Compile Include="Entities\Paper.cs" />
     <Compile Include="LylyraHelperModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
