@@ -258,7 +258,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                                 }
                             }
                             Logger.Log("Scissors", "test");
-
+                            
 
 
                             d.Collider = new Hitbox(d1Width, d1Height);
@@ -266,16 +266,34 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                             var tiles = d.GetType().GetField("tiles", BindingFlags.NonPublic | BindingFlags.Instance);
                             var tileType = d.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
-                            TileGrid t = GFX.FGAutotiler.GenerateBox((char) tileType.GetValue(d), (int)d1Width / 8, (int)d1Height / 8).TileGrid;
+                            char tileTypeChar = (char)tileType.GetValue(d);
+
+                            if (tileTypeChar == '1')
+                            {
+                                Audio.Play("event:/game/general/wall_break_dirt", Position);
+                            }
+                            else if (tileTypeChar == '3')
+                            {
+                                Audio.Play("event:/game/general/wall_break_ice", Position);
+                            }
+                            else if (tileTypeChar == '9')
+                            {
+                                Audio.Play("event:/game/general/wall_break_wood", Position);
+                            }
+                            else
+                            {
+                                Audio.Play("event:/game/general/wall_break_stone", Position);
+                            }
+                            TileGrid t = GFX.FGAutotiler.GenerateBox(tileTypeChar, (int)d1Width / 8, (int)d1Height / 8).TileGrid;
                             d.Remove((Component)tiles.GetValue(d));
+                            d.Position = d1Position;
                             tiles.SetValue(d, t);
                             d.Add(t);
-                            Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
+                            
                             return true;
                         }
                         return false;
                     });
-
                 }
             }
     }
