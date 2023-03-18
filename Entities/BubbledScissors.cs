@@ -1,4 +1,5 @@
 ﻿using Celeste;
+using Celeste.Mod.LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
