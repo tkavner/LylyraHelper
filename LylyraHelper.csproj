@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\BigCloud.cs" />
+    <Compile Include="Entities\BubbledScissors.cs" />
     <Compile Include="Entities\ChessBlock.cs" />
     <Compile Include="Entities\DeathNote.cs" />
     <Compile Include="Entities\CloudBlock.cs" />

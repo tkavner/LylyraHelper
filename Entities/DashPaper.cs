@@ -159,6 +159,25 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             }
                         }
                     }
+                    foreach (DreamBlock d in base.Scene.Tracker.GetEntities<DreamBlock>())
+                    {
+                        int x1 = (int)d.Position.X;
+                        int x2 = (int)(Position.X);
+
+                        int y1 = (int)d.Position.Y;
+                        int y2 = (int)(Position.Y);
+                        if (!DreamCutting.Contains(d) && this.CollideCheck(d))
+                        {
+                            if (!(x1 == x2 ||
+                                y1 == y2 ||
+                                x1 + d.Width <= x2 ||
+                                y1 + d.Height <= y2))
+                            {
+                                DreamCutting.Add(d);
+                            }
+                        }
+                    }
+
                     //check list for not colliding if so call Cut(X/Y)()
                     Cutting.RemoveAll(d =>
                     {
