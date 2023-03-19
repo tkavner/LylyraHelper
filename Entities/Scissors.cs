@@ -39,8 +39,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private List<CrushBlock> KevinCutting = new List<CrushBlock>();
 
         private List<CrushBlock> KevinCuttingActivationList = new List<CrushBlock>();
+        private bool fragile;
 
-        public Scissors(Vector2[] nodes, int amount, int index, float offset, float speedMult, Vector2 direction, Vector2 initialPosition) : base(nodes[0])
+        public Scissors(Vector2[] nodes, int amount, int index, float offset, float speedMult, Vector2 direction, Vector2 initialPosition, bool fragile = false) : base(nodes[0])
         {
             this.CutDirection = direction;
             if (nodes[1].X - nodes[0].X > 0)
@@ -73,6 +74,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             sprite.Visible = true;
             base.Collider = new ColliderList(new Circle(12f), new Hitbox(30F, 8f, -15f, -4f));
             Add(new PlayerCollider(OnPlayer));
+            this.fragile = fragile;
         }
 
 
@@ -234,7 +236,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private void CutDreamBlocks()
         {
-            DreamCutting.RemoveAll(d =>
+            if (DreamCutting.RemoveAll(d =>
             {
                 if (!d.CollideCheck(this))
                 {
@@ -278,12 +280,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     return true;
                 }
                 return false;
-            });
+            }) > 0 && fragile)
+            {
+                RemoveSelf();
+            }
         }
 
         private void CutFallBlocks()
         {
-            FallCutting.RemoveAll(d =>
+            if(FallCutting.RemoveAll(d =>
             {
                 if (!d.CollideCheck(this))
                 {
@@ -354,7 +359,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     return true;
                 }
                 return false;
-            });
+            }) > 0 && fragile)
+            {
+                RemoveSelf();
+            }
         }
 
         private void CutKevins()
@@ -367,7 +375,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 return true;
             });
 
-            KevinCutting.RemoveAll(d =>
+            if(KevinCutting.RemoveAll(d =>
             {
                 if (!d.CollideCheck(this))
                 {
@@ -416,7 +424,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                     else
                     {
-                        cb1Width = cb2Width = (int)d.Collider.Height;
+                        cb1Width = cb2Width = (int)d.Collider.Width;
                         //check for larger side
                         Vector2 diffPos = Position - d.Position;
                         float diffY = diffPos.Y;
@@ -441,7 +449,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                         KevinCuttingActivationList.Add(cb1);
                         //TODO: Add particles for the poofing / reveal of new kevins
-
                     }
                     else
                     {
@@ -465,7 +472,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     return true;
                 }
                 return false;
-            });
+            }) > 0 && fragile)
+            {
+                RemoveSelf();
+            }
         }
 
         internal static void Load()
