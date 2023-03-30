@@ -21,25 +21,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private List<CrushBlock> KevinCutting = new List<CrushBlock>();
         private List<CrushBlock> KevinCuttingActivationList = new List<CrushBlock>();
 
-        internal static void Load()
-        {
-            On.Celeste.CrushBlock.Update += KevinCutCode;
-        }
-
-        internal static void Unload()
-        {
-            On.Celeste.CrushBlock.Update -= KevinCutCode;
-        }
 
 
-        private static void KevinCutCode(On.Celeste.CrushBlock.orig_Update orig, CrushBlock self)
-        {
-            List<Entity> collisions = self.CollideAll<LaserCutter>();
-            foreach (LaserCutter cutter in collisions)
-            {
-                
-            }
-        }
 
         private void AddEntititesToLists()
         {
@@ -130,7 +113,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        private void CutPaper()
+        private void CutPaper() 
         {
             //check list for not colliding if so call Cut(X/Y)()
             Cutting.RemoveAll(d =>

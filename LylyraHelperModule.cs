@@ -2,7 +2,7 @@
 using Celeste.Mod;
 using Monocle;
 
-namespace LylyraHelper.Entities
+namespace Celeste.Mod.LylyraHelper.Entities
 {
     public class LylyraHelperModule : EverestModule
     {
@@ -19,11 +19,12 @@ namespace LylyraHelper.Entities
         public override void Load()
         {
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
+            Scissors.Load();
         }
 
         public override void Unload()
         {
-            
+            Scissors.Unload();
         }
 
         public override void LoadContent(bool firstLoad)

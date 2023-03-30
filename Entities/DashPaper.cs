@@ -62,11 +62,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors s;
             if (direction.Y < 0)
             {
-                s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, yOnly, gridPosition);
+                s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, yOnly, gridPosition, true);
             }
             else
             {
-                s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, yOnly, gridPosition);
+                s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, yOnly, gridPosition, true);
             }
             base.Scene.Add(s);
         }
@@ -77,11 +77,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors s;
             if (direction.X < 0)
             {
-                s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, xOnly, gridPosition);
+                s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, xOnly, gridPosition, true);
             }
             else
             {
-                s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, xOnly, gridPosition);
+                s = new Scissors(new Vector2[] { v2, v1 }, 1, 1, 0, 1, xOnly, gridPosition, true);
             }
             base.Scene.Add(s);
         }
