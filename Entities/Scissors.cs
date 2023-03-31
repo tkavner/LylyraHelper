@@ -242,40 +242,27 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 if (!d.CollideCheck(this))
                 {
-                    Vector2 d1Position = d.Position;
-                    float d1Width = d.Width;
-                    float d1Height = d.Height;
-                    if (CutDirection.Y != 0)
-                    {
-                        d1Height = d.Height;
-                        //check for larger side
-                        if (Math.Abs(d.Position.X - this.Position.X) > Math.Abs(d.Position.X + d.Width - this.Position.X))
-                        {
-                            d1Width = Math.Abs(d.Position.X - this.Position.X);
-                        }
-                        else
-                        {
-                            d1Width = Math.Abs(d.Position.X + d.Width - this.Position.X);
-                            d1Position.X = this.Position.X;
-                        }
-                    }
-                    if (CutDirection.X != 0)
-                    {
-                        d1Height = d.Width;
-                        //check for larger side
-                        if (Math.Abs(d.Position.Y - this.Position.Y) > Math.Abs(d.Position.Y + d.Height - this.Position.Y))
-                        {
-                            d1Height = Math.Abs(d.Position.Y - this.Position.Y);
-                        }
-                        else
-                        {
-                            d1Height = Math.Abs(d.Position.Y + d.Height - this.Position.Y);
-                            d1Position.Y = this.Position.Y;
-                        }
-                    }
-                    DreamBlock d1 = new DreamBlock(d1Position, d1Width, d1Height, null, false, false);
+                    Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, 16);
 
-                    Scene.Add(d1);
+                    Vector2 db1Pos = resultArray[0];
+                    Vector2 db2Pos = resultArray[1];
+                    int db1Width = (int)resultArray[2].X;
+                    int db1Height = (int)resultArray[2].Y;
+
+                    int db2Width = (int)resultArray[3].X;
+                    int db2Height = (int)resultArray[3].Y;
+                    DreamBlock d1 = new DreamBlock(db1Pos, db1Width, db1Height, null, false, false);
+                    DreamBlock d2 = new DreamBlock(db2Pos, db2Width, db2Height, null, false, false);
+                    if (db1Width >= 8 && db1Height >= 8)
+                    {
+
+                        Scene.Add(d1);
+                    }
+                    if (db2Width >= 8 && db2Height >= 8)
+                    {
+
+                        Scene.Add(d2);
+                    }
                     Scene.Remove(d);
                     Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
 
