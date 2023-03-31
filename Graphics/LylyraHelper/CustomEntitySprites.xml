@@ -3,10 +3,31 @@
 
 <Sprites>
 
-    <bigcloud path="objects/LylyraHelper/bigCloud/" start="idle">
-        <Anim id="spawn" path="bigcloud" delay="0.1" frames="6-12" goto="idle"/>
-        <Loop id="idle" path="bigcloud" delay="0.1" frames="0"/>
-        <Anim id="fade" path="bigcloud" delay="0.1" frames="1-5"/>
+    <scissorsdown path="objects/LylyraHelper/scissors/" start="spawndown">
+        <Loop id="spawndown" path="cutdown" delay="0.1" frames="0"/>
+        <Loop id="idledown" path="cutdown" delay="0.1" frames="0-5"/>
+    </scissorsdown>
+
+    <scissorsup path="objects/LylyraHelper/scissors/" start="spawnup">
+        <Loop id="spawnup" path="cutup" delay="0.1" frames="0"/>
+        <Loop id="idleup" path="cutup" delay="0.1" frames="0-5"/>
+    </scissorsup>
+
+    <scissors path="objects/LylyraHelper/scissors/" start="spawnright">
+        <Loop id="spawnright" path="cutright" delay="0.1" frames="0"/>
+        <Loop id="idleright" path="cutright" delay="0.1" frames="0-5"/>
+    </scissors>
+
+    <scissorsleft path="objects/LylyraHelper/scissors/" start="spawnleft">
+        <Loop id="spawnleft" path="cutleft" delay="0.1" frames="0"/>
+        <Loop id="idleleft" path="cutleft" delay="0.1" frames="0-5"/>
+    </scissorsleft>
+
+    <bigcloud path="objects/LylyraHelper/scissors/" start="idle">
+        <Anim id="spawn" path="scissors" delay="0.1" frames="6-10"/>
+        <Loop id="idle" path="scissors" delay="0.1" frames="0"/>
+        <Anim id="fade" path="scissors" delay="0.1" frames="1-5"/>
     </bigcloud>
+
 
 </Sprites>

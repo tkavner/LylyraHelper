@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LylyraHelper.Entities
+namespace Celeste.Mod.LylyraHelper.Entities
 {
     [CustomEntity("LylyraHelper/BigCloud")]
     public class BigCloud : Cloud
