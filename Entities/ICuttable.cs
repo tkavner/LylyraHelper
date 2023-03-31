@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Celeste.Mods.LylyraHelper.Intefaces
+namespace Celeste.Mod.LylyraHelper.Intefaces
 {
-    public interface Cuttable
+    public interface ICuttable
     {
-        bool Cut(Vector2 direction, Vector2 position, int width);
+        bool Cut(Vector2 cutPosition, Vector2 direction, int gapWidth);
 
 
     }

@@ -27,41 +27,41 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public int[,][] holeTiles;
         public int[,][] tiles;
 
-        private static int[][] leftTopCorners = new int[][] { new int[] { 0, 0 }, new int[] { 7, 3 }, new int[] { 7, 4 } };
-        private static int[][] leftBottomCorners = new int[][] { new int[] { 0, 5 }, new int[] { 6, 3 }, new int[] { 6, 4 } };
-        private static int[][] rightTopCorners = new int[][] { new int[] { 5, 0 }, new int[] { 6, 2 }, new int[] { 7, 2 } };
-        private static int[][] rightBottomCorners = new int[][] { new int[] { 5, 5 }, new int[] { 6, 5 }, new int[] { 7, 5 } };
+        internal static int[][] leftTopCorners = new int[][] { new int[] { 0, 0 }, new int[] { 7, 3 }, new int[] { 7, 4 } };
+        internal static int[][] leftBottomCorners = new int[][] { new int[] { 0, 5 }, new int[] { 6, 3 }, new int[] { 6, 4 } };
+        internal static int[][] rightTopCorners = new int[][] { new int[] { 5, 0 }, new int[] { 6, 2 }, new int[] { 7, 2 } };
+        internal static int[][] rightBottomCorners = new int[][] { new int[] { 5, 5 }, new int[] { 6, 5 }, new int[] { 7, 5 } };
 
-        private static int[][] rightBottomCornersInvert = new int[][] { new int[] { 6, 0 } };
-        private static int[][] leftBottomCornersInvert = new int[][] { new int[] { 7, 0 } };
-        private static int[][] rightTopCornersInvert = new int[][] { new int[] { 6, 1 } };
-        private static int[][] leftTopCornersInvert = new int[][] { new int[] { 7, 1 } };
+        internal static int[][] rightBottomCornersInvert = new int[][] { new int[] { 6, 0 } };
+        internal static int[][] leftBottomCornersInvert = new int[][] { new int[] { 7, 0 } };
+        internal static int[][] rightTopCornersInvert = new int[][] { new int[] { 6, 1 } };
+        internal static int[][] leftTopCornersInvert = new int[][] { new int[] { 7, 1 } };
 
-        private static int[][] topSide = new int[][] { new int[] { 1, 0 }, new int[] { 2, 0 }, new int[] { 3, 0 }, new int[] { 4, 0 } };
+        internal static int[][] topSide = new int[][] { new int[] { 1, 0 }, new int[] { 2, 0 }, new int[] { 3, 0 }, new int[] { 4, 0 } };
 
-        private static int[][] bottomSide = new int[][] { new int[] { 1, 5 }, new int[] { 2, 5 }, new int[] { 3, 5 }, new int[] { 4, 5 } };
+        internal static int[][] bottomSide = new int[][] { new int[] { 1, 5 }, new int[] { 2, 5 }, new int[] { 3, 5 }, new int[] { 4, 5 } };
 
-        private static int[][] leftSide = new int[][] { new int[] { 0, 1 }, new int[] { 0, 2 }, new int[] { 0, 3 }, new int[] { 0, 4 } };
+        internal static int[][] leftSide = new int[][] { new int[] { 0, 1 }, new int[] { 0, 2 }, new int[] { 0, 3 }, new int[] { 0, 4 } };
 
-        private static int[][] rightSide = new int[][] { new int[] { 5, 1 }, new int[] { 5, 2 }, new int[] { 5, 3 }, new int[] { 5, 4 } };
+        internal static int[][] rightSide = new int[][] { new int[] { 5, 1 }, new int[] { 5, 2 }, new int[] { 5, 3 }, new int[] { 5, 4 } };
 
-        private static int[][] middle = new int[][] {
+        internal static int[][] middle = new int[][] {
             new int[] { 1, 1 }, new int[] { 1, 2 }, new int[] { 1, 3 }, new int[] { 1, 4 },
             new int[] { 2, 1 }, new int[] { 2, 2 }, new int[] { 2, 3 }, new int[] { 2, 4 },
             new int[] { 3, 1 }, new int[] { 3, 2 }, new int[] { 3, 3 }, new int[] { 3, 4 },
             new int[] { 4, 1 }, new int[] { 4, 2 }, new int[] { 4, 3 }, new int[] { 4, 4 }};
 
-        private static int[][] holeTopSide = new int[][] { new int[] { 1, 0 }, new int[] { 2, 0 }, new int[] { 3, 0 } };
-        private static int[][] holeBottomSide = new int[][] { new int[] { 1, 4 }, new int[] { 2, 4 }, new int[] { 3, 4 } };
-        private static int[][] holeLeftSide = new int[][] { new int[] { 0, 1 }, new int[] { 0, 2 }, new int[] { 0, 3 } };
-        private static int[][] holeRightSide = new int[][] { new int[] { 4, 1 }, new int[] { 4, 2 }, new int[] { 4, 3 } };
+        internal static int[][] holeTopSide = new int[][] { new int[] { 1, 0 }, new int[] { 2, 0 }, new int[] { 3, 0 } };
+        internal static int[][] holeBottomSide = new int[][] { new int[] { 1, 4 }, new int[] { 2, 4 }, new int[] { 3, 4 } };
+        internal static int[][] holeLeftSide = new int[][] { new int[] { 0, 1 }, new int[] { 0, 2 }, new int[] { 0, 3 } };
+        internal static int[][] holeRightSide = new int[][] { new int[] { 4, 1 }, new int[] { 4, 2 }, new int[] { 4, 3 } };
 
-        private static int[][] holeLeftTopCorner = new int[][] { new int[] { 0, 0 } };
-        private static int[][] holeRightTopCorner = new int[][] { new int[] { 4, 0 } };
-        private static int[][] holeRightBottomCorner = new int[][] { new int[] { 4, 4 } };
-        private static int[][] holeLeftBottomCorner = new int[][] { new int[] { 0, 4 } };
+        internal static int[][] holeLeftTopCorner = new int[][] { new int[] { 0, 0 } };
+        internal static int[][] holeRightTopCorner = new int[][] { new int[] { 4, 0 } };
+        internal static int[][] holeRightBottomCorner = new int[][] { new int[] { 4, 4 } };
+        internal static int[][] holeLeftBottomCorner = new int[][] { new int[] { 0, 4 } };
 
-        private static int[][] holeEmpty = new int[][] { new int[] { 1, 1 } };
+        internal static int[][] holeEmpty = new int[][] { new int[] { 1, 1 } };
 
         public Type thisType;
 

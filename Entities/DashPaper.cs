@@ -15,7 +15,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 {
     [Tracked]
     [CustomEntity("LylyraHelper/DashPaper")]
-    public class DashPaper : Paper
+    public class DashPaper : CuttablePaper
     {
         
 

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Celeste.Mod.Helpers;
-using Celeste.Mods.LylyraHelper.Intefaces;
+using Celeste.Mod.LylyraHelper.Intefaces;
 using global::Celeste;
 using global::Celeste.Mod;
 using global::Celeste.Mod.Entities;
@@ -19,7 +19,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
     [Tracked(true)]
     public class Scissors : Entity
     {
-        private List<Paper> Cutting = new List<Paper>();
+        private List<CuttablePaper> Cutting = new List<CuttablePaper>();
         private Vector2 CutDirection;
         private Vector2 initialPosition;
 
@@ -88,7 +88,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             level = SceneAs<Level>();
         }
 
-
         private void OnPlayer(Player player)
         {
             if (timeElapsed > 1)
@@ -139,12 +138,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private void CheckCollisions()
         {
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for sppeed)
-            foreach (Paper d in base.Scene.Tracker.GetEntities<DashPaper>())
+            foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DashPaper>())
             {
                 if (!Cutting.Contains(d)) if (this.CollideCheck(d)) Cutting.Add(d);
             }
 
-            foreach (Paper d in base.Scene.Tracker.GetEntities<DeathNote>())
+            foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DeathNote>())
             {
                 if (!Cutting.Contains(d)) if (this.CollideCheck(d)) Cutting.Add(d);
             }
@@ -171,7 +170,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 if (d.GetType() == typeof(CrushBlock))
                 {
-
                     if (!KevinCutting.Contains(d) && this.CollideCheck(d))
                     {
                         int x1 = (int)d.Position.X;
@@ -217,19 +215,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 if (!d.CollideCheck(this))
                 {
-                    if (!Scene.Contains(d))
-                    {
-                        return true;
-                    }
-                    if (CutDirection.Y != 0)
-                    {
-                        d.CutY(new Hole(initialPosition), CutDirection);
-                    }
-                    if (CutDirection.X != 0)
-                    {
-                        d.CutX(new Hole(initialPosition), CutDirection);
-                    }
-                    return true;
+                    return d.Cut(Position, CutDirection, cutSize);
                 }
                 return false;
             });
@@ -427,15 +413,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             Vector2 pos1, pos2, size1, size2;
             pos1 = pos2 = blockPos;
-            size1 = size2 = blockSize;
-
+            size1 = new Vector2(blockSize.X, blockSize.Y);
+            size2 = new Vector2(blockSize.X, blockSize.Y);
             if (cutDir.X != 0) //cut is horizontal
             {
                 float delY = blockPos.Y + blockSize.Y - (cutPos.Y + gapWidth / 2);
                 size2.Y = delY - Mod(delY, cutSize);
                 pos2.Y = blockPos.Y + blockSize.Y - size2.Y;
                 size1.Y = pos2.Y - pos1.Y - gapWidth;
-            } else //cut vertical
+                Logger.Log(LogLevel.Error, "CutDetails", String.Format("({0} {1}) ({2} {3}) ({4} {5}) ({6} {7}))", delY, Mod(delY, cutSize), size2.Y, pos2.Y, blockPos.Y, blockSize.Y, cutPos.Y, gapWidth / 2));
+
+            }
+            else //cut vertical
             {
                 float delX = blockPos.X + blockSize.X - (cutPos.X + gapWidth / 2);
                 size2.X = delX - Mod(delX, cutSize);
@@ -476,14 +465,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         */
         private bool Cut(Entity toCut, Vector2 cutDirection, Vector2 cutPosition, int cutWidth, Type[] breaklist, Type[] ignorelist)
         {
-            if (toCut is Cuttable cuttable)
-            {
-                return cuttable.Cut(cutDirection, cutPosition, cutWidth);
-            }
-            else //check for vanilla entity
-            {
-
-            }
+            
 
             return false;
         }

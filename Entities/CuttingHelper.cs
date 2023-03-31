@@ -1,4 +1,4 @@
-﻿using Celeste.Mods.LylyraHelper.Intefaces;
+﻿using Celeste.Mod.LylyraHelper.Intefaces;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -18,17 +18,5 @@ namespace LylyraHelper.Entities
      */
     public static class CuttingHelper
     {
-        public static bool Cut(Scene s, Entity toCut, Vector2 cutDirection, Vector2 cutPosition, int cutWidth, Type[] breaklist, Type[] ignorelist)
-        {
-            if (toCut is Cuttable cuttable)
-            {
-                return cuttable.Cut(cutDirection, cutPosition, cutWidth);
-            } else //check for vanilla entity
-            {
-
-            }
-
-            return false;
-        }
     }
 }
