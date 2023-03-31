@@ -230,7 +230,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-
         internal virtual void CutY(Hole h, Vector2 direction)
         {
             Vector2 v = h.position - Position;
@@ -285,7 +284,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
         }
-
 
         private void FindInGroup(Paper paper)
         {

@@ -37,14 +37,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
     internal override void OnDash(Vector2 direction)
     {
-        if (CanCloudSpawn())
+        if (CanActivate())
         {
             Audio.Play("event:/char/madeline/jump");
-            SpawnCloud(direction);
+            Activate(direction);
         }
     }
 
-    private void SpawnCloud(Vector2 direction)
+    internal virtual void Activate(Vector2 direction)
     {
         Audio.Play("event:/game/04_cliffside/cloud_pink_boost", Position);
         Player p = base.Scene.Tracker.GetEntity<Player>();
@@ -85,10 +85,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
             base.Scene.Add(s);
         }
-        Logger.Log("DashPaper", "Spawning Scissors!");
     }
 
-    public bool CanCloudSpawn()
+    public bool CanActivate()
     {
         Player p = base.Scene.Tracker.GetEntity<Player>();
         if (this.CollideCheck<Player>())

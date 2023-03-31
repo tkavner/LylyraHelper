@@ -215,7 +215,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             //check list for not colliding if so call Cut(X/Y)()
             Cutting.RemoveAll(d =>
             {
-                if (!d.CollideCheck(this))
+                if (!d.CollideCheck(this) && Scene.Contains(d))
                 {
                     if (CutDirection.Y != 0)
                     {
@@ -226,7 +226,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         d.CutX(new Hole(initialPosition), CutDirection);
                     }
                     return true;
-
                 }
                 return false;
             });
@@ -236,7 +235,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             if (DreamCutting.RemoveAll(d =>
             {
-                if (!d.CollideCheck(this))
+                if (!d.CollideCheck(this) && Scene.Contains(d))
                 {
                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
 
@@ -276,7 +275,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             if (FallCutting.RemoveAll(d =>
              {
-                 if (!d.CollideCheck(this))
+                 if (!d.CollideCheck(this) && Scene.Contains(d))
                  {
                      Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
                      Vector2 fb1Pos = resultArray[0];
@@ -350,9 +349,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             KevinCutting.RemoveAll(d =>
              {
-                 if (!d.CollideCheck(this))
+                 if (!d.CollideCheck(this) && Scene.Contains(d))
                  {
-
                      //get private fields
                      Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
 
