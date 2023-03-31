@@ -215,8 +215,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
             //check list for not colliding if so call Cut(X/Y)()
             Cutting.RemoveAll(d =>
             {
-                if (!d.CollideCheck(this) && Scene.Contains(d))
+                if (!d.CollideCheck(this))
                 {
+                    if (!Scene.Contains(d))
+                    {
+                        return true;
+                    }
                     if (CutDirection.Y != 0)
                     {
                         d.CutY(new Hole(initialPosition), CutDirection);
@@ -237,6 +241,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 if (!d.CollideCheck(this) && Scene.Contains(d))
                 {
+                    if (!Scene.Contains(d))
+                    {
+                        return true;
+                    }
                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
 
                     Vector2 db1Pos = resultArray[0];
@@ -275,8 +283,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             if (FallCutting.RemoveAll(d =>
              {
-                 if (!d.CollideCheck(this) && Scene.Contains(d))
+                 if (!d.CollideCheck(this))
                  {
+                     if (!Scene.Contains(d))
+                     {
+                         return true;
+                     }
                      Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
                      Vector2 fb1Pos = resultArray[0];
                      Vector2 fb2Pos = resultArray[1];
@@ -349,8 +361,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             KevinCutting.RemoveAll(d =>
             {
-                 if (!d.CollideCheck(this) && Scene.Contains(d))
+                 if (!d.CollideCheck(this))
                  {
+                    if (!Scene.Contains(d))
+                    {
+                        return true;
+                    }
                      //get private fields
                      Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
 
