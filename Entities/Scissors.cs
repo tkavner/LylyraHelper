@@ -40,6 +40,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private List<CrushBlock> KevinCutting = new List<CrushBlock>();
 
         private List<CrushBlock> KevinCuttingActivationList = new List<CrushBlock>();
+
         private bool fragile;
 
         private Level level;
@@ -286,42 +287,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
              {
                  if (!d.CollideCheck(this))
                  {
-                     Vector2 d1Position = d.Position;
-                     float d1Width = d.Width;
-                     float d1Height = d.Height;
-                     if (CutDirection.Y != 0)
-                     {
-                         d1Height = d.Height;
-                         //check for larger side
-                         if (Math.Abs(d.Position.X - this.Position.X) > Math.Abs(d.Position.X + d.Width - this.Position.X))
-                         {
-                             d1Width = Math.Abs(d.Position.X - this.Position.X);
-                         }
-                         else
-                         {
-                             d1Width = Math.Abs(d.Position.X + d.Width - this.Position.X);
-                             d1Position.X = this.Position.X;
-                         }
-                     }
-                     if (CutDirection.X != 0)
-                     {
-                         d1Height = d.Width;
-                         //check for larger side
-                         if (Math.Abs(d.Position.Y - this.Position.Y) > Math.Abs(d.Position.Y + d.Height - this.Position.Y))
-                         {
-                             d1Height = Math.Abs(d.Position.Y - this.Position.Y);
-                         }
-                         else
-                         {
-                             d1Height = Math.Abs(d.Position.Y + d.Height - this.Position.Y);
-                             d1Position.Y = this.Position.Y;
-                         }
-                     }
-                     Logger.Log("Scissors", "test");
+                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, 16);
+                     Vector2 fb1Pos = resultArray[0];
+                     Vector2 fb2Pos = resultArray[1];
+                     int fb1Width = (int)resultArray[2].X;
+                     int fb1Height = (int)resultArray[2].Y;
 
+                     int fb2Width = (int)resultArray[3].X;
+                     int fb2Height = (int)resultArray[3].Y;
 
-
-                     d.Collider = new Hitbox(d1Width, d1Height);
+                     d.Collider = new Hitbox(fb1Width, fb1Height);
 
 
                      var tiles = d.GetType().GetField("tiles", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -344,12 +319,24 @@ namespace Celeste.Mod.LylyraHelper.Entities
                      {
                          Audio.Play("event:/game/general/wall_break_stone", Position);
                      }
-                     TileGrid t = GFX.FGAutotiler.GenerateBox(tileTypeChar, (int)d1Width / 8, (int)d1Height / 8).TileGrid;
-                     d.Remove((Component)tiles.GetValue(d));
-                     d.Position = d1Position;
-                     tiles.SetValue(d, t);
-                     d.Add(t);
+                     if (fb1Width >= 8 && fb1Height >= 8)
+                     {
+                         FallingBlock fb1 = new FallingBlock(fb1Pos, tileTypeChar, fb1Width, fb1Height, false, false, true);
+                         Scene.Add(fb1);
 
+                         
+                         fb1.Triggered = true;
+                         fb1.FallDelay = 0;
+                     }
+                     if (fb2Width >= 8 && fb2Height >= 8)
+                     {
+                         FallingBlock fb2 = new FallingBlock(fb2Pos, tileTypeChar, fb2Width, fb2Height, false, false, true);
+                         Scene.Add(fb2);
+
+                         fb2.Triggered = true;
+                         fb2.FallDelay = 0;
+                     }
+                     Scene.Remove(d);
                      return true;
                  }
                  return false;
@@ -449,7 +436,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
              });
         }
 
-        private static Vector2[] CalcCuts(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int cutSize = 8)
+        public static Vector2[] CalcCuts(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int cutSize = 8)
         {
             Vector2 pos1, pos2, size1, size2;
             pos1 = pos2 = blockPos;
