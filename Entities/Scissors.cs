@@ -230,6 +230,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         d.CutX(new Hole(initialPosition), CutDirection);
                     }
                     return true;
+
                 }
                 return false;
             });
@@ -277,6 +278,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scene.Add(d1);
                     Scene.Remove(d);
                     Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
+
+                    AddParticles(d.Position, new Vector2(d.Width, d.Height));
                     return true;
                 }
                 return false;
@@ -340,6 +343,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                          fb2.Triggered = true;
                          fb2.FallDelay = 0;
                      }
+                     AddParticles(d.Position, new Vector2(d.Width, d.Height));
                      Scene.Remove(d);
                      return true;
                  }
@@ -434,6 +438,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                      {
                          //TODO: do not spawn, instead have particles show it exploding
                      }
+
+                     AddParticles(d.Position, new Vector2(d.Width, d.Height)); //i dont know why either
                      return true;
                  }
                  return false;
@@ -465,8 +471,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private void AddParticles(Vector2 position, Vector2 range)
         {
-            int numParticles = (int)(range.X * range.Y); //proportional to the area to cover
-            level.Particles.Emit(ParticleTypes.Steam, numParticles, position, range);
+            int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
+            level.ParticlesFG.Emit(ParticleTypes.Chimney, numParticles, position + new Vector2(range.X / 2, 0), new Vector2(range.X / 2, range.Y));
         }
 
         internal static void Load()
