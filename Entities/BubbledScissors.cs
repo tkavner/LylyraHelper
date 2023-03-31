@@ -148,7 +148,7 @@ namespace LylyraHelper.Entities
             Vector2 yOnly = new Vector2(0, direction.Y);
             var v1 = Position;
             var v2 = Position + direction * 100;
-            Scissors s = new Scissors(new Vector2[] { v1, v2 }, 1, 1, 0, 1, direction, gridPosition);
+            Scissors s = new Scissors(new Vector2[] { v1, v2 }, direction, gridPosition);
             base.Scene.Add(s);
             if (player.StartStarFly())
             {

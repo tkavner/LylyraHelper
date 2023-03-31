@@ -44,19 +44,25 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private bool fragile;
 
         private Level level;
+        private Shaker shaker;
 
-        public Scissors(Vector2[] nodes, int amount, int index, float offset, float speedMult, Vector2 direction, Vector2 initialPosition, bool fragile = false) : base(nodes[0])
+        public Scissors(Vector2[] nodes, Vector2 direction, Vector2 initialPosition, bool fragile = false) : this(nodes[0], direction, initialPosition, fragile)
+        {
+            
+        }
+
+        public Scissors(Vector2 Position, Vector2 direction, Vector2 initialPosition, bool fragile = false) : base(Position)
         {
             this.CutDirection = direction;
-            if (nodes[1].X - nodes[0].X > 0)
+            if (direction.X > 0)
             {
                 directionPath = "right";
             }
-            else if (nodes[1].X - nodes[0].X < 0)
+            else if (direction.X < 0)
             {
                 directionPath = "left";
             }
-            else if (nodes[1].Y - nodes[0].Y > 0)
+            else if (direction.Y > 0)
             {
                 directionPath = "down";
             }
@@ -65,9 +71,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 directionPath = "up";
             }
             this.initialPosition = initialPosition;
-            moveStartPos = nodes[0];
-            targetPos = nodes[1];
-            Position = moveStartPos;
+            this.Position = Position;
 
             sprite = new Sprite(GFX.Game, "objects/LylyraHelper/scissors/");
             sprite.AddLoop("spawn", "cut" + directionPath, 0.1F, new int[] { 0 });
@@ -79,6 +83,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.Collider = new ColliderList(new Circle(12f), new Hitbox(30F, 8f, -15f, -4f));
             Add(new PlayerCollider(OnPlayer));
             this.fragile = fragile;
+            Add(shaker = new Shaker());
         }
 
         public override void Added(Scene scene)
@@ -94,6 +99,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 player.Die((player.Position - Position).SafeNormalize());
                 Moving = false;
+                sprite.Stop();
             }
         }
 
@@ -115,7 +121,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 }
                 if (timeElapsed > 1)
                 {
-                    this.Position += (targetPos - moveStartPos).SafeNormalize() * 3;
+                    this.Position += (CutDirection).SafeNormalize() * 3;
                     sprite.CenterOrigin();
                     sprite.Visible = true;
                     sprite.Play("idle");
@@ -266,7 +272,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             d1Position.Y = this.Position.Y;
                         }
                     }
-                    Logger.Log("Scissors", "test");
                     DreamBlock d1 = new DreamBlock(d1Position, d1Width, d1Height, null, false, false);
 
                     Scene.Add(d1);
@@ -299,9 +304,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                      d.Collider = new Hitbox(fb1Width, fb1Height);
 
 
-                     var tiles = d.GetType().GetField("tiles", BindingFlags.NonPublic | BindingFlags.Instance);
-                     var tileType = d.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
-                     char tileTypeChar = (char)tileType.GetValue(d);
+                     var tileTypeField = d.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
+                     char tileTypeChar = (char)tileTypeField.GetValue(d);
 
                      if (tileTypeChar == '1')
                      {
@@ -445,13 +449,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (cutDir.X != 0) //cut is horizontal
             {
                 float delY = blockPos.Y + blockSize.Y - (cutPos.Y + gapWidth / 2);
-                size2.Y = delY - delY % cutSize;
+                size2.Y = delY - Mod(delY, cutSize);
                 pos2.Y = blockPos.Y + blockSize.Y - size2.Y;
                 size1.Y = pos2.Y - pos1.Y - gapWidth;
             } else //cut vertical
             {
                 float delX = blockPos.X + blockSize.X - (cutPos.X + gapWidth / 2);
-                size2.X = delX - delX % cutSize;
+                size2.X = delX - Mod(delX, cutSize);
                 pos2.X = blockPos.X + blockSize.X - size2.X;
                 size1.X = pos2.X - pos1.X - gapWidth;
             }
@@ -472,6 +476,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal static void Unload()
         {
         }
+
+        public override void Render()
+        {
+            Vector2 placeholder = sprite.Position;
+            if (!Moving) sprite.Position += shaker.Value;
+            base.Render();
+            sprite.Position = placeholder;
+        }
+
+
+
         /**
         * Cutting for vanilla entities is done on a case by case basis instead of calling the Cut(Vector2) method in a Cuttable item.
         * Due to the case by case nature of vanilla entities
