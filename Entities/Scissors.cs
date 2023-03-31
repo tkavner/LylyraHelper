@@ -203,14 +203,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         }
                     }
                 }
-                else
-                {
-                    if (this.CollideCheck(d))
-                    {
-                        Scene.Remove(d);
-                        Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
-                    }
-                }
             }
 
         }
@@ -410,43 +402,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
                      //Process private fields
                      CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
 
-                     Vector2 cb1Pos = d.Position;
-                     Vector2 cb2Pos = d.Position;
-                     int cb1Width, cb1Height, cb2Width, cb2Height;
 
-                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, 8);
+                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, 16);
+                     Vector2 cb1Pos = resultArray[0];
+                     Vector2 cb2Pos = resultArray[1];
+                     int cb1Width = (int)resultArray[2].X;
+                     int cb1Height = (int)resultArray[2].Y;
 
-                     if (CutDirection.Y != 0) //traveling up/down, split on width
-                     {
-                         cb1Height = cb2Height = (int)d.Collider.Height;
-                         //find relative pos of scissors
-                         Vector2 diffPos = Position - d.Position;
-                         float diffX = diffPos.X;
-                         //round to nearest 8
-                         diffX = (float)Math.Round(diffX / 8) * 8;
-                         if (diffX < 8) diffX = 8; //minimum cut size
-                         cb1Width = (int)(diffX - Collider.Width / 2);
-                         cb2Width = (int)(d.Collider.Width - diffX) - (int)(16);
-
-                         cb2Pos += new Vector2(cb1Width + 32, 0);
-                     }
-                     else
-                     {
-                         cb1Width = cb2Width = (int)d.Collider.Width;
-                         //check for larger side
-                         Vector2 diffPos = Position - d.Position;
-                         float diffY = diffPos.Y;
-                         //round to nearest 8
-                         diffY = (float)Math.Round(diffY / 8) * 8;
-                         if (diffY < 8) diffY = 8; //minimum cut size
-                         cb1Height = (int)diffY - (int)Collider.Height / 2;
-                         cb2Height = (int)(d.Collider.Height - diffY) - (int)16;
-                         cb2Pos += new Vector2(0, cb1Height + 24);
-                     }
-
+                     int cb2Width = (int)resultArray[3].X;
+                     int cb2Height = (int)resultArray[3].Y;
+                     Logger.Log("CalcCuts", String.Format("KB POS 1: ({0}, {1})KB POS 2: ({2}, {3})KB SIZE 1: ({4}, {5}) KB SIZE 2: ({6}, {7})", cb1Pos.X, cb1Pos.Y, cb2Pos.X, cb2Pos.Y, resultArray[2].X, resultArray[2].Y, resultArray[3].X, resultArray[3].Y));
                      //create cloned crushblocks + set data
-
-
+                     
                      Scene.Remove(d);
                      Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
                      if (cb1Width >= 24 && cb1Height >= 24)
@@ -482,60 +449,34 @@ namespace Celeste.Mod.LylyraHelper.Entities
              });
         }
 
-        private static Vector2[] CalcCuts(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth)
+        private static Vector2[] CalcCuts(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int cutSize = 8)
         {
             Vector2 pos1, pos2, size1, size2;
             pos1 = pos2 = blockPos;
             size1 = size2 = blockSize;
+            Logger.Log(LogLevel.Error, "CalcCuts", String.Format("blockPos 1: ({0}, {1})\nblockSize 2: ({2}, {3})\ncutPos 1: ({4}, {5})\ncutDir 2: ({6}, {7})", blockPos.X, blockPos.Y, blockSize.X, blockSize.Y, cutPos.X, cutPos.Y, cutDir.X, cutDir.Y));
+
+
             if (cutDir.X != 0) //cut is horizontal
             {
-                float x = pos1.Y + blockSize.Y;
-                float r1 = Mod(x, 8F);
-                int q1 = (int)((x - r1) / 8);
+                
 
-                float ys = cutPos.Y + gapWidth / 2 + r1;
-                float r2 = Mod(ys, 8F);
-                int q2 = (int)((ys - r2) / 8);
+                float delY = blockPos.Y + blockSize.Y - (cutPos.Y + gapWidth / 2);
 
-                float x3 = pos1.Y;
-                float r3 = Mod(x, 8F); //r1 should = r3
-                int q3 = (int)((x3 - r3) / 8);
+                size2.Y = delY - delY % cutSize;
 
-                float x4 = cutPos.Y - gapWidth / 2 + r3;
-                float r4 = Mod(r3, 8F);
-                int q4 = (int)((x4 - r4) / 8);
-
-                pos2.Y = 8 * (q2 - q1) + r1;
-
-                size1.Y = 8 * (q4 - q3);
-
-                size2.Y = blockPos.Y + blockSize.Y - pos2.Y;
+                pos2.Y = blockPos.Y + blockSize.Y - size2.Y;
+                size1.Y = pos2.Y - pos1.Y - gapWidth;
             } else //cut vertical
             {
-                float x = pos1.X + blockSize.X;
-                float r1 = Mod(x, 8F);
-                int q1 = (int)((x - r1) / 8);
+                float delX = blockPos.X + blockSize.X - (cutPos.X + gapWidth / 2);
 
-                float ys = cutPos.X + gapWidth / 2 + r1;
-                float r2 = Mod(ys, 8F);
-                int q2 = (int)((ys - r2) / 8);
+                size2.X = delX - delX % cutSize;
 
-                float x3 = pos1.X;
-                float r3 = Mod(x, 8F); //r1 should = r3
-                int q3 = (int)((x3 - r3) / 8);
-
-                float x4 = cutPos.X - gapWidth / 2 + r3;
-                float r4 = Mod(r3, 8F);
-                int q4 = (int)((x4 - r4) / 8);
-
-                pos2.X = 8 * (q2 - q1) + r1;
-
-                size1.X = 8 * (q4 - q3);
-
-                size2.X = blockPos.X + blockSize.X - pos2.X;
+                pos2.X = blockPos.X + blockSize.X - size2.X;
+                size1.X = pos2.X - pos1.X - gapWidth;
             }
-
-
+            Logger.Log(LogLevel.Error, "CalcCuts", String.Format("KB POS 1: ({0}, {1})\nKB POS 2: ({2}, {3})\nKB SIZE 1: ({4}, {5})\nKB SIZE 2: ({6}, {7})", pos1.X, pos1.Y, pos2.X, pos2.Y, size1.X, size1.Y, size2.X, size2.Y));
 
             return new Vector2[] { pos1, pos2, size1, size2 };
         }
