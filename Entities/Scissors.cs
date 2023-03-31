@@ -131,7 +131,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
 
-                AddEntititesToLists();
+                CheckCollisions();
 
                 CutPaper();
                 CutDreamBlocks();
@@ -140,7 +140,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        private void AddEntititesToLists()
+        private void CheckCollisions()
         {
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for sppeed)
             foreach (Paper d in base.Scene.Tracker.GetEntities<DashPaper>())
