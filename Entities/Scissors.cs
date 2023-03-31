@@ -454,29 +454,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Vector2 pos1, pos2, size1, size2;
             pos1 = pos2 = blockPos;
             size1 = size2 = blockSize;
-            Logger.Log(LogLevel.Error, "CalcCuts", String.Format("blockPos 1: ({0}, {1})\nblockSize 2: ({2}, {3})\ncutPos 1: ({4}, {5})\ncutDir 2: ({6}, {7})", blockPos.X, blockPos.Y, blockSize.X, blockSize.Y, cutPos.X, cutPos.Y, cutDir.X, cutDir.Y));
-
 
             if (cutDir.X != 0) //cut is horizontal
             {
-                
-
                 float delY = blockPos.Y + blockSize.Y - (cutPos.Y + gapWidth / 2);
-
                 size2.Y = delY - delY % cutSize;
-
                 pos2.Y = blockPos.Y + blockSize.Y - size2.Y;
                 size1.Y = pos2.Y - pos1.Y - gapWidth;
             } else //cut vertical
             {
                 float delX = blockPos.X + blockSize.X - (cutPos.X + gapWidth / 2);
-
                 size2.X = delX - delX % cutSize;
-
                 pos2.X = blockPos.X + blockSize.X - size2.X;
                 size1.X = pos2.X - pos1.X - gapWidth;
             }
-            Logger.Log(LogLevel.Error, "CalcCuts", String.Format("KB POS 1: ({0}, {1})\nKB POS 2: ({2}, {3})\nKB SIZE 1: ({4}, {5})\nKB SIZE 2: ({6}, {7})", pos1.X, pos1.Y, pos2.X, pos2.Y, size1.X, size1.Y, size2.X, size2.Y));
 
             return new Vector2[] { pos1, pos2, size1, size2 };
         }
