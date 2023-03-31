@@ -348,7 +348,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
             KevinCutting.RemoveAll(d =>
-             {
+            {
                  if (!d.CollideCheck(this) && Scene.Contains(d))
                  {
                      //get private fields
@@ -451,8 +451,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.Render();
             sprite.Position = placeholder;
         }
-
-
 
         /**
         * Cutting for vanilla entities is done on a case by case basis instead of calling the Cut(Vector2) method in a Cuttable item.
