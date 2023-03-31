@@ -24,13 +24,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Vector2 initialPosition;
 
         private float timeElapsed;
-        private float lerp;
-        private float lerpTime = 1F; //time to lerp over in seconds
 
-        private double rampUpTime = 0.2F;
-        private Vector2 moveStartPos;
-        private Vector2 targetPos;
-        private float speed;
         private Sprite sprite;
         private bool Moving = true;
         private bool playedAudio;
@@ -45,6 +39,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private Level level;
         private Shaker shaker;
+
+        private int cutSize = 32;
 
         public Scissors(Vector2[] nodes, Vector2 direction, Vector2 initialPosition, bool fragile = false) : this(nodes[0], direction, initialPosition, fragile)
         {
@@ -213,7 +209,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
         }
-
+        //TODO: Rewrite Cut Method for Paper
         private void CutPaper()
         {
             //check list for not colliding if so call Cut(X/Y)()
@@ -242,7 +238,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 if (!d.CollideCheck(this))
                 {
-                    Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, 16);
+                    Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
 
                     Vector2 db1Pos = resultArray[0];
                     Vector2 db2Pos = resultArray[1];
@@ -282,7 +278,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
              {
                  if (!d.CollideCheck(this))
                  {
-                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, 16);
+                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
                      Vector2 fb1Pos = resultArray[0];
                      Vector2 fb2Pos = resultArray[1];
                      int fb1Width = (int)resultArray[2].X;
@@ -290,9 +286,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                      int fb2Width = (int)resultArray[3].X;
                      int fb2Height = (int)resultArray[3].Y;
-
-                     d.Collider = new Hitbox(fb1Width, fb1Height);
-
 
                      var tileTypeField = d.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
                      char tileTypeChar = (char)tileTypeField.GetValue(d);
@@ -359,9 +352,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
              {
                  if (!d.CollideCheck(this))
                  {
-                     //Dimension Checks
-
-                     //make clone crushblocks
 
                      //get private fields
                      Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
@@ -384,8 +374,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                      //Process private fields
                      CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
 
-
-                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, 16);
+                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
                      Vector2 cb1Pos = resultArray[0];
                      Vector2 cb2Pos = resultArray[1];
                      int cb1Width = (int)resultArray[2].X;
@@ -393,7 +382,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                      int cb2Width = (int)resultArray[3].X;
                      int cb2Height = (int)resultArray[3].Y;
-                     Logger.Log("CalcCuts", String.Format("KB POS 1: ({0}, {1})KB POS 2: ({2}, {3})KB SIZE 1: ({4}, {5}) KB SIZE 2: ({6}, {7})", cb1Pos.X, cb1Pos.Y, cb2Pos.X, cb2Pos.Y, resultArray[2].X, resultArray[2].Y, resultArray[3].X, resultArray[3].Y));
                      //create cloned crushblocks + set data
                      
                      Scene.Remove(d);
@@ -405,28 +393,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
                          Scene.Add(cb1);
 
                          KevinCuttingActivationList.Add(cb1);
-                         //TODO: Add particles for the poofing / reveal of new kevins
                      }
-                     else
-                     {
-                         //TODO: do not spawn, instead have particles show it exploding
-                     }
-
                      if (cb2Width >= 24 && cb2Height >= 24)
                      {
                          CrushBlock cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
                          cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack);
                          Scene.Add(cb2);
                          KevinCuttingActivationList.Add(cb2);
-
-                         //TODO: Add particles for the poofing / reveal of new kevins
-                     }
-                     else
-                     {
-                         //TODO: do not spawn, instead have particles show it exploding
                      }
 
-                     AddParticles(d.Position, new Vector2(d.Width, d.Height)); //i dont know why either
+                     AddParticles(d.Position, new Vector2(d.Width, d.Height));
                      return true;
                  }
                  return false;
@@ -459,7 +435,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private void AddParticles(Vector2 position, Vector2 range)
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            level.ParticlesFG.Emit(ParticleTypes.Chimney, numParticles, position + new Vector2(range.X / 2, 0), new Vector2(range.X / 2, range.Y));
+            level.ParticlesFG.Emit(ParticleTypes.Chimney, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2));
         }
 
         internal static void Load()
