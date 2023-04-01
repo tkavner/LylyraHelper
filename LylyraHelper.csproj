@@ -72,11 +72,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Ahorn\entities\bubbledScsissors.jl" />
     <None Include="Ahorn\entities\deathNote.jl" />
     <None Include="Ahorn\entities\dashPaper.jl" />
     <None Include="Ahorn\entities\cloudBlock.jl" />
     <None Include="Ahorn\entities\ChessBlock.jl" />
     <None Include="Ahorn\entities\bigCloud.jl" />
+    <None Include="Lonn\dashPaper.lua" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Lonn\bubbledScissors.lua" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -21,7 +21,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
     {
         private List<CuttablePaper> Cutting = new List<CuttablePaper>();
         private Vector2 CutDirection;
-        private Vector2 initialPosition;
 
         private float timeElapsed;
 
@@ -42,12 +41,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private int cutSize = 32;
 
-        public Scissors(Vector2[] nodes, Vector2 direction, Vector2 initialPosition, bool fragile = false) : this(nodes[0], direction, initialPosition, fragile)
+        public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
             
         }
 
-        public Scissors(Vector2 Position, Vector2 direction, Vector2 initialPosition, bool fragile = false) : base(Position)
+        public Scissors(Vector2 Position, Vector2 direction, bool fragile = false) : base(Position)
         {
             this.CutDirection = direction;
             if (direction.X > 0)
@@ -66,7 +65,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 directionPath = "up";
             }
-            this.initialPosition = initialPosition;
             this.Position = Position;
 
             sprite = new Sprite(GFX.Game, "objects/LylyraHelper/scissors/");
