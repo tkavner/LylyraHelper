@@ -168,8 +168,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
 				foreach (Entity entity2 in base.Scene.Tracker.GetEntities<SeekerBarrier>())
 				{
 					entity2.Collidable = true;
-				}
-				if (CollideCheck<SeekerBarrier>())
+                }
+                if (CollideCheck<SeekerBarrier>())
 				{
 					startPop = true;
 					if (scissorSpawnDirection == Vector2.Zero)
