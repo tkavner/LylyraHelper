@@ -33,7 +33,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             p2 -= Position;
             p1 /= 8;
             p2 /= 8;
-            Logger.Log(LogLevel.Error, "LylyraHelper", String.Format("arrayresults pos1({0} {1}) arrayresults pos2({2} {3}) arrayresults size1({4} {5}) arrayresultssize2({6} {7}) position({8} {9}) p1({10} {11}) p2({12} {13}) Width/height: ({14} {15})", arrayResults[0].X, arrayResults[0].Y, arrayResults[1].X, arrayResults[1].Y, arrayResults[2].X, arrayResults[2].Y, arrayResults[3].X, arrayResults[3].Y, Position.X, Position.Y, p1.X, p1.Y, p2.X, p2.Y, Width, Height));
             for(int i = (int) p1.X; i < p2.X; i++)
             {
                 for (int j = (int)p1.Y; j < p2.Y; j++)
