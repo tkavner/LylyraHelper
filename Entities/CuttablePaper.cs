@@ -29,10 +29,29 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 p1 = arrayResults[0] + new Vector2((arrayResults[2].X > 0 ? arrayResults[2].X : 0), 0);
                 p2 = arrayResults[1] + new Vector2(0, (arrayResults[3].Y < Height ? arrayResults[3].Y : Height));
             }
+            if (direction.X > 0)
+            {
+                if (cutPosition.X < p2.X) p2.X = (int)cutPosition.X;
+            }
+            else if (direction.X < 0)
+            {
+                if (cutPosition.X > p1.X) p1.X = (int)cutPosition.X;
+            }
+
+            if (direction.Y > 0)
+            {
+                if (cutPosition.Y < p2.Y) p2.Y = (int)cutPosition.Y;
+            }
+            else if (direction.Y < 0)
+            {
+                if (cutPosition.Y > p1.Y) p1.Y = (int)cutPosition.Y;
+            }
+
             p1 -= Position;
             p2 -= Position;
             p1 /= 8;
             p2 /= 8;
+
             for(int i = (int) p1.X; i < p2.X; i++)
             {
                 for (int j = (int)p1.Y; j < p2.Y; j++)

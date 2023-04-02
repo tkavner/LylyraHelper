@@ -95,15 +95,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
             while (!breaking) yield return null;
             Moving = false;
             sprite.Play("break");
-            Collidable = false;
+            
             //Partial cut non solid entities
-            if (Cutting.Count > 0 && timeElapsed > 1)
+            if (Cutting.Count > 0 && timeElapsed > 0.5)
             {
                 foreach (CuttablePaper cp in Cutting)
                 {
                     cp.Cut(Position, CutDirection, cutSize);
                 }
             }
+            Collidable = false;
             yield return 0.75F;
             Scene.Remove(this);
             yield return null;

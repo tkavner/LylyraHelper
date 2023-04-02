@@ -363,23 +363,19 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
        public bool CollidePaper(Circle c)
         {
-            List<Vector2> pointsToCheck = new List<Vector2>();
             for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1 += 8)
             {
                 for (float f2 = c.AbsoluteTop - this.Position.Y; f2 < c.AbsoluteBottom - this.Position.Y; f2 += 8)
                 {
-                    pointsToCheck.Add(new Vector2(f1, f2));
-                }
-            }
-            foreach (Vector2 v in pointsToCheck)
-            {
-                int x = (int)v.X;
-                int y = (int)v.Y;
-                if (x >= 0 && y >= 0 && x < (int)Width && y < (int)Height)
-                {
-                    if (!this.skip[x / 8, y / 8])
+
+                    int x = (int)f1;
+                    int y = (int)f2;
+                    if (x >= 0 && y >= 0 && (int) x < (int)Width && (int) y < (int)Height)
                     {
-                        if (c.Collide(new Rectangle((int) (x + Position.X), (int) (y + Position.Y), (int)(8), (int)(8)))) return true;
+                        if (!this.skip[(int)(x / 8), (int) (y / 8)])
+                        {
+                            if (c.Collide(new Rectangle((int)(f1 + Position.X), (int)(f2 + Position.Y), (int)(8), (int)(8)))) return true;
+                        }
                     }
                 }
             }
