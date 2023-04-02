@@ -164,7 +164,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 previousPosition = base.ExactPosition;
                 MoveH(Speed.X * Engine.DeltaTime, onCollideH);
                 MoveV(Speed.Y * Engine.DeltaTime, onCollideV);
-
+				
                 foreach (Entity entity2 in base.Scene.Tracker.GetEntities<SeekerBarrier>())
                 {
                     entity2.Collidable = true;
