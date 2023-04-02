@@ -42,6 +42,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private int cutSize = 32;
         private bool breaking;
         private float breakTimer;
+        private Collider directionalCollider;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -54,17 +55,21 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (direction.X > 0)
             {
                 directionPath = "right";
+                this.directionalCollider = new Hitbox(1, 20f, 10f, -10f);
             }
             else if (direction.X < 0)
             {
                 directionPath = "left";
+                this.directionalCollider = new Hitbox(1, 20f, -10f, -10f);
             }
             else if (direction.Y > 0)
             {
                 directionPath = "down";
+                this.directionalCollider = new Hitbox(20, 1f, -10f, 10f);
             }
             else
             {
+                this.directionalCollider = new Hitbox(20, 1f, -10f, -10f);
                 directionPath = "up";
             }
             this.Position = Position;
@@ -91,8 +96,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Moving = false;
             sprite.Play("break");
             Collidable = false;
-
-            //TODO add code to early cut?
+            //Partial cut non solid entities
+            if (Cutting.Count > 0 && timeElapsed > 1)
+            {
+                foreach (CuttablePaper cp in Cutting)
+                {
+                    cp.Cut(Position, CutDirection, cutSize);
+                }
+            }
             yield return 0.75F;
             Scene.Remove(this);
             yield return null;
@@ -228,27 +239,25 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     if (d is SolidTiles)
                     {
+                        Collider tempHold = Collider;
+                        Collider = directionalCollider;
                         if (d.CollideCheck(this))
                         {
-                            Vector2 dp = Position - d.Position;
-                            if (Math.Sign(dp.X) != Math.Sign(this.CutDirection.X) || Math.Sign(dp.Y) != Math.Sign(this.CutDirection.Y))
-                            {
-                                breaking = true;
-                            }
+                            breaking = true;
                         }
+                        Collider = tempHold;
                     }
-
                 }
             }
 
         }
         //TODO: Rewrite Cut Method for Paper
-        private void CutPaper()
+        private void CutPaper(bool collisionOverride = false)
         {
             //check list for not colliding if so call Cut(X/Y)()
             Cutting.RemoveAll(d =>
             {
-                if (!d.CollideCheck(this))
+                if (!d.CollideCheck(this) || collisionOverride)
                 {
                     return d.Cut(Position, CutDirection, cutSize);
                 }
