@@ -492,18 +492,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             sprite.Position = placeholder;
         }
 
-        /**
-        * Cutting for vanilla entities is done on a case by case basis instead of calling the Cut(Vector2) method in a Cuttable item.
-        * Due to the case by case nature of vanilla entities
-        * 
-        * @return: whether or not toCut was cut
-        */
-        private bool Cut(Entity toCut, Vector2 cutDirection, Vector2 cutPosition, int cutWidth, Type[] breaklist, Type[] ignorelist)
-        {
-
-
-            return false;
-        }
         private static float Mod(float x, float m)
         {
             return (x % m + m) % m;
