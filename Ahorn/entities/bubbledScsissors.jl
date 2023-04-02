@@ -10,7 +10,7 @@ const placements = Ahorn.PlacementDict(
     )
 )
 
-sprite = "characters/theoCrystal/idle00.png"
+sprite = "object/LylyraHelper/BubbledScissors/bubble00.png"
 
 function Ahorn.selection(entity::BubbledScissors)
     x, y = Ahorn.position(entity)

@@ -40,6 +40,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Shaker shaker;
 
         private int cutSize = 32;
+        private bool breaking;
+        private float breakTimer;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -70,14 +72,30 @@ namespace Celeste.Mod.LylyraHelper.Entities
             sprite = new Sprite(GFX.Game, "objects/LylyraHelper/scissors/");
             sprite.AddLoop("spawn", "cut" + directionPath, 0.1F, new int[] { 0 });
             sprite.AddLoop("idle", "cut" + directionPath, 0.1F);
+
+            sprite.AddLoop("break", "break" + directionPath, 0.1F);
             sprite.Play("spawn");
             Add(sprite);
             sprite.CenterOrigin();
             sprite.Visible = true;
-            base.Collider = new ColliderList(new Circle(12f), new Hitbox(30F, 8f, -15f, -4f));
+            base.Collider = new ColliderList(new Circle(10F), new Hitbox(24, 4f, -12f, -2f));
             Add(new PlayerCollider(OnPlayer));
             this.fragile = fragile;
             Add(shaker = new Shaker());
+            Add(new Coroutine(Break()));
+        }
+
+        private IEnumerator Break()
+        {
+            while (!breaking) yield return null;
+            Moving = false;
+            sprite.Play("break");
+            Collidable = false;
+
+            //TODO add code to early cut?
+            yield return 0.75F;
+            Scene.Remove(this);
+            yield return null;
         }
 
         public override void Added(Scene scene)
@@ -102,34 +120,38 @@ namespace Celeste.Mod.LylyraHelper.Entities
             float oldElapsed = timeElapsed;
             timeElapsed += Engine.DeltaTime;
 
-            if (timeElapsed != oldElapsed && Moving) //check for frame advacement
+            if (timeElapsed != oldElapsed) //check for frame advacement
             {
-                if (oldElapsed == 0)
+                if(Moving)
                 {
-                    Level level = SceneAs<Level>();
-                    level.Displacement.AddBurst(Position, 0.4f, 12f, 36f, 0.5f);
-                    level.Displacement.AddBurst(Position, 0.4f, 24f, 48f, 0.5f);
-                    level.Displacement.AddBurst(Position, 0.4f, 36f, 60f, 0.5f);
-                    Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
-                }
-                if (timeElapsed > 1)
-                {
-                    this.Position += (CutDirection).SafeNormalize() * 3;
-                    sprite.CenterOrigin();
-                    sprite.Visible = true;
-                    sprite.Play("idle");
-                    if (!playedAudio)
+                    if (oldElapsed == 0)
                     {
-                        playedAudio = true;
+                        Level level = SceneAs<Level>();
+                        level.Displacement.AddBurst(Position, 0.4f, 12f, 36f, 0.5f);
+                        level.Displacement.AddBurst(Position, 0.4f, 24f, 48f, 0.5f);
+                        level.Displacement.AddBurst(Position, 0.4f, 36f, 60f, 0.5f);
+                        Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
                     }
+                    if (timeElapsed > 1)
+                    {
+                        this.Position += (CutDirection).SafeNormalize() * 3;
+                        sprite.CenterOrigin();
+                        sprite.Visible = true;
+                        sprite.Play("idle");
+                        if (!playedAudio)
+                        {
+                            playedAudio = true;
+                        }
+                    }
+                    CheckCollisions();
+
+                    CutPaper();
+                    CutDreamBlocks();
+                    CutKevins();
+                    CutFallBlocks();
                 }
 
-                CheckCollisions();
-
-                CutPaper();
-                CutDreamBlocks();
-                CutKevins();
-                CutFallBlocks();
+                
             }
         }
 
@@ -201,6 +223,19 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             FallCutting.Add((FallingBlock)d);
                         }
                     }
+                } else
+                {
+                    if (d is SolidTiles)
+                    {
+                        if (d.CollideCheck(this)) {
+                            Vector2 dp = Position - d.Position;
+                            if (Math.Sign(dp.X) != Math.Sign(this.CutDirection.X) || Math.Sign(dp.Y) != Math.Sign(this.CutDirection.Y))
+                            {
+                                breaking = true;
+                            }
+                        }
+                    }
+                        
                 }
             }
 
@@ -450,7 +485,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Render()
         {
             Vector2 placeholder = sprite.Position;
-            if (!Moving) sprite.Position += shaker.Value;
+            if (!Moving && !breaking) sprite.Position += shaker.Value;
             base.Render();
             sprite.Position = placeholder;
         }

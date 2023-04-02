@@ -19,14 +19,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Load()
         {
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
-            Scissors.Load();
-            BubbledScissors.Load();
         }
 
         public override void Unload()
         {
-            Scissors.Unload();
-            BubbledScissors.Unload();
         }
 
         public override void LoadContent(bool firstLoad)
