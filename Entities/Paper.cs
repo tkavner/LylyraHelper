@@ -307,20 +307,25 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public bool CollidePaper(Collider c)
         {
+
             if (c is Circle)
             {
+
                 return (CollidePaper(c as Circle));
             }
             else
             if (c is Hitbox)
             {
+
                 return (CollidePaper(c as Hitbox));
             } 
             else if (c is ColliderList)
             {
+
                 foreach (Collider collider in (c as ColliderList).colliders)
                 {
                     bool toReturn = false;
+
                     toReturn = CollidePaper(collider) || toReturn;
                     return toReturn;
                 }
@@ -331,15 +336,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public bool CollidePaper(Hitbox c)
         {
             List<Vector2> pointsToCheck = new List<Vector2>();
-            for (float f1 = c.Position.X - this.Position.X; f1 < c.Position.X + c.Width - this.Position.X; f1++)
+
+            for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1+=8)
             {
-                for (float f2 = c.Position.X - this.Position.X; f2 < c.Position.Y + c.Height - this.Position.Y; f2++)
+                for (float f2 = c.AbsoluteTop - this.Position.Y; f2 < c.AbsoluteBottom - this.Position.Y; f2+=8)
                 {
                     pointsToCheck.Add(new Vector2(f1, f2));
                 }
             }
-
-
 
             foreach (Vector2 v in pointsToCheck)
             {
@@ -360,9 +364,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
        public bool CollidePaper(Circle c)
         {
             List<Vector2> pointsToCheck = new List<Vector2>();
-            for (float f1 = c.AbsolutePosition.X - this.Position.X; f1 < c.AbsolutePosition.X + c.Width - this.Position.X; f1++)
+            for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1 += 8)
             {
-                for (float f2 = c.AbsolutePosition.X - this.Position.X; f2 < c.AbsolutePosition.Y + c.Height - this.Position.Y; f2++)
+                for (float f2 = c.AbsoluteTop - this.Position.Y; f2 < c.AbsoluteBottom - this.Position.Y; f2 += 8)
                 {
                     pointsToCheck.Add(new Vector2(f1, f2));
                 }
