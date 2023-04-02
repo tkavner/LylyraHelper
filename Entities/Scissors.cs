@@ -171,12 +171,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for sppeed)
             foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DashPaper>())
             {
-                if (!Cutting.Contains(d)) if (this.CollideCheck(d)) Cutting.Add(d);
+                if (!Cutting.Contains(d)) if (d.CollidePaper(this)) Cutting.Add(d);
             }
 
             foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DeathNote>())
             {
-                if (!Cutting.Contains(d)) if (this.CollideCheck(d)) Cutting.Add(d);
+                if (!Cutting.Contains(d)) if (d.CollidePaper(this)) Cutting.Add(d);
             }
 
             foreach (DreamBlock d in base.Scene.Tracker.GetEntities<DreamBlock>())
@@ -257,7 +257,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             //check list for not colliding if so call Cut(X/Y)()
             Cutting.RemoveAll(d =>
             {
-                if (!d.CollideCheck(this) || collisionOverride)
+                if (!d.CollidePaper(this) || collisionOverride)
                 {
                     return d.Cut(Position, CutDirection, cutSize);
                 }

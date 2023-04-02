@@ -302,22 +302,80 @@ namespace Celeste.Mod.LylyraHelper.Entities
         //really only used with the player so this should work?
         public bool CollidePaper(Entity e)
         {
-            Vector2[] playerPointsToCheck = new Vector2[] {
-                    (e.Position - this.Position),
-                    (e.Position + new Vector2(e.Width, 0) - this.Position),
-                    (e.Position + new Vector2(e.Width, -e.Height) - this.Position),
-                    (e.Position + new Vector2(0, -e.Height) - this.Position) };
+            return CollidePaper(e.Collider);
+        }
 
-            foreach (Vector2 v in playerPointsToCheck)
+        public bool CollidePaper(Collider c)
+        {
+            if (c is Circle)
+            {
+                return (CollidePaper(c as Circle));
+            }
+            else
+            if (c is Hitbox)
+            {
+                return (CollidePaper(c as Hitbox));
+            } 
+            else if (c is ColliderList)
+            {
+                foreach (Collider collider in (c as ColliderList).colliders)
+                {
+                    bool toReturn = false;
+                    toReturn = CollidePaper(collider) || toReturn;
+                    return toReturn;
+                }
+            }
+            return false;
+        }
+
+        public bool CollidePaper(Hitbox c)
+        {
+            List<Vector2> pointsToCheck = new List<Vector2>();
+            for (float f1 = c.Position.X - this.Position.X; f1 < c.Position.X + c.Width - this.Position.X; f1++)
+            {
+                for (float f2 = c.Position.X - this.Position.X; f2 < c.Position.Y + c.Height - this.Position.Y; f2++)
+                {
+                    pointsToCheck.Add(new Vector2(f1, f2));
+                }
+            }
+
+
+
+            foreach (Vector2 v in pointsToCheck)
             {
                 int x = (int)v.X;
                 int y = (int)v.Y;
-                Logger.Log("CloudBlock", string.Format("x: {0}, y: {1} player: {2}, {3}", x, y, e.Width, e.Height));
                 if (x >= 0 && y >= 0 && x < (int)Width && y < (int)Height)
                 {
                     if (!this.skip[x / 8, y / 8])
                     {
                         return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+       public bool CollidePaper(Circle c)
+        {
+            List<Vector2> pointsToCheck = new List<Vector2>();
+            for (float f1 = c.AbsolutePosition.X - this.Position.X; f1 < c.AbsolutePosition.X + c.Width - this.Position.X; f1++)
+            {
+                for (float f2 = c.AbsolutePosition.X - this.Position.X; f2 < c.AbsolutePosition.Y + c.Height - this.Position.Y; f2++)
+                {
+                    pointsToCheck.Add(new Vector2(f1, f2));
+                }
+            }
+            foreach (Vector2 v in pointsToCheck)
+            {
+                int x = (int)v.X;
+                int y = (int)v.Y;
+                if (x >= 0 && y >= 0 && x < (int)Width && y < (int)Height)
+                {
+                    if (!this.skip[x / 8, y / 8])
+                    {
+                        if (c.Collide(new Rectangle((int) (x + Position.X), (int) (y + Position.Y), (int)(8), (int)(8)))) return true;
                     }
                 }
             }
@@ -332,16 +390,5 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return arr[0];
         }
         
-        public class Hole
-        {
-            public float timer;
-            public Vector2 position;
-
-            public Hole(Vector2 v2)
-            {
-                timer = 5F;
-                position = v2;
-            }
-        }
     }
 }

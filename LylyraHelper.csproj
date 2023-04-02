@@ -59,13 +59,13 @@
     <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />
     <Compile Include="Entities\ChessBlock.cs" />
+    <Compile Include="Entities\PaperCollider.cs" />
     <Compile Include="Entities\CuttablePaper.cs" />
     <Compile Include="Entities\CuttingHelper.cs" />
     <Compile Include="Entities\ICuttable.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
     <Compile Include="Entities\Scissors.cs" />
     <Compile Include="Entities\DeathNote.cs" />
-    <Compile Include="Entities\CloudBlock.cs" />
     <Compile Include="Entities\DashPaper.cs" />
     <Compile Include="Entities\Paper.cs" />
     <Compile Include="LylyraHelperModule.cs" />
@@ -75,7 +75,6 @@
     <None Include="Ahorn\entities\bubbledScsissors.jl" />
     <None Include="Ahorn\entities\deathNote.jl" />
     <None Include="Ahorn\entities\dashPaper.jl" />
-    <None Include="Ahorn\entities\cloudBlock.jl" />
     <None Include="Ahorn\entities\ChessBlock.jl" />
     <None Include="Ahorn\entities\bigCloud.jl" />
     <None Include="Lonn\dashPaper.lua" />
