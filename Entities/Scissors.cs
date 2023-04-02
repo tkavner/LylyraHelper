@@ -45,7 +45,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
-            
+
         }
 
         public Scissors(Vector2 Position, Vector2 direction, bool fragile = false) : base(Position)
@@ -122,7 +122,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             if (timeElapsed != oldElapsed) //check for frame advacement
             {
-                if(Moving)
+                if (Moving)
                 {
                     if (oldElapsed == 0)
                     {
@@ -151,7 +151,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     CutFallBlocks();
                 }
 
-                
+
             }
         }
 
@@ -223,11 +223,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             FallCutting.Add((FallingBlock)d);
                         }
                     }
-                } else
+                }
+                else
                 {
                     if (d is SolidTiles)
                     {
-                        if (d.CollideCheck(this)) {
+                        if (d.CollideCheck(this))
+                        {
                             Vector2 dp = Position - d.Position;
                             if (Math.Sign(dp.X) != Math.Sign(this.CutDirection.X) || Math.Sign(dp.Y) != Math.Sign(this.CutDirection.Y))
                             {
@@ -235,7 +237,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             }
                         }
                     }
-                        
+
                 }
             }
 
@@ -341,7 +343,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                          FallingBlock fb1 = new FallingBlock(fb1Pos, tileTypeChar, fb1Width, fb1Height, false, false, true);
                          Scene.Add(fb1);
 
-                         
+
                          fb1.Triggered = true;
                          fb1.FallDelay = 0;
                      }
@@ -380,66 +382,66 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             KevinCutting.RemoveAll(d =>
             {
-                 if (!d.CollideCheck(this))
-                 {
+                if (!d.CollideCheck(this))
+                {
                     if (!Scene.Contains(d))
                     {
                         return true;
                     }
-                     //get private fields
-                     Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
+                    //get private fields
+                    Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
 
 
-                     FieldInfo[] fia = cbType?.GetFields();
-                     foreach (FieldInfo fiai in fia)
-                     {
-                         Logger.Log("Scissors", fiai.Name);
-                     }
-                     bool canMoveVertically = (bool)cbType?.GetField("canMoveVertically", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                     bool canMoveHorizontally = (bool)cbType?.GetField("canMoveHorizontally", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                     bool chillOut = (bool)cbType.GetField("chillOut", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                    FieldInfo[] fia = cbType?.GetFields();
+                    foreach (FieldInfo fiai in fia)
+                    {
+                        Logger.Log("Scissors", fiai.Name);
+                    }
+                    bool canMoveVertically = (bool)cbType?.GetField("canMoveVertically", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                    bool canMoveHorizontally = (bool)cbType?.GetField("canMoveHorizontally", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                    bool chillOut = (bool)cbType.GetField("chillOut", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
 
-                     var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                     var newReturnStack = Activator.CreateInstance(returnStack.GetType(), returnStack);
+                    var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                    var newReturnStack = Activator.CreateInstance(returnStack.GetType(), returnStack);
 
-                     Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                    Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
 
-                     //Process private fields
-                     CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
+                    //Process private fields
+                    CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
 
-                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
-                     Vector2 cb1Pos = resultArray[0];
-                     Vector2 cb2Pos = resultArray[1];
-                     int cb1Width = (int)resultArray[2].X;
-                     int cb1Height = (int)resultArray[2].Y;
+                    Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
+                    Vector2 cb1Pos = resultArray[0];
+                    Vector2 cb2Pos = resultArray[1];
+                    int cb1Width = (int)resultArray[2].X;
+                    int cb1Height = (int)resultArray[2].Y;
 
-                     int cb2Width = (int)resultArray[3].X;
-                     int cb2Height = (int)resultArray[3].Y;
-                     //create cloned crushblocks + set data
-                     
-                     Scene.Remove(d);
-                     Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
-                     if (cb1Width >= 24 && cb1Height >= 24)
-                     {
-                         CrushBlock cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
-                         cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, returnStack);
-                         Scene.Add(cb1);
+                    int cb2Width = (int)resultArray[3].X;
+                    int cb2Height = (int)resultArray[3].Y;
+                    //create cloned crushblocks + set data
 
-                         KevinCuttingActivationList.Add(cb1);
-                     }
-                     if (cb2Width >= 24 && cb2Height >= 24)
-                     {
-                         CrushBlock cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
-                         cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack);
-                         Scene.Add(cb2);
-                         KevinCuttingActivationList.Add(cb2);
-                     }
+                    Scene.Remove(d);
+                    Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
+                    if (cb1Width >= 24 && cb1Height >= 24)
+                    {
+                        CrushBlock cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
+                        cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, returnStack);
+                        Scene.Add(cb1);
 
-                     AddParticles(d.Position, new Vector2(d.Width, d.Height));
-                     return true;
-                 }
-                 return false;
-             });
+                        KevinCuttingActivationList.Add(cb1);
+                    }
+                    if (cb2Width >= 24 && cb2Height >= 24)
+                    {
+                        CrushBlock cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
+                        cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack);
+                        Scene.Add(cb2);
+                        KevinCuttingActivationList.Add(cb2);
+                    }
+
+                    AddParticles(d.Position, new Vector2(d.Width, d.Height));
+                    return true;
+                }
+                return false;
+            });
         }
 
         public static Vector2[] CalcCuts(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int cutSize = 8)
@@ -498,7 +500,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         */
         private bool Cut(Entity toCut, Vector2 cutDirection, Vector2 cutPosition, int cutWidth, Type[] breaklist, Type[] ignorelist)
         {
-            
+
 
             return false;
         }

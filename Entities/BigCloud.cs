@@ -22,14 +22,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
             this.Collider.Width = 64;
             base.Collider.Position.X = -32f;
             base.Collider.Position.Y = -5f;
-
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
             cloudData = new DynData<Cloud>(this);
-            
+
 
             // replace sprite
             Remove(cloudData.Get<Sprite>("sprite"));
