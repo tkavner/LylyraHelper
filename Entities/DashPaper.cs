@@ -103,7 +103,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     int x = (int)v.X;
                     int y = (int)v.Y;
-                    Logger.Log("CloudBlock", string.Format("x: {0}, y: {1} player: {2}, {3}", x, y, p.Width, p.Height));
                     if (x >= 0 && y >= 0 && x < (int)Width && y < (int)Height)
                     {
                         if (!this.skip[x / 8, y / 8])

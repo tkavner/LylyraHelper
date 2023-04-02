@@ -120,7 +120,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             public override void Render()
             {
                 sprite.Draw(Position);
-                Logger.Log("Cloud Block", "Rendering mini cloud");
             }
         }
 

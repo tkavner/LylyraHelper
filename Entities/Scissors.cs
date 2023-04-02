@@ -380,7 +380,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (KevinCuttingActivationList.RemoveAll(d =>
              {
                  Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
-
                  cbType.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, -CutDirection);
                  cbType.GetMethod("Attack", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(d, new object[] { -CutDirection });
                  return true;
@@ -399,13 +398,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                     //get private fields
                     Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
-
-
-                    FieldInfo[] fia = cbType?.GetFields();
-                    foreach (FieldInfo fiai in fia)
-                    {
-                        Logger.Log("Scissors", fiai.Name);
-                    }
                     bool canMoveVertically = (bool)cbType?.GetField("canMoveVertically", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
                     bool canMoveHorizontally = (bool)cbType?.GetField("canMoveHorizontally", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
                     bool chillOut = (bool)cbType.GetField("chillOut", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
@@ -465,7 +457,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 size2.Y = delY - Mod(delY, cutSize);
                 pos2.Y = blockPos.Y + blockSize.Y - size2.Y;
                 size1.Y = pos2.Y - pos1.Y - gapWidth;
-                Logger.Log(LogLevel.Error, "CutDetails", String.Format("({0} {1}) ({2} {3}) ({4} {5}) ({6} {7}))", delY, Mod(delY, cutSize), size2.Y, pos2.Y, blockPos.Y, blockSize.Y, cutPos.Y, gapWidth / 2));
 
             }
             else //cut vertical
