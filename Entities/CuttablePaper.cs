@@ -16,7 +16,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         }
 
-        public bool Cut(Vector2 cutPosition, Vector2 direction, int gapWidth)
+        //TODO: Add ability to accomodate half cut (eg: scissors start on paper)
+        public bool Cut(Vector2 cutPosition, Vector2 direction, int gapWidth, Vector2 cutStartPosition)
         {
             Vector2[] arrayResults = Scissors.CalcCuts(Position, new Vector2(Width, Height), cutPosition, direction, gapWidth); //cuts gives where the new block should exist, we want where it should not
             Vector2 p1, p2; //these points represent the cut area
@@ -45,6 +46,24 @@ namespace Celeste.Mod.LylyraHelper.Entities
             else if (direction.Y < 0)
             {
                 if (cutPosition.Y > p1.Y) p1.Y = (int)cutPosition.Y;
+            }
+
+            if (direction.X < 0)
+            {
+                if (cutStartPosition.X < p2.X) p2.X = (int)cutStartPosition.X;
+            }
+            else if (direction.X > 0)
+            {
+                if (cutStartPosition.X > p1.X) p1.X = (int)cutStartPosition.X;
+            }
+
+            if (direction.Y < 0)
+            {
+                if (cutStartPosition.Y < p2.Y) p2.Y = (int)cutStartPosition.Y;
+            }
+            else if (direction.Y > 0)
+            {
+                if (cutStartPosition.Y > p1.Y) p1.Y = (int)cutStartPosition.Y;
             }
 
             p1 -= Position;

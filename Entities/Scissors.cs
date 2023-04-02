@@ -43,6 +43,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private bool breaking;
         private float breakTimer;
         private Collider directionalCollider;
+        private Vector2 initialPosition;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -72,7 +73,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 this.directionalCollider = new Hitbox(20, 1f, -10f, -10f);
                 directionPath = "up";
             }
-            this.Position = Position;
+            this.Position = initialPosition = Position;
 
             sprite = new Sprite(GFX.Game, "objects/LylyraHelper/scissors/");
             sprite.AddLoop("spawn", "cut" + directionPath, 0.1F, new int[] { 0 });
@@ -101,7 +102,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 foreach (CuttablePaper cp in Cutting)
                 {
-                    cp.Cut(Position, CutDirection, cutSize);
+                    cp.Cut(Position, CutDirection, cutSize, initialPosition);
                 }
             }
             Collidable = false;
@@ -252,15 +253,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
         }
-        //TODO: Rewrite Cut Method for Paper
+
         private void CutPaper(bool collisionOverride = false)
         {
-            //check list for not colliding if so call Cut(X/Y)()
             Cutting.RemoveAll(d =>
             {
                 if (!d.CollidePaper(this) || collisionOverride)
                 {
-                    return d.Cut(Position, CutDirection, cutSize);
+                    return d.Cut(Position, CutDirection, cutSize, initialPosition);
                 }
                 return false;
             });
@@ -458,7 +458,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 size2.Y = delY - Mod(delY, cutSize);
                 pos2.Y = blockPos.Y + blockSize.Y - size2.Y;
                 size1.Y = pos2.Y - pos1.Y - gapWidth;
-
             }
             else //cut vertical
             {
