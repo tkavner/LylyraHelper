@@ -230,61 +230,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        internal virtual void CutY(Hole h, Vector2 direction)
-        {
-            Vector2 v = h.position - Position;
-
-            int x = (int)Math.Round(v.X / 8);
-            int y = (int)Math.Round(v.Y / 8);
-
-            int startX = direction.X > 0 ? 0 : x;
-            int endX = direction.X > 0 ? x : (int)Width / 8;
-
-            for (int i = startX; i <= endX; i++)
-            {
-                for (int j = 0; j <= (int)Height / 8; j++)
-                {
-
-                    int numx = i;
-                    int numy = j;
-
-                    if (numx >= 0 && numy >= 0 && numx < (int)Width / 8 && numy < (int)Height / 8)
-                    {
-                        skip[numx, numy] = true;
-                        holeTiles[numx, numy] = holeEmpty[0];
-                    }
-                }
-            }
-
-        }
-
-        internal virtual void CutX(Hole h, Vector2 direction)
-        {
-            Vector2 v = h.position - Position;
-            int x = (int)Math.Round(v.X / 8);
-            int y = (int)Math.Round(v.Y / 8);
-
-            int startY = direction.Y > 0 ? 0 : y;
-            int endY = direction.Y > 0 ? y : (int)Height / 8;
-
-            for (int i = 0; i <= (int)Width / 8; i++)
-            {
-                for (int j = startY; j <= endY; j++)
-                {
-
-                    int numx = i;
-                    int numy = j;
-
-                    if (numx >= 0 && numy >= 0 && numx < (int)Width / 8 && numy < (int)Height / 8)
-                    {
-                        holeTiles[numx, numy] = holeEmpty[0];
-                        skip[numx, numy] = true;
-                    }
-                }
-            }
-
-        }
-
         private void FindInGroup(Paper paper)
         {
             foreach (Paper entity in base.Scene.Tracker.GetEntities<Paper>())
