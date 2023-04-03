@@ -58,7 +58,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
             //janky hackfix but I'm not really sure how to load particles
             if (scissorShards == null)
             {
-                Chooser<MTexture> sourceChooser = new Chooser<MTexture>(GFX.Game["particles/LylyraHelper/scissorshard00"], GFX.Game["particles/LylyraHelper/scissorshard01"]);
+                Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
+                    GFX.Game["particles/LylyraHelper/scissorshard00"], 
+                    GFX.Game["particles/LylyraHelper/scissorshard01"], 
+                    GFX.Game["particles/LylyraHelper/scissorshard02"]);
                 scissorShards = new ParticleType()
                 {
                     SourceChooser = sourceChooser,
