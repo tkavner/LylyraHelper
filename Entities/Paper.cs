@@ -390,5 +390,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return arr[0];
         }
         
+        public bool TileEmpty(int x, int y)
+        {
+            if (x >= 0 && x < (int)Width / 8 && y >= 0 && y < (int)Height / 8) return skip[x, y];
+            else return true;
+        }
+
+        public bool TileExists(int x, int y)
+        {
+            return x >= 0 && x < (int)Width / 8 && y >= 0 && y < (int)Height / 8;
+        }
+
+        
     }
 }

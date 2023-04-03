@@ -17,15 +17,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
     [CustomEntity("LylyraHelper/DashPaper")]
     public class DashPaper : CuttablePaper
     {
+        private bool spawnScissors;
 
-
-        public DashPaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew")
+        public DashPaper(Vector2 position, int width, int height, bool safe, bool trapped = true, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew")
         : base(position, width, height, safe, texture)
         {
             thisType = this.GetType();
+            this.spawnScissors = true;
         }
 
-        public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, false)
+        public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, data.Bool("trapped", true), false)
         {
 
         }
@@ -51,39 +52,43 @@ namespace Celeste.Mod.LylyraHelper.Entities
             var session = SceneAs<Level>().Session;
             session.Inventory.Dashes = p.MaxDashes;
             p.Dashes = p.MaxDashes;
-            Vector2 gridPosition = new Vector2(8 * (int)(p.Position.X / 8), 8 * (int)(p.Position.Y / 8));
+            
+            if (spawnScissors)
+            {
+                Vector2 gridPosition = new Vector2(8 * (int)(p.Position.X / 8), 8 * (int)(p.Position.Y / 8));
 
-            Vector2 xOnly = new Vector2(direction.X, 0);
-            Vector2 yOnly = new Vector2(0, direction.Y);
-            if (direction.Y != 0)
-            {
-                var v1 = new Vector2(gridPosition.X, Position.Y + Height);
-                var v2 = new Vector2(gridPosition.X, Position.Y + 0);
-                Scissors s;
-                if (direction.Y < 0)
+                Vector2 xOnly = new Vector2(direction.X, 0);
+                Vector2 yOnly = new Vector2(0, direction.Y);
+                if (direction.Y != 0)
                 {
-                    s = new Scissors(new Vector2[] { v1, v2 }, yOnly, false);
+                    var v1 = new Vector2(gridPosition.X, Position.Y + Height);
+                    var v2 = new Vector2(gridPosition.X, Position.Y + 0);
+                    Scissors s;
+                    if (direction.Y < 0)
+                    {
+                        s = new Scissors(new Vector2[] { v1, v2 }, yOnly, false);
+                    }
+                    else
+                    {
+                        s = new Scissors(new Vector2[] { v2, v1 }, yOnly, false);
+                    }
+                    base.Scene.Add(s);
                 }
-                else
+                if (direction.X != 0)
                 {
-                    s = new Scissors(new Vector2[] { v2, v1 }, yOnly, false);
+                    var v1 = new Vector2(Position.X + Width, gridPosition.Y);
+                    var v2 = new Vector2(Position.X, gridPosition.Y);
+                    Scissors s;
+                    if (direction.X < 0)
+                    {
+                        s = new Scissors(new Vector2[] { v1, v2 }, xOnly, false);
+                    }
+                    else
+                    {
+                        s = new Scissors(new Vector2[] { v2, v1 }, xOnly, false);
+                    }
+                    base.Scene.Add(s);
                 }
-                base.Scene.Add(s);
-            }
-            if (direction.X != 0)
-            {
-                var v1 = new Vector2(Position.X + Width, gridPosition.Y);
-                var v2 = new Vector2(Position.X, gridPosition.Y);
-                Scissors s;
-                if (direction.X < 0)
-                {
-                    s = new Scissors(new Vector2[] { v1, v2 }, xOnly, false);
-                }
-                else
-                {
-                    s = new Scissors(new Vector2[] { v2, v1 }, xOnly, false);
-                }
-                base.Scene.Add(s);
             }
         }
 

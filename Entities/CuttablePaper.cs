@@ -30,6 +30,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 p1 = arrayResults[0] + new Vector2((arrayResults[2].X > 0 ? arrayResults[2].X : 0), 0);
                 p2 = arrayResults[1] + new Vector2(0, (arrayResults[3].Y < Height ? arrayResults[3].Y : Height));
             }
+
             if (direction.X > 0)
             {
                 if (cutPosition.X < p2.X) p2.X = (int)cutPosition.X;
@@ -66,6 +67,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 if (cutStartPosition.Y > p1.Y) p1.Y = (int)cutStartPosition.Y;
             }
 
+            AddParticles((p1), new Vector2(Math.Abs(p2.X - p1.X), Math.Abs(p2.Y - p1.Y) / 2));
+
             p1 -= Position;
             p2 -= Position;
             p1 /= 8;
@@ -82,8 +85,81 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
             }
+            //TODO: CLEAN THIS UP PLEASE
+
+            int counter1 = 0;
+            int counter2 = 0;
+            //fix top and bottom holes
+            if(direction.X != 0) for (int i = (int)p1.X - 1; i < p2.X + 1; i++)
+            {
+                for (int j = 0; j <= 1; j++)
+                {
+                    int x = i;
+                    int y1 = (int)p1.Y - j;
+                    int y2 = (int)p2.Y + j - 1;
+                    if (TileExists(x, y1))
+                    {
+                        bool emptyTop = TileEmpty(i, y1 - 1);
+
+                        bool emptyLeft = TileEmpty(i - 1, y1);
+
+                        bool emptyRight = TileEmpty(i + 1, y1);
+
+                            if (!emptyTop) holeTiles[i, y1] = holeTopSide[(counter1++ % holeTopSide.Length)];
+                            else if (emptyTop && emptyLeft && emptyRight) holeTiles[i, y1] = holeEmpty[0];
+                    }
+
+                    if (TileExists(x, y2))
+                    {
+
+                        bool emptyTop = TileEmpty(i, y2 + 1);
+
+                            bool emptyLeft = TileEmpty(i - 1, y2);
+
+                            bool emptyRight = TileEmpty(i + 1, y2);
+                            if (!emptyTop) holeTiles[i, y2] = holeBottomSide[(counter2++ % holeBottomSide.Length)];
+                            else if (emptyTop && emptyLeft && emptyRight) holeTiles[i, y2] = holeEmpty[0];
+                        }
+                }
+            }
+            else for (int i = (int)p1.Y - 1; i < p2.Y + 1; i++)
+            {
+
+                for (int j = 0; j <= 1; j++)
+                {
+                    int y = i;
+                    int x1 = (int)p1.X - j;
+                    int x2 = (int)p2.X + j - 1;
+                    if (TileExists(x1, y))
+                    {
+                        bool emptyTop = TileEmpty(x1 - 1, y);
+
+                            bool emptyLeft = TileEmpty(x1, y - 1);
+
+                            bool emptyRight = TileEmpty(x1, y + 1);
+                            if (!emptyTop) holeTiles[x1, y] = holeLeftSide[(counter1++ % holeLeftSide.Length)];
+                            else if (emptyTop && emptyLeft && emptyRight) holeTiles[x1, y] = holeEmpty[0];
+                        }
+
+                    if (TileExists(x2, y))
+                    {
+                        bool emptyTop = TileEmpty(x2 + 1, y);
+                            bool emptyLeft = TileEmpty(x2, y - 1);
+
+                            bool emptyRight = TileEmpty(x2, y + 1);
+                            if (!emptyTop) holeTiles[x2, y] = holeRightSide[(counter2++ % holeRightSide.Length)];
+                            else if (emptyTop && emptyLeft && emptyRight) holeTiles[x2, y] = holeEmpty[0];
+                        }
+                }
+            }
 
             return true;
+        }
+        private void AddParticles(Vector2 position, Vector2 range)
+        {
+            int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
+            SceneAs<Level>().ParticlesFG.Emit(ParticleTypes.Chimney, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2));
+
         }
     }
 }

@@ -2,7 +2,7 @@
 
 using ..Ahorn, Maple
 
-@mapdef Entity "LylyraHelper/DashPaper" DashPaper(x::Integer, y::Integer, width::Integer=32, height::Integer=32)
+@mapdef Entity "LylyraHelper/DashPaper" DashPaper(x::Integer, y::Integer, width::Integer=32, height::Integer=32, trapped::Bool=True)
 
 const placements = Ahorn.PlacementDict(
     "Dash Paper (Lylyra Helper)" => Ahorn.EntityPlacement(
