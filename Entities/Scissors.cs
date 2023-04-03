@@ -574,38 +574,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public override void Render()
         {
-            /*foreach (Vector2 v in cutStartPositions.Values)
-            {
-                Vector2 dv = Position - v;
-                if (CutDirection.X != 0) //we moving on the x direction
-                {
-                    if (Math.Abs(dv.X) > 10)
-                    {
-                        if (Position.X < v.X)
-                        {
-                            Draw.Rect(new Rectangle((int)X + 10, (int)(Y), (int)Math.Abs(dv.X) - 10, 1), Color.White);
-                        }
-                        else
-                        {
-                            Draw.Rect(new Rectangle((int)v.X, (int)(Y), (int)Math.Abs(dv.X) - 10, 1), Color.White);
-                        }
-                    }
-                }
-                else
-                {
-                    if (Math.Abs(dv.Y) > 10)
-                    {
-                        if (Position.Y < v.Y)
-                        {
-                            Draw.Rect(new Rectangle((int)X , (int)(Y + 10), 1, (int)Math.Abs(dv.Y) - 10), Color.White);
-                        }
-                        else
-                        {
-                            Draw.Rect(new Rectangle((int)(X - 1), (int)v.Y, 1, (int)Math.Abs(dv.Y) - 10), Color.White);
-                        }
-                    }
-                }
-            }*/
             Vector2 placeholder = sprite.Position;
             if (!Moving && !breaking) sprite.Position += shaker.Value;
             base.Render();
