@@ -16,7 +16,6 @@ using static Celeste.Mod.LylyraHelper.Entities.Paper;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
-    [Tracked(true)]
     public class Scissors : Entity
     {
         private List<CuttablePaper> Cutting = new List<CuttablePaper>();
@@ -34,6 +33,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private List<CrushBlock> KevinCuttingActivationList = new List<CrushBlock>();
 
+        private Dictionary<Entity, Vector2> cutStartPositions = new Dictionary<Entity, Vector2>();
+
         private bool fragile;
 
         private Level level;
@@ -44,6 +45,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private float breakTimer;
         private Collider directionalCollider;
         private Vector2 initialPosition;
+        private float spawnGrace = 0.5F;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -89,6 +91,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             this.fragile = fragile;
             Add(shaker = new Shaker());
             Add(new Coroutine(Break()));
+            Depth = Depths.Enemy - 400;
         }
 
         private IEnumerator Break()
@@ -96,14 +99,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             while (!breaking) yield return null;
             Moving = false;
             sprite.Play("break");
-            
+
             //Partial cut non solid entities
             if (Cutting.Count > 0 && timeElapsed > 0.5)
             {
-                foreach (CuttablePaper cp in Cutting)
-                {
-                    cp.Cut(Position, CutDirection, cutSize, initialPosition);
-                }
+                CutPaper(true);
             }
             Collidable = false;
             yield return 0.75F;
@@ -145,7 +145,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         level.Displacement.AddBurst(Position, 0.4f, 36f, 60f, 0.5f);
                         Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
                     }
-                    if (timeElapsed > 1)
+                    if (timeElapsed > spawnGrace)
                     {
                         this.Position += (CutDirection).SafeNormalize() * 3;
                         sprite.CenterOrigin();
@@ -173,12 +173,22 @@ namespace Celeste.Mod.LylyraHelper.Entities
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for sppeed)
             foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DashPaper>())
             {
-                if (!Cutting.Contains(d)) if (d.CollidePaper(this)) Cutting.Add(d);
+                if (!Cutting.Contains(d)) 
+                    if (d.CollidePaper(this))
+                    {
+                        Cutting.Add(d);
+                        cutStartPositions.Add(d, Position);
+                    }
             }
 
             foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DeathNote>())
             {
-                if (!Cutting.Contains(d)) if (d.CollidePaper(this)) Cutting.Add(d);
+                if (!Cutting.Contains(d)) 
+                    if (d.CollidePaper(this))
+                    {
+                        Cutting.Add(d);
+                        cutStartPositions.Add(d, Position);
+                    }
             }
 
             foreach (DreamBlock d in base.Scene.Tracker.GetEntities<DreamBlock>())
@@ -196,6 +206,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         y1 + d.Height <= y2))
                     {
                         DreamCutting.Add(d);
+                        cutStartPositions.Add(d, Position);
                     }
                 }
             }
@@ -216,6 +227,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             y1 + d.Height <= y2))
                         {
                             KevinCutting.Add((CrushBlock)d);
+                            cutStartPositions.Add(d, Position);
                         }
                     }
                 }
@@ -234,6 +246,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             y1 + d.Height <= y2))
                         {
                             FallCutting.Add((FallingBlock)d);
+                            cutStartPositions.Add(d, Position);
                         }
                     }
                 }
@@ -260,6 +273,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 if (!d.CollidePaper(this) || collisionOverride)
                 {
+
+                    cutStartPositions.Remove(d);
                     return d.Cut(Position, CutDirection, cutSize, initialPosition);
                 }
                 return false;
@@ -298,6 +313,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         Scene.Add(d2);
                     }
                     Scene.Remove(d);
+                    cutStartPositions.Remove(d);
                     Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
 
                     AddParticles(d.Position, new Vector2(d.Width, d.Height));
@@ -367,6 +383,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                      }
                      AddParticles(d.Position, new Vector2(d.Width, d.Height));
                      Scene.Remove(d);
+                     cutStartPositions.Remove(d);
                      return true;
                  }
                  return false;
@@ -422,6 +439,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     //create cloned crushblocks + set data
 
                     Scene.Remove(d);
+
                     Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
                     if (cb1Width >= 24 && cb1Height >= 24)
                     {
@@ -440,6 +458,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
 
                     AddParticles(d.Position, new Vector2(d.Width, d.Height));
+
+                    cutStartPositions.Remove(d);
                     return true;
                 }
                 return false;
@@ -486,10 +506,44 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public override void Render()
         {
+            foreach (Vector2 v in cutStartPositions.Values)
+            {
+                Vector2 dv = Position - v;
+                if (CutDirection.X != 0) //we moving on the x direction
+                {
+                    if (Math.Abs(dv.X) > 10)
+                    {
+                        if (Position.X < v.X)
+                        {
+                            Draw.Rect(new Rectangle((int)X + 10, (int)(Y - 2), (int)Math.Abs(dv.X) - 10, 4), Color.White);
+                        }
+                        else
+                        {
+                            Draw.Rect(new Rectangle((int)v.X, (int)(Y - 2), (int)Math.Abs(dv.X) - 10, 4), Color.White);
+                        }
+                    }
+                }
+                else
+                {
+                    if (Math.Abs(dv.Y) > 10)
+                    {
+                        if (Position.Y < v.Y)
+                        {
+                            Draw.Rect(new Rectangle((int)X -2 , (int)(Y + 10), 4, (int)Math.Abs(dv.Y) - 10), Color.White);
+                        }
+                        else
+                        {
+                            Draw.Rect(new Rectangle((int)(X - 2), (int)v.Y, 4, (int)Math.Abs(dv.Y) - 10), Color.White);
+                        }
+                    }
+                }
+
+            }
             Vector2 placeholder = sprite.Position;
             if (!Moving && !breaking) sprite.Position += shaker.Value;
             base.Render();
             sprite.Position = placeholder;
+            
         }
 
         private static float Mod(float x, float m)

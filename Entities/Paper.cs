@@ -74,7 +74,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Visible = true;
 
             Logger.Log("CloudBlock", "Initialized");
-            Depth = Depths.BGDecals;
+            Depth = Depths.SolidsBelow + 200;
             skip = new bool[width / 8, height / 8];
             tiles = new int[width / 8, height / 8][];
             holeTiles = new int[width / 8, height / 8][];
