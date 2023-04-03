@@ -46,6 +46,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Collider directionalCollider;
         private Vector2 initialPosition;
         private float spawnGrace = 0.5F;
+        private static ParticleType scissorShards;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -54,25 +55,47 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public Scissors(Vector2 Position, Vector2 direction, bool fragile = false) : base(Position)
         {
+            //janky hackfix but I'm not really sure how to load particles
+            if (scissorShards == null)
+            {
+                Chooser<MTexture> sourceChooser = new Chooser<MTexture>(GFX.Game["particles/LylyraHelper/scissorshard00"], GFX.Game["particles/LylyraHelper/scissorshard01"]);
+                scissorShards = new ParticleType()
+                {
+                    SourceChooser = sourceChooser,
+                    Color = Color.White,
+                    Acceleration = new Vector2(0f, 4f),
+                    LifeMin = 0.4f,
+                    LifeMax = 1.2f,
+                    Size = .8f,
+                    SizeRange = 0.2f,
+                    Direction = (float)Math.PI / 2f,
+                    DirectionRange = 0.5f,
+                    SpeedMin = 5f,
+                    SpeedMax = 15f,
+                    RotationMode = ParticleType.RotationModes.Random,
+                    ScaleOut = true,
+                    UseActualDeltaTime = true
+                };
+            }
             this.CutDirection = direction;
             if (direction.X > 0)
             {
                 directionPath = "right";
-                this.directionalCollider = new Hitbox(1, 20f, 10f, -10f);
+                this.directionalCollider = new Hitbox(1, 6f, 10f, -3f);
             }
             else if (direction.X < 0)
             {
                 directionPath = "left";
-                this.directionalCollider = new Hitbox(1, 20f, -10f, -10f);
+                this.directionalCollider = new Hitbox(1, 6f, -10f, -3f);
             }
             else if (direction.Y > 0)
             {
                 directionPath = "down";
-                this.directionalCollider = new Hitbox(20, 1f, -10f, 10f);
+                this.directionalCollider = new Hitbox(6, 1f, -3f, 10f);
             }
             else
             {
-                this.directionalCollider = new Hitbox(20, 1f, -10f, -10f);
+                this.directionalCollider = new Hitbox(6, 1f, -3f, -10f);
                 directionPath = "up";
             }
             this.Position = initialPosition = Position;
@@ -86,7 +109,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Add(sprite);
             sprite.CenterOrigin();
             sprite.Visible = true;
-            base.Collider = new ColliderList(new Circle(10F), new Hitbox(24, 4f, -12f, -2f));
+            base.Collider = new Circle(10F);
             Add(new PlayerCollider(OnPlayer));
             this.fragile = fragile;
             Add(shaker = new Shaker());
@@ -101,7 +124,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             sprite.Play("break");
 
             //Partial cut non solid entities
-            if (Cutting.Count > 0 && timeElapsed > 0.5)
+            if (Cutting.Count > 0 && timeElapsed > spawnGrace)
             {
                 CutPaper(true);
             }
@@ -119,7 +142,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private void OnPlayer(Player player)
         {
-            if (timeElapsed > 1)
+            if (timeElapsed > spawnGrace)
             {
                 player.Die((player.Position - Position).SafeNormalize());
                 Moving = false;
@@ -162,6 +185,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     CutDreamBlocks();
                     CutKevins();
                     CutFallBlocks();
+
+                    if (cutStartPositions.Count > 0 && timeElapsed > spawnGrace + 0.1F)
+                    {
+                        level.ParticlesFG.Emit(scissorShards, GetDirectionalPosition());
+                    }
                 }
 
 
@@ -206,7 +234,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         y1 + d.Height <= y2))
                     {
                         DreamCutting.Add(d);
-                        cutStartPositions.Add(d, Position);
+                        cutStartPositions.Add(d, GetDirectionalPosition());
                     }
                 }
             }
@@ -227,7 +255,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             y1 + d.Height <= y2))
                         {
                             KevinCutting.Add((CrushBlock)d);
-                            cutStartPositions.Add(d, Position);
+                            cutStartPositions.Add(d, GetDirectionalPosition());
                         }
                     }
                 }
@@ -246,7 +274,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             y1 + d.Height <= y2))
                         {
                             FallCutting.Add((FallingBlock)d);
-                            cutStartPositions.Add(d, Position);
+                            cutStartPositions.Add(d, GetDirectionalPosition());
                         }
                     }
                 }
@@ -267,6 +295,27 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         }
 
+        private Vector2 GetDirectionalPosition()
+        {
+            if (CutDirection.X > 0)
+            {
+                return Position + new Vector2(6, 0);
+            } 
+            else if (CutDirection.X < 0)
+            {
+
+                return Position + new Vector2(-6, 0);
+            }
+            else if (CutDirection.Y > 0)
+            {
+                return Position + new Vector2(0, 6);
+            }
+            else 
+            {
+                return Position + new Vector2(0, -6);
+            }
+        }
+
         private void CutPaper(bool collisionOverride = false)
         {
             Cutting.RemoveAll(d =>
@@ -275,7 +324,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
 
                     cutStartPositions.Remove(d);
-                    return d.Cut(Position, CutDirection, cutSize, initialPosition);
+                    return d.Cut(GetDirectionalPosition(), CutDirection, cutSize, initialPosition);
                 }
                 return false;
             });
@@ -334,6 +383,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                  {
                      if (!Scene.Contains(d))
                      {
+                         cutStartPositions.Remove(d);
+
                          return true;
                      }
                      Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
@@ -412,6 +463,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     if (!Scene.Contains(d))
                     {
+                        cutStartPositions.Remove(d);
+
                         return true;
                     }
                     //get private fields
@@ -494,19 +547,22 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
             level.ParticlesFG.Emit(ParticleTypes.Chimney, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2));
+            
         }
 
         internal static void Load()
         {
+            
         }
 
         internal static void Unload()
         {
+            scissorShards = null;
         }
 
         public override void Render()
         {
-            foreach (Vector2 v in cutStartPositions.Values)
+            /*foreach (Vector2 v in cutStartPositions.Values)
             {
                 Vector2 dv = Position - v;
                 if (CutDirection.X != 0) //we moving on the x direction
@@ -515,11 +571,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     {
                         if (Position.X < v.X)
                         {
-                            Draw.Rect(new Rectangle((int)X + 10, (int)(Y - 2), (int)Math.Abs(dv.X) - 10, 4), Color.White);
+                            Draw.Rect(new Rectangle((int)X + 10, (int)(Y), (int)Math.Abs(dv.X) - 10, 1), Color.White);
                         }
                         else
                         {
-                            Draw.Rect(new Rectangle((int)v.X, (int)(Y - 2), (int)Math.Abs(dv.X) - 10, 4), Color.White);
+                            Draw.Rect(new Rectangle((int)v.X, (int)(Y), (int)Math.Abs(dv.X) - 10, 1), Color.White);
                         }
                     }
                 }
@@ -529,16 +585,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     {
                         if (Position.Y < v.Y)
                         {
-                            Draw.Rect(new Rectangle((int)X -2 , (int)(Y + 10), 4, (int)Math.Abs(dv.Y) - 10), Color.White);
+                            Draw.Rect(new Rectangle((int)X , (int)(Y + 10), 1, (int)Math.Abs(dv.Y) - 10), Color.White);
                         }
                         else
                         {
-                            Draw.Rect(new Rectangle((int)(X - 2), (int)v.Y, 4, (int)Math.Abs(dv.Y) - 10), Color.White);
+                            Draw.Rect(new Rectangle((int)(X - 1), (int)v.Y, 1, (int)Math.Abs(dv.Y) - 10), Color.White);
                         }
                     }
                 }
-
-            }
+            }*/
             Vector2 placeholder = sprite.Position;
             if (!Moving && !breaking) sprite.Position += shaker.Value;
             base.Render();
