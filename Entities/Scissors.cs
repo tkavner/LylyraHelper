@@ -191,13 +191,23 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         level.ParticlesFG.Emit(scissorShards, GetDirectionalPosition());
                     }
                 }
-
+                Rectangle bounds = SceneAs<Level>().Bounds;
+                if (Top < bounds.Bottom ||
+                    Bottom > bounds.Top ||
+                    Right < bounds.Left ||
+                    Left > bounds.Right)
+                {
+                    Scene.Remove();
+                }
 
             }
         }
 
         private void CheckCollisions()
         {
+
+            Collider tempHold = Collider;
+            Collider = directionalCollider;
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for sppeed)
             foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DashPaper>())
             {
@@ -282,16 +292,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     if (d is SolidTiles)
                     {
-                        Collider tempHold = Collider;
-                        Collider = directionalCollider;
                         if (d.CollideCheck(this))
                         {
                             breaking = true;
                         }
-                        Collider = tempHold;
                     }
                 }
             }
+
+            Collider = tempHold;
 
         }
 
