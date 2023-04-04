@@ -46,7 +46,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Collider directionalCollider;
         private Vector2 initialPosition;
         private float spawnGrace = 0.5F;
-        private static ParticleType scissorShards;
+        public static ParticleType scissorShards;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {

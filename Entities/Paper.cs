@@ -52,22 +52,34 @@ namespace Celeste.Mod.LylyraHelper.Entities
             new int[] { 4, 1 }, new int[] { 4, 2 }, new int[] { 4, 3 }, new int[] { 4, 4 }};
 
         internal static int[][] holeTopSide = new int[][] { new int[] { 1, 0 }, new int[] { 2, 0 }, new int[] { 3, 0 } };
+
+        internal static int[][] holeTopSideLeftEdge = new int[][] { new int[] { 1, 1 } };
+        internal static int[][] holeTopSideRightEdge = new int[][] { new int[] { 1, 2 } };
         internal static int[][] holeBottomSide = new int[][] { new int[] { 1, 4 }, new int[] { 2, 4 }, new int[] { 3, 4 } };
+        internal static int[][] holeBottomSideLeftEdge = new int[][] { new int[] { 2, 3 } };
+        internal static int[][] holeBottomSideRightEdge = new int[][] { new int[] { 3, 3 } };
         internal static int[][] holeLeftSide = new int[][] { new int[] { 0, 1 }, new int[] { 0, 2 }, new int[] { 0, 3 } };
+        internal static int[][] holeLeftSideTopEdge = new int[][] { new int[] { 3, 1 } };
+        internal static int[][] holeLeftSideBottomEdge = new int[][] { new int[] { 3, 2 } };
         internal static int[][] holeRightSide = new int[][] { new int[] { 4, 1 }, new int[] { 4, 2 }, new int[] { 4, 3 } };
+        internal static int[][] holeRightSideTopEdge = new int[][] { new int[] { 1, 2 } };
+        internal static int[][] holeRightSideBottomEdge = new int[][] { new int[] { 1, 3 } };
 
         internal static int[][] holeLeftTopCorner = new int[][] { new int[] { 0, 0 } };
         internal static int[][] holeRightTopCorner = new int[][] { new int[] { 4, 0 } };
         internal static int[][] holeRightBottomCorner = new int[][] { new int[] { 4, 4 } };
         internal static int[][] holeLeftBottomCorner = new int[][] { new int[] { 0, 4 } };
 
-        internal static int[][] holeEmpty = new int[][] { new int[] { 1, 1 } };
+
+
+        internal static int[][] holeEmpty = new int[][] { new int[] { 2, 2 } };
 
         public Type thisType;
 
         public Paper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew")
         : base(position)
         {
+
             thisType = this.GetType();
             base.Collider = new Hitbox(width, height);
             Collidable = true;
