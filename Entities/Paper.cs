@@ -278,23 +278,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     if (!skip[i, j])
                     {
-                        texSplice[tiles[i, j][0], tiles[i, j][1]].DrawOutline(Position + new Vector2(i * 8, j * 8));
-                    }
-                    else
-                    {
-                        if (holeTiles[i, j] != holeEmpty[0])
-                        {
-                            holeTexSplice[holeTiles[i, j][0], holeTiles[i, j][1]].DrawOutline(Position + new Vector2(i * 8, j * 8));
-                        }
-                    }
-                }
-            }
-            for (int i = 0; i < (int)Width / 8; i++)
-            {
-                for (int j = 0; j < (int)Height / 8; j++)
-                {
-                    if (!skip[i, j])
-                    {
                         texSplice[tiles[i, j][0], tiles[i, j][1]].Draw(Position + new Vector2(i * 8, j * 8));
                     }
                     else
