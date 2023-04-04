@@ -18,15 +18,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
     public class DashPaper : CuttablePaper
     {
         private bool spawnScissors;
+        private bool fragileScissors;
 
-        public DashPaper(Vector2 position, int width, int height, bool safe, bool trapped = true, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
+        public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
         : base(position, width, height, safe, texture, gapTexture)
         {
             thisType = this.GetType();
             this.spawnScissors = true;
+            this.fragileScissors = fragileScissors;
         }
 
-        public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, data.Bool("trapped", true), false)
+        public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, false, data.Bool("spawnScissors", true), data.Bool("fragileScissors", true))
         {
 
         }
@@ -66,11 +68,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scissors s;
                     if (direction.Y < 0)
                     {
-                        s = new Scissors(new Vector2[] { v1, v2 }, yOnly, false);
+                        s = new Scissors(new Vector2[] { v1, v2 }, yOnly, fragileScissors);
                     }
                     else
                     {
-                        s = new Scissors(new Vector2[] { v2, v1 }, yOnly, false);
+                        s = new Scissors(new Vector2[] { v2, v1 }, yOnly, fragileScissors);
                     }
                     base.Scene.Add(s);
                 }
@@ -81,11 +83,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scissors s;
                     if (direction.X < 0)
                     {
-                        s = new Scissors(new Vector2[] { v1, v2 }, xOnly, false);
+                        s = new Scissors(new Vector2[] { v1, v2 }, xOnly, fragileScissors);
                     }
                     else
                     {
-                        s = new Scissors(new Vector2[] { v2, v1 }, xOnly, false);
+                        s = new Scissors(new Vector2[] { v2, v1 }, xOnly, fragileScissors);
                     }
                     base.Scene.Add(s);
                 }

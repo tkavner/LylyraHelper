@@ -10,7 +10,7 @@ local axesOptions = {
     Horizontal = "horizontal"
 }
 
-paper.name = "crushBlock"
+paper.name = "dashPaper"
 paper.depth = 0
 paper.minimumSize = {24, 24}
 paper.fieldInformation = {
@@ -75,7 +75,7 @@ function paper.sprite(room, entity)
     return sprites
 end
 
-function kevin.rotate(room, entity, direction)
+function paper.rotate(room, entity, direction)
     local axes = (entity.axes or ""):lower()
 
     if axes == "horizontal" then
@@ -88,4 +88,4 @@ function kevin.rotate(room, entity, direction)
     return true
 end
 
-return kevin
+return paper

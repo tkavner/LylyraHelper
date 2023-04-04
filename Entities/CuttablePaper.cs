@@ -11,7 +11,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 {
     public class CuttablePaper : Paper, ICuttable
     {
-        private static ParticleType paperScraps;
+        public static ParticleType paperScraps;
         internal Color color = Calc.HexToColor("ffa2b7");
 
         public CuttablePaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")

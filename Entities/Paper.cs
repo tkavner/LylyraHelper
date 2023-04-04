@@ -79,7 +79,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public Paper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
         : base(position)
         {
-
             thisType = this.GetType();
             base.Collider = new Hitbox(width, height);
             Collidable = true;
@@ -273,7 +272,23 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Render()
         {
             base.Render();
-
+            for (int i = 0; i < (int)Width / 8; i++)
+            {
+                for (int j = 0; j < (int)Height / 8; j++)
+                {
+                    if (!skip[i, j])
+                    {
+                        texSplice[tiles[i, j][0], tiles[i, j][1]].DrawOutline(Position + new Vector2(i * 8, j * 8));
+                    }
+                    else
+                    {
+                        if (holeTiles[i, j] != holeEmpty[0])
+                        {
+                            holeTexSplice[holeTiles[i, j][0], holeTiles[i, j][1]].DrawOutline(Position + new Vector2(i * 8, j * 8));
+                        }
+                    }
+                }
+            }
             for (int i = 0; i < (int)Width / 8; i++)
             {
                 for (int j = 0; j < (int)Height / 8; j++)

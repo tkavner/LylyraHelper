@@ -377,7 +377,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     cutStartPositions.Remove(d);
                     Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
 
-                    AddParticles(d.Position, new Vector2(d.Width, d.Height));
+                    AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("000000"));
                     return true;
                 }
                 return false;
@@ -444,7 +444,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                          fb2.Triggered = true;
                          fb2.FallDelay = 0;
                      }
-                     AddParticles(d.Position, new Vector2(d.Width, d.Height));
+                     AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("444444"));
                      Scene.Remove(d);
                      cutStartPositions.Remove(d);
                      return true;
@@ -522,7 +522,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         KevinCuttingActivationList.Add(cb2);
                     }
 
-                    AddParticles(d.Position, new Vector2(d.Width, d.Height));
+                    AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("62222b"));
 
                     cutStartPositions.Remove(d);
                     return true;
@@ -555,10 +555,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return new Vector2[] { pos1, pos2, size1, size2 };
         }
 
-        private void AddParticles(Vector2 position, Vector2 range)
+        private void AddParticles(Vector2 position, Vector2 range, Color color)
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            level.ParticlesFG.Emit(ParticleTypes.Chimney, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2));
+            level.ParticlesFG.Emit(CuttablePaper.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
             
         }
 

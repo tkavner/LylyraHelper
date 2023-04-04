@@ -2,7 +2,7 @@
 
 using ..Ahorn, Maple
 
-@mapdef Entity "LylyraHelper/BubbledScissors" BubbledScissors(x::Integer, y::Integer, fragile::Bool=true)
+@mapdef Entity "LylyraHelper/BubbledScissors (WIP)" BubbledScissors(x::Integer, y::Integer, fragile::Bool=true)
 
 const placements = Ahorn.PlacementDict(
     "BubbledScissors (LylyraHelper)" => Ahorn.EntityPlacement(
