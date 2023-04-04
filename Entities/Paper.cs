@@ -76,7 +76,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public Type thisType;
 
-        public Paper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew")
+        public Paper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
         : base(position)
         {
 
@@ -99,7 +99,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 }
             }
             MTexture cloudTexturesUnsliced = GFX.Game[texture];
-            MTexture holeTexturesUnsliced = GFX.Game["objects/LylyraHelper/cloudBlock/cloudblockgap"];
+            MTexture holeTexturesUnsliced = GFX.Game[gapTexture];
 
             Add(new DashListener(OnDash));
             Add(new PlayerCollider(OnPlayer));

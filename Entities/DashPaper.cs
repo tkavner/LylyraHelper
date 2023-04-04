@@ -19,8 +19,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
     {
         private bool spawnScissors;
 
-        public DashPaper(Vector2 position, int width, int height, bool safe, bool trapped = true, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew")
-        : base(position, width, height, safe, texture)
+        public DashPaper(Vector2 position, int width, int height, bool safe, bool trapped = true, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
+        : base(position, width, height, safe, texture, gapTexture)
         {
             thisType = this.GetType();
             this.spawnScissors = true;

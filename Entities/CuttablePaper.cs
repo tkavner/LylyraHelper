@@ -12,9 +12,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
     public class CuttablePaper : Paper, ICuttable
     {
         private static ParticleType paperScraps;
+        internal Color color = Calc.HexToColor("ffa2b7");
 
-        public CuttablePaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew")
-        : base(position, width, height, safe, texture)
+        public CuttablePaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
+        : base(position, width, height, safe, texture, gapTexture)
         {
             if (paperScraps == null)
             {
@@ -25,7 +26,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 paperScraps = new ParticleType()
                 {
                     SourceChooser = sourceChooser,
-                    Color = Color.White,
+                    Color = color,
                     Acceleration = new Vector2(0f, 4f),
                     LifeMin = 0.4f,
                     LifeMax = 1.2f,
@@ -119,7 +120,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             if (j < furthestTop) furthestTop = j;
                             if (j > furthestDown) furthestDown = j;
 
-                            SceneAs<Level>().ParticlesFG.Emit(paperScraps, 1, Position + new Vector2(i * 8 + 4, j * 8 + 4), new Vector2(4));
+                            SceneAs<Level>().ParticlesFG.Emit(paperScraps, 1, Position + new Vector2(i * 8 + 4, j * 8 + 4), new Vector2(4), color);
                         }
                         
                         skip[i, j] = true;
