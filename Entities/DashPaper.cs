@@ -19,16 +19,43 @@ namespace Celeste.Mod.LylyraHelper.Entities
     {
         private bool spawnScissors;
         private bool fragileScissors;
+        private Random r = new Random(); //for particle gen only
+        private int particleEmitPoints;
+        private static ParticleType scissorScraps;
 
         public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
         : base(position, width, height, safe, texture, gapTexture)
         {
             thisType = this.GetType();
-            this.spawnScissors = true;
-            this.fragileScissors = fragileScissors;
+            this.spawnScissors = spawnScissors;
+            this.fragileScissors = fragileScissors; 
+            if (scissorScraps == null)
+            {
+                Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
+                    GFX.Game["particles/LylyraHelper/dashpapershard00"],
+                    GFX.Game["particles/LylyraHelper/dashpapershard01"],
+                    GFX.Game["particles/LylyraHelper/dashpapershard02"]);
+                scissorScraps = new ParticleType()
+                {
+                    SourceChooser = sourceChooser,
+                    Color = color,
+                    Acceleration = new Vector2(0f, 4f),
+                    LifeMin = 0.8f,
+                    LifeMax = 1.6f,
+                    Size = .8f,
+                    SizeRange = 0.2f,
+                    Direction = (float)Math.PI / 2f,
+                    DirectionRange = (float)Math.PI * 2F,
+                    SpeedMin = 5f,
+                    SpeedMax = 7F,
+                    RotationMode = ParticleType.RotationModes.Random,
+                    ScaleOut = true,
+                    UseActualDeltaTime = true
+                };
+            }
         }
 
-        public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, false, data.Bool("spawnScissors", true), data.Bool("fragileScissors", true))
+        public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, false, data.Bool("spawnScissors", true), data.Bool("fragileScissors", false))
         {
 
         }
@@ -36,6 +63,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Update()
         {
             base.Update();
+            if (spawnScissors)
+            {
+                int i = r.Next(0, (int) Width / 8);
+                int j = r.Next(0, (int) Height / 8);
+                particleEmitPoints += (int)(Width * Height);
+                if (!skip[i, j] && particleEmitPoints > 40000)
+                {
+                    particleEmitPoints -= 40000;
+                    SceneAs<Level>().ParticlesFG.Emit(scissorScraps, 1, Position + new Vector2(i * 8, j * 8), Vector2.Zero, Color.White);
+                }
+
+            }
         }
 
         internal override void OnDash(Vector2 direction)

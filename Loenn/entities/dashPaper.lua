@@ -21,7 +21,8 @@ table.insert(paper.placements, {
 
 
 local frameTextures = {
-    none = "objects/LylyraHelper/dashPaper/cloudblocknew9tile",
+    none = "objects/LylyraHelper/dashpaper/cloudblocknew9tile",
+	scissors = "objects/LylyraHelper/dashpaper/cloudblocknewScissors9tile" 
 }
 
 local ninePatchOptions = {
@@ -37,13 +38,16 @@ function paper.sprite(room, entity)
 	
 
     local frameTexture = frameTextures["none"]
+	if (entity.spawnScissors)
+	then
+		frameTexture = frameTextures["scissors"]
+	end
     local ninePatch = drawableNinePatch.fromTexture(frameTexture, ninePatchOptions, x, y, width, height)
 
-    local rectangle = drawableRectangle.fromRectangle("fill", x + 2, y + 2, width - 4, height - 4, kevinColor)
+    local rectangle = drawableRectangle.fromRectangle("fill", x + 2, y + 2, width - 4, height - 4, papercolor)
 
     local sprites = ninePatch:getDrawableSprite()
 
-    table.insert(sprites, 1, rectangle:getDrawableSprite())
 
     return sprites
 end

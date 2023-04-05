@@ -253,10 +253,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             return true;
         }
-        private void AddParticles(Vector2 position, Vector2 range)
+        public void AddParticles(Vector2 position, Vector2 range)
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            SceneAs<Level>().ParticlesFG.Emit(ParticleTypes.Chimney, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2));
+            SceneAs<Level>().ParticlesFG.Emit(paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
 
         }
     }
