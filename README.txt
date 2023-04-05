@@ -1,12 +1,8 @@
 README
 
-This file is an explanation of Entities and names in LylyraHelper. Feel free to redraw whatever you want, although the Paper varieties and BubbleScissors Crystal are the most dire in my opinion. Scissor animations I think look okay but definately willing to replace them because I know you make good stuff. Scissors should have baked in outlines, Paper should not (will be added in code for dynamic outlines)
+This file is an explanation of Entities and names in LylyraHelper. Feel free to redraw whatever you want, although the Paper varieties and BubbleScissors Crystal are the most dire in my opinion. Scissor animations I think look okay but definately willing to replace them because I know you make good stuff. Scissors 
 
-This contains a full pre-release for Lylyra Helper, meaning you should be able to place anything in a map the somewhat jank and deprecated Ahorn implementation, although DashPaper and BubbledScissors do have functional Lonn Files and DashPaper should be placed from Lonn.
-
-Try not to play with the ChessBlocks. Those should be in a seperate helper and are currently a secret (not so good secret to those in SJ) but I somehow started making them in here a long time ago. I don't remember why. I would simply remove them + other dead files but I am honestly feeling pretty bad right now and the last thing I want to do is test to make sure the code still work after removing them.
-
-Try to keep this stuff secret to those outside SJ.
+This contains a full pre-release for Lylyra Helper, meaning you should be able to place anything with it in Loenn. Ahorn Files are dead and jank; don't use Ahorn.
 
 ///////////////////
 Basic Terminology:
@@ -50,14 +46,23 @@ Scissor animation notes: kinda cursed, uses a 64 x 64 texture so I can easily im
 Paper Textures: Currently a 9 tile for Lonn and a custom tileset png thing for Celeste. Will be switching over entirely to a 9 tile (unless a cool tileset is made). Additionally needs a gap png which contains the rough cutting edges you see in the video. its a 5x5 tile array. Special cases occur when a rough edge / gap tile needs to go on the edge. These go in a 3 x3 ring in the middle of the file.
 Current Tileset images are as follows:
 
-DashPaper: objects/LylyraHelper/dashpaper/cloudblocknew.png, objects/LylyraHelper/dashpaper/cloudblocknew9Tile.png, objects/LylyraHelper/dashpaper/cloudblockgap.png
-DeathNote: objects/LylyraHelper/dashpaper/deathnote.png, objects/LylyraHelper/dashpaper/deathnotegap.png
+DashPaper: 
+
+objects/LylyraHelper/dashpaper/cloudblocknew.png, 
+objects/LylyraHelper/dashpaper/cloudblocknew9Tile.png, 
+objects/LylyraHelper/dashpaper/cloudblockgap.png
+
+DeathNote: 
+
+objects/LylyraHelper/dashpaper/deathnote.png, 
+objects/LylyraHelper/dashpaper/deathnotegap.png,
+objects/LylyraHelper/dashpaper/deathnote9Tile.png
 
 PaperScraps: Particle type for Paper upon cutting. Recolored versions (recolors done in code) are used for Kevins, DashBlocks, and Fall Blocks.
 
 Other:
 
-objects/LylyraHelper/dashpaper/cloudblocknewScissors9Tile.png was originally a file for trapped dash paper. Only currently used in Lonn to differentiate Dash Paper from Trapped Dash Paper.
+objects/LylyraHelper/dashpaper/cloudblocknewScissors9Tile.png was originally a file for trapped dash paper. Not currently in use.
 objects/LylyraHelper/ was originally the file location for what became Paper
 
 
