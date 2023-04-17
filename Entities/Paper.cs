@@ -434,7 +434,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             private MTexture[,] texSplice;
             private Paper parent;
 
-            public Decoration(Paper parent, String filePath, Vector2 size, Vector2 tilingPosition)
+            public Decoration(Paper parent, String filePath, Vector2 tilingPosition, Vector2 size)
             {
                 this.parent = parent;
                 this.size = size;
@@ -452,13 +452,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             public void Render()
             {
-                for (int i = 0; i < (int)size.X; i++)
+                for (int i = 0; i < (int) size.X; i++)
                 {
-                    for (int j = 0; j < (int)size.Y; j++)
+                    for (int j = 0; j < (int) size.Y; j++)
                     {
-                        if (!parent.TileEmpty(position + new Vector2(i, j)))
+                        if (!parent.TileEmpty((position + new Vector2(i, j))))
                         {
-                            texSplice[i, j].Draw(parent.Position + new Vector2(i * 8, j * 8));
+                            texSplice[i, j].Draw(parent.Position + position * 8 + new Vector2(i * 8, j * 8));
                         }
                     }
                 }

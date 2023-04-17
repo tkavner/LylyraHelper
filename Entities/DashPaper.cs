@@ -40,19 +40,39 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     SourceChooser = sourceChooser,
                     Color = color,
-                    Acceleration = new Vector2(0f, 4f),
-                    LifeMin = 0.8f,
-                    LifeMax = 1.6f,
+                    Acceleration = new Vector2(0f, 0f),
+                    LifeMin = 0.4f,
+                    LifeMax = 1.2f,
                     Size = .8f,
                     SizeRange = 0.2f,
-                    Direction = (float)Math.PI / 2f,
-                    DirectionRange = (float)Math.PI * 2F,
-                    SpeedMin = 5f,
-                    SpeedMax = 7F,
-                    RotationMode = ParticleType.RotationModes.Random,
+                    SpeedMin = 0f,
+                    SpeedMax = 0f,
+                    RotationMode = ParticleType.RotationModes.SameAsDirection,
                     ScaleOut = true,
                     UseActualDeltaTime = true
                 };
+            }
+            if (width >= 32)
+            {
+                if (height >= 32)
+                {
+                    if (width / 8 % 2 == 1)
+                    {
+                        if (width >= 72 && width / 8 % 4 == 1)
+                        {
+                            decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom", new Vector2((int)Math.Round(width / 16F)  - 1, height / 8 - 2), new Vector2(3, 2)));
+                            decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up", new Vector2((int)Math.Round(width / 16F) - 1, 0), new Vector2(3, 2)));
+                        } else
+                        {
+                            decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom", new Vector2((int)Math.Round(width / 16F) - 2, height / 8 - 2), new Vector2(3, 2)));
+                            decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up", new Vector2((int)Math.Round(width / 16F) - 2, 0), new Vector2(3, 2)));
+                        }
+                    } else
+                    {
+                        decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom_32", new Vector2((int)Math.Round(width / 16F) - 2, height / 8 - 2), new Vector2(4, 2)));
+                        decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up_32", new Vector2((int) Math.Round(width / 16F) - 2, 0), new Vector2(4, 2)));
+                    }
+                }
             }
         }
 

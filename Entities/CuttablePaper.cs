@@ -24,17 +24,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     GFX.Game["particles/LylyraHelper/dashpapershard01"],
                     GFX.Game["particles/LylyraHelper/dashpapershard02"]);
                 paperScraps = new ParticleType()
+                
                 {
                     SourceChooser = sourceChooser,
                     Color = color,
-                    Acceleration = new Vector2(0f, 0f),
-                    LifeMin = 0.4f,
-                    LifeMax = 1.2f,
+                    Acceleration = new Vector2(0f, 4f),
+                    LifeMin = 0.8f,
+                    LifeMax = 1.6f,
                     Size = .8f,
                     SizeRange = 0.2f,
-                    SpeedMin = 0f,
-                    SpeedMax = 0f,
-                    RotationMode = ParticleType.RotationModes.SameAsDirection,
+                    Direction = (float)Math.PI / 2f,
+                    DirectionRange = (float)Math.PI * 2F,
+                    SpeedMin = 5f,
+                    SpeedMax = 7F,
+                    RotationMode = ParticleType.RotationModes.Random,
                     ScaleOut = true,
                     UseActualDeltaTime = true
                 };
