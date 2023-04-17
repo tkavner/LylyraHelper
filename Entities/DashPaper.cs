@@ -23,7 +23,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private int particleEmitPoints;
         private static ParticleType scissorScraps;
 
-        public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
+        public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/dashpaper", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
         : base(position, width, height, safe, texture, gapTexture)
         {
             thisType = this.GetType();
@@ -32,9 +32,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (scissorScraps == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
-                    GFX.Game["particles/LylyraHelper/dashpapershard00"],
-                    GFX.Game["particles/LylyraHelper/dashpapershard01"],
-                    GFX.Game["particles/LylyraHelper/dashpapershard02"]);
+                    GFX.Game["particles/LylyraHelper/dashsymbol"],
+                    GFX.Game["particles/LylyraHelper/dashsymbol"],
+                    GFX.Game["particles/LylyraHelper/refillsymbol"],
+                    GFX.Game["particles/LylyraHelper/doublerefillsymbol"]);
                 scissorScraps = new ParticleType()
                 {
                     SourceChooser = sourceChooser,

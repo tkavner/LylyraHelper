@@ -58,7 +58,6 @@
   <ItemGroup>
     <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />
-    <Compile Include="Entities\ChessBlock.cs" />
     <Compile Include="Entities\CuttablePaper.cs" />
     <Compile Include="Entities\CuttingHelper.cs" />
     <Compile Include="Entities\ICuttable.cs" />
@@ -75,7 +74,6 @@
     <None Include="Ahorn\entities\bubbledScsissors.jl" />
     <None Include="Ahorn\entities\deathNote.jl" />
     <None Include="Ahorn\entities\dashPaper.jl" />
-    <None Include="Ahorn\entities\ChessBlock.jl" />
     <None Include="Ahorn\entities\bigCloud.jl" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

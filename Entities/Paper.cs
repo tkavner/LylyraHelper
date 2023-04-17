@@ -27,6 +27,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public int[,][] holeTiles;
         public int[,][] tiles;
 
+        public List<Decoration> decorations = new List<Decoration>();
+
         internal static int[][] leftTopCorners = new int[][] { new int[] { 0, 0 }, new int[] { 7, 3 }, new int[] { 7, 4 } };
         internal static int[][] leftBottomCorners = new int[][] { new int[] { 0, 5 }, new int[] { 6, 3 }, new int[] { 6, 4 } };
         internal static int[][] rightTopCorners = new int[][] { new int[] { 5, 0 }, new int[] { 6, 2 }, new int[] { 7, 2 } };
@@ -84,7 +86,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Collidable = true;
             Visible = true;
 
-            Logger.Log("CloudBlock", "Initialized");
             Depth = Depths.SolidsBelow + 200;
             skip = new bool[width / 8, height / 8];
             tiles = new int[width / 8, height / 8][];
@@ -263,7 +264,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         internal virtual void OnDash(Vector2 direction)
         {
-            
+
         }
         internal virtual void OnPlayer(Player player)
         {
@@ -288,6 +289,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         }
                     }
                 }
+            }
+            foreach(Decoration deco in decorations)
+            {
+                deco.Render();
             }
         }
 
@@ -328,7 +333,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
 
                 return (CollidePaper(c as Hitbox));
-            } 
+            }
             else if (c is ColliderList)
             {
 
@@ -347,9 +352,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             List<Vector2> pointsToCheck = new List<Vector2>();
 
-            for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1+=8)
+            for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1 += 8)
             {
-                for (float f2 = c.AbsoluteTop - this.Position.Y; f2 < c.AbsoluteBottom - this.Position.Y; f2+=8)
+                for (float f2 = c.AbsoluteTop - this.Position.Y; f2 < c.AbsoluteBottom - this.Position.Y; f2 += 8)
                 {
                     pointsToCheck.Add(new Vector2(f1, f2));
                 }
@@ -371,7 +376,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return false;
         }
 
-       public bool CollidePaper(Circle c)
+        public bool CollidePaper(Circle c)
         {
             for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1 += 8)
             {
@@ -380,9 +385,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                     int x = (int)f1;
                     int y = (int)f2;
-                    if (x >= 0 && y >= 0 && (int) x < (int)Width && (int) y < (int)Height)
+                    if (x >= 0 && y >= 0 && (int)x < (int)Width && (int)y < (int)Height)
                     {
-                        if (!this.skip[(int)(x / 8), (int) (y / 8)])
+                        if (!this.skip[(int)(x / 8), (int)(y / 8)])
                         {
                             if (c.Collide(new Rectangle((int)(f1 + Position.X), (int)(f2 + Position.Y), (int)(8), (int)(8)))) return true;
                         }
@@ -399,11 +404,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             return arr[0];
         }
-        
+
         public bool TileEmpty(int x, int y)
         {
             if (x >= 0 && x < (int)Width / 8 && y >= 0 && y < (int)Height / 8) return skip[x, y];
             else return true;
+        }
+
+        public bool TileEmpty(Vector2 pos)
+        {
+            return TileEmpty((int)pos.X, (int)pos.Y);
         }
 
         public bool TileExists(int x, int y)
@@ -411,6 +421,48 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return x >= 0 && x < (int)Width / 8 && y >= 0 && y < (int)Height / 8;
         }
 
-        
+        public bool TileExists(Vector2 pos)
+        {
+            return TileExists((int) pos.X, (int) pos.Y);
+        }
+
+
+        public class Decoration
+        {
+            public Vector2 position; //in tiles relative to the paper
+            public Vector2 size;
+            private MTexture[,] texSplice;
+            private Paper parent;
+
+            public Decoration(Paper parent, String filePath, Vector2 size, Vector2 tilingPosition)
+            {
+                this.parent = parent;
+                this.size = size;
+                this.position = tilingPosition;
+                texSplice = new MTexture[(int)size.X, (int)size.Y];
+                MTexture uncut = GFX.Game[filePath];
+                for (int i = 0; i < (int)size.X; i++)
+                {
+                    for (int j = 0; j < (int)size.Y; j++)
+                    {
+                        texSplice[i, j] = uncut.GetSubtexture(new Rectangle(i * 8, j * 8, 8, 8));
+                    }
+                }
+            }
+
+            public void Render()
+            {
+                for (int i = 0; i < (int)size.X; i++)
+                {
+                    for (int j = 0; j < (int)size.Y; j++)
+                    {
+                        if (!parent.TileEmpty(position + new Vector2(i, j)))
+                        {
+                            texSplice[i, j].Draw(parent.Position + new Vector2(i * 8, j * 8));
+                        }
+                    }
+                }
+            }
+        }
     }
 }

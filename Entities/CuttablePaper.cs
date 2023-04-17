@@ -12,7 +12,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
     public class CuttablePaper : Paper, ICuttable
     {
         public static ParticleType paperScraps;
-        internal Color color = Calc.HexToColor("ffa2b7");
+        internal Color color = Calc.HexToColor("cac7e3");
 
         public CuttablePaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
         : base(position, width, height, safe, texture, gapTexture)
@@ -27,16 +27,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     SourceChooser = sourceChooser,
                     Color = color,
-                    Acceleration = new Vector2(0f, 4f),
+                    Acceleration = new Vector2(0f, 0f),
                     LifeMin = 0.4f,
                     LifeMax = 1.2f,
                     Size = .8f,
                     SizeRange = 0.2f,
-                    Direction = (float)Math.PI / 2f,
-                    DirectionRange = 0.5f,
-                    SpeedMin = 5f,
-                    SpeedMax = 15f,
-                    RotationMode = ParticleType.RotationModes.Random,
+                    SpeedMin = 0f,
+                    SpeedMax = 0f,
+                    RotationMode = ParticleType.RotationModes.SameAsDirection,
                     ScaleOut = true,
                     UseActualDeltaTime = true
                 };
