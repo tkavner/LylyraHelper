@@ -24,7 +24,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public override void Unload()
         {
-
             Scissors.Unload();
         }
 

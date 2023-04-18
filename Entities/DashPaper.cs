@@ -24,18 +24,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private static ParticleType paperSymbols;
         private int playerParticleEmitPoints;
 
-        public DashPaper(Vector2 position, int width, int height, bool safe, 
-            bool spawnScissors = true, 
-            bool fragileScissors = false, 
-            string texture = "objects/LylyraHelper/dashPaper/dashpaper", 
-            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", 
-            string flagName = "", 
+        public DashPaper(Vector2 position, int width, int height, bool safe,
+            bool spawnScissors = true,
+            bool fragileScissors = false,
+            string texture = "objects/LylyraHelper/dashPaper/dashpaper",
+            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap",
+            string flagName = "",
             bool noEffects = false)
         : base(position, width, height, safe, texture, gapTexture, flagName, noEffects)
         {
             thisType = this.GetType();
             this.spawnScissors = spawnScissors;
-            this.fragileScissors = fragileScissors; 
+            this.fragileScissors = fragileScissors;
             if (paperSymbols == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
@@ -80,9 +80,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 int borderSize = width / 8 % 2 == 0 ? 32 : 24;
                 int offsetBorder = width / 8 % 4 == 1 ? -1 : -2;
-                decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom_{0}", borderSize), 
+                decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom_{0}", borderSize),
                     new Vector2((int)Math.Round(width / 16F) + offsetBorder, height / 8 - 2), new Vector2(borderSize / 8, 2)));
-                decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_up_{0}", borderSize), 
+                decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_up_{0}", borderSize),
                     new Vector2((int)Math.Round(width / 16F) + offsetBorder, 0), new Vector2(borderSize / 8, 2)));
 
                 if (height >= 48)
@@ -99,7 +99,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                     int xOffset = width / 8 % 4 == 3 ? -3 : -2;
                     int yOffset = height / 8 % 4 == 3 ? -3 : -2;
-                    decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_center_{0}_{1}", xSize, ySize), 
+                    decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_center_{0}_{1}", xSize, ySize),
                         new Vector2((int)Math.Round(width / 16F) + xOffset, (int)Math.Round(height / 16F) + yOffset), new Vector2(4, 4)));
                 }
             }
@@ -111,8 +111,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.Update();
             if (!noEffects)
             {
-                int i = r.Next(0, (int) Width / 8);
-                int j = r.Next(0, (int) Height / 8);
+                int i = r.Next(0, (int)Width / 8);
+                int j = r.Next(0, (int)Height / 8);
                 particleEmitPoints += (int)(Width * Height);
                 if (!skip[i, j] && particleEmitPoints > 40000)
                 {
@@ -139,7 +139,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             var session = SceneAs<Level>().Session;
             session.Inventory.Dashes = p.MaxDashes;
             p.Dashes = p.MaxDashes;
-            
+
             if (spawnScissors)
             {
                 Vector2 gridPosition = new Vector2(8 * (int)(p.Position.X / 8), 8 * (int)(p.Position.Y / 8));
@@ -227,12 +227,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal override void OnPlayerEnter(Player player)
         {
             base.OnPlayerEnter(player);
-            Audio.Play("event:/game/general/diamond_touch", player.Position); //TODO FIND BETTER SOUND EFFECTS: we may be going for an effect analogous to a refill but this is not a refill!
-            if(player != null && player.Dashes < player.MaxDashes)
+            if (player != null)
             {
-                Activate(player.Speed); //autoactivate on enter? kind of makes it seem like a refill, which is good because it makes it analogous to a familiar concept
+                Audio.Play("event:/game/general/diamond_touch", player.Position); //TODO FIND BETTER SOUND EFFECTS: we may be going for an effect analogous to a refill but this is not a refill!
+                if (player.Dashes < player.MaxDashes)
+                {
+                    Activate(player.Speed); //autoactivate on enter? kind of makes it seem like a refill, which is good because it makes it analogous to a familiar concept
+                }
             }
         }
-
     }
 }
