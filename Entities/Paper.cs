@@ -121,6 +121,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     holeTexSplice[i, j] = holeTexturesUnsliced.GetSubtexture(new Rectangle(i * 8, j * 8, 8, 8));
                 }
             }
+            AddDecorations();
         }
 
         public override void Awake(Scene scene)
@@ -290,7 +291,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
             }
-            foreach(Decoration deco in decorations)
+            foreach (Decoration deco in decorations)
             {
                 deco.Render();
             }
@@ -423,7 +424,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public bool TileExists(Vector2 pos)
         {
-            return TileExists((int) pos.X, (int) pos.Y);
+            return TileExists((int)pos.X, (int)pos.Y);
         }
 
 
@@ -452,9 +453,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             public void Render()
             {
-                for (int i = 0; i < (int) size.X; i++)
+                for (int i = 0; i < (int)size.X; i++)
                 {
-                    for (int j = 0; j < (int) size.Y; j++)
+                    for (int j = 0; j < (int)size.Y; j++)
                     {
                         if (!parent.TileEmpty((position + new Vector2(i, j))))
                         {
@@ -463,6 +464,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
             }
+        }
+
+        internal virtual void AddDecorations()
+        {
         }
     }
 }
