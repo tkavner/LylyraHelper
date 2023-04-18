@@ -52,28 +52,126 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     UseActualDeltaTime = true
                 };
             }
+            //decoration additions, yeah don't ask
+            AddDecorations();
+        }
+
+        private void AddDecorations()
+        {
+            int width = (int)Width;
+            int height = (int)Height;
             if (width >= 32)
+            {
+                int borderSize = width / 8 % 2 == 0 ? 32 : 24;
+                int offsetBorder = width / 8 % 4 == 1 ? -1 : -2;
+                decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom_{0}", borderSize), 
+                    new Vector2((int)Math.Round(width / 16F) + offsetBorder, height / 8 - 2), new Vector2(borderSize / 8, 2)));
+                decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_up_{0}", borderSize), 
+                    new Vector2((int)Math.Round(width / 16F) + offsetBorder, 0), new Vector2(borderSize / 8, 2)));
+
+                if (height >= 48)
+                {
+                    string xSize = "32";
+                    string ySize = "32";
+                    if (width / 8 % 2 == 1)
+                    {
+                        xSize = "40";
+                    }
+                    if (height / 8 % 2 == 1)
+                    {
+                        ySize = "40";
+                    }
+                    int xOffset = width / 8 % 4 == 3 ? -3 : -2;
+                    int yOffset = height / 8 % 4 == 3 ? -3 : -2;
+                    decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_center_{0}_{1}", xSize, ySize), 
+                        new Vector2((int)Math.Round(width / 16F) + xOffset, (int)Math.Round(height / 16F) + yOffset), new Vector2(4, 4)));
+
+                }
+            }
+            /*if (width >= 32)
             {
                 if (height >= 32)
                 {
                     if (width / 8 % 2 == 1)
                     {
-                        if (width >= 72 && width / 8 % 4 == 1)
+                        if (width == 40)
                         {
-                            decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom", new Vector2((int)Math.Round(width / 16F)  - 1, height / 8 - 2), new Vector2(3, 2)));
+                            decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom", new Vector2((int)Math.Round(width / 16F) - 1, height / 8 - 2), new Vector2(3, 2)));
                             decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up", new Vector2((int)Math.Round(width / 16F) - 1, 0), new Vector2(3, 2)));
-                        } else
-                        {
-                            decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom", new Vector2((int)Math.Round(width / 16F) - 2, height / 8 - 2), new Vector2(3, 2)));
-                            decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up", new Vector2((int)Math.Round(width / 16F) - 2, 0), new Vector2(3, 2)));
+
+                            if (height > 48)
+                            {
+                                if (height / 8 % 2 == 3)
+                                {
+                                    decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_center_40_40", new Vector2((int)Math.Round(width / 16F) - 2, (int)Math.Round(height / 16F) - 3), new Vector2(4, 4)));
+                                }
+                                else
+                                {
+                                    decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_center_40_32", new Vector2((int)Math.Round(width / 16F) - 2, (int)Math.Round(height / 16F) - 2), new Vector2(4, 4)));
+
+                                }
+                            }
                         }
-                    } else
+                        else
+                        {
+                            if (width >= 72 && width / 8 % 4 == 1)
+                            {
+                                decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom", new Vector2((int)Math.Round(width / 16F) - 1, height / 8 - 2), new Vector2(3, 2)));
+                                decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up", new Vector2((int)Math.Round(width / 16F) - 1, 0), new Vector2(3, 2)));
+                            }
+                            else
+                            {
+                                decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom", new Vector2((int)Math.Round(width / 16F) - 2, height / 8 - 2), new Vector2(3, 2)));
+                                decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up", new Vector2((int)Math.Round(width / 16F) - 2, 0), new Vector2(3, 2)));
+                            }
+
+                            if (height > 48)
+                            {
+                                if (height / 8 % 2 == 3)
+                                {
+                                    decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_center_40_40", new Vector2((int)Math.Round(width / 16F) - 2, (int)Math.Round(height / 16F) - 3), new Vector2(4, 4)));
+                                }
+                                else
+                                {
+                                    decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_center_40_32", new Vector2((int)Math.Round(width / 16F) - 2, (int)Math.Round(height / 16F) - 2), new Vector2(4, 4)));
+
+                                }
+                            }
+                        }
+
+                    }
+                    else
                     {
                         decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom_32", new Vector2((int)Math.Round(width / 16F) - 2, height / 8 - 2), new Vector2(4, 2)));
-                        decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up_32", new Vector2((int) Math.Round(width / 16F) - 2, 0), new Vector2(4, 2)));
+                        decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_up_32", new Vector2((int)Math.Round(width / 16F) - 2, 0), new Vector2(4, 2)));
+
+
+                        if (height > 48)
+                        {
+
+                            if (height / 8 % 2 == 1)
+                            {
+
+                                if (height / 8 % 4 == 3)
+                                {
+                                    decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_center_32_40", new Vector2((int)Math.Round(width / 16F) - 2, (int)Math.Round(height / 16F) - 3), new Vector2(4, 4)));
+
+                                }
+                                else
+                                {
+                                    decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_center_32_40", new Vector2((int)Math.Round(width / 16F) - 2, (int)Math.Round(height / 16F) - 2), new Vector2(4, 4)));
+
+                                }
+                            }
+                            else
+                            {
+                                decorations.Add(new Decoration(this, "objects/LylyraHelper/dashPaper/dash_paper_decoration_center", new Vector2((int)Math.Round(width / 16F) - 2, (int)Math.Round(height / 16F) - 2), new Vector2(4, 4)));
+
+                            }
+                        }
                     }
                 }
-            }
+            }*/
         }
 
         public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, false, data.Bool("spawnScissors", true), data.Bool("fragileScissors", false))
