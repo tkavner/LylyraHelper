@@ -105,9 +105,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             p1 /= 8;
             p2 /= 8;
 
-            int furthestTop = 10000000;
+            int furthestTop = Int32.MaxValue;
             int furthestDown = -1;
-            int furthestLeft = 1000000;
+            int furthestLeft = Int32.MaxValue;
             int furthestRight = -1;
 
             for (int i = (int)p1.X; i < p2.X; i++)
