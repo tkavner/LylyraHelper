@@ -13,7 +13,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 {
 
     [Tracked(true)]
-    public abstract class Paper : Entity
+    public class Paper : Entity
     {
 
         private Scene scene;
@@ -77,14 +77,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal static int[][] holeEmpty = new int[][] { new int[] { 2, 2 } };
 
         public Type thisType;
+        private string flagName;
 
-        public Paper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
+        public Paper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", string flagName = "")
         : base(position)
         {
             thisType = this.GetType();
             base.Collider = new Hitbox(width, height);
             Collidable = true;
             Visible = true;
+            this.flagName = flagName.Trim();
 
             Depth = Depths.SolidsBelow + 200;
             skip = new bool[width / 8, height / 8];
@@ -121,6 +123,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     holeTexSplice[i, j] = holeTexturesUnsliced.GetSubtexture(new Rectangle(i * 8, j * 8, 8, 8));
                 }
             }
+
             AddDecorations();
         }
 
@@ -270,6 +273,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal virtual void OnPlayer(Player player)
         {
 
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (flagName != "")
+            {
+                bool playerCheck = this.CollideCheck<Player>();
+                SceneAs<Level>().Session.SetFlag(flagName, playerCheck);
+            }
         }
         public override void Render()
         {

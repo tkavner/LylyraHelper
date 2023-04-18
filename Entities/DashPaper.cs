@@ -23,8 +23,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private int particleEmitPoints;
         private static ParticleType scissorScraps;
 
-        public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/dashpaper", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
-        : base(position, width, height, safe, texture, gapTexture)
+        public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/dashpaper", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", string flagName = "")
+        : base(position, width, height, safe, texture, gapTexture, flagName)
         {
             thisType = this.GetType();
             this.spawnScissors = spawnScissors;
@@ -192,7 +192,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         }
                     }
                 }
-
             }
             return false;
         }
