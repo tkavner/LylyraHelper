@@ -72,8 +72,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal static int[][] holeRightBottomCorner = new int[][] { new int[] { 4, 4 } };
         internal static int[][] holeLeftBottomCorner = new int[][] { new int[] { 0, 4 } };
 
-
-
         internal static int[][] holeEmpty = new int[][] { new int[] { 2, 2 } };
 
         public Type thisType;
@@ -281,15 +279,47 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         }
 
+        bool previousState = false;
+
         public override void Update()
         {
             base.Update();
+            Player player = Scene.Tracker.GetEntity<Player>();
+            bool playerCheck = CollidePaper(player);
+            if (!previousState && playerCheck) //false --> true (entering)
+            {
+                OnPlayerEnter(player);
+            }
+            else if (previousState && !playerCheck) //true --> false (leaving)
+            {
+                OnPlayerLeave(player);
+            }
+            previousState = playerCheck;
+
             if (flagName != "")
             {
-                bool playerCheck = this.CollideCheck<Player>();
                 SceneAs<Level>().Session.SetFlag(flagName, playerCheck);
             }
+            if (playerCheck) AddPlayerEffects();
         }
+
+        internal virtual void OnPlayerLeave(Player player)
+        {
+
+        }
+
+        //method only called when the player enters the player
+        internal virtual void OnPlayerEnter(Player player)
+        {
+
+        }
+
+        //Add Visual Effects for the player being on the paper
+        internal virtual void AddPlayerEffects()
+        {
+            
+        }
+
         public override void Render()
         {
             base.Render();
@@ -337,6 +367,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         //really only used with the player so this should work?
         public bool CollidePaper(Entity e)
         {
+            if (e == null) return false;
             return CollidePaper(e.Collider);
         }
 

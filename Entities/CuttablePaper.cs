@@ -28,7 +28,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     GFX.Game["particles/LylyraHelper/dashpapershard01"],
                     GFX.Game["particles/LylyraHelper/dashpapershard02"]);
                 paperScraps = new ParticleType()
-                
                 {
                     SourceChooser = sourceChooser,
                     Color = color,

@@ -22,6 +22,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Random r = new Random(); //for particle gen only
         private int particleEmitPoints;
         private static ParticleType paperSymbols;
+        private int playerParticleEmitPoints;
 
         public DashPaper(Vector2 position, int width, int height, bool safe, 
             bool spawnScissors = true, 
@@ -60,6 +61,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
+        public DashPaper(EntityData data, Vector2 vector2) :
+            this(data.Position + vector2, data.Width, data.Height, false,
+                spawnScissors: data.Bool("spawnScissors", true),
+                fragileScissors: data.Bool("fragileScissors", false),
+                flagName: data.Attr("flagName", ""),
+                noEffects: data.Bool("noEffects", false))
+        {
+
+        }
         internal override void AddDecorations()
         {
 
@@ -95,15 +105,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        public DashPaper(EntityData data, Vector2 vector2) : 
-            this(data.Position + vector2, data.Width, data.Height, false, 
-                spawnScissors:data.Bool("spawnScissors", true),
-                fragileScissors: data.Bool("fragileScissors", false), 
-                flagName:data.Attr("flagName", ""), 
-                noEffects:data.Bool("noEffects", false))
-        {
-            
-        }
 
         public override void Update()
         {
@@ -204,6 +205,33 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 }
             }
             return false;
+        }
+
+        internal override void AddPlayerEffects()
+        {
+            Player player = Scene.Tracker.GetEntity<Player>();
+            if (playerParticleEmitPoints++ >= 1)
+            {
+                playerParticleEmitPoints = 0;
+                SceneAs<Level>().ParticlesFG.Emit(paperSymbols, 1, player.Center, player.Collider.HalfSize, Color.White);
+            }
+        }
+
+        internal override void OnPlayerLeave(Player player)
+        {
+            base.OnPlayerLeave(player);
+            if (player != null) Audio.Play("event:/game/general/diamond_return", player.Position);
+        }
+
+        //method only called when the player enters the player
+        internal override void OnPlayerEnter(Player player)
+        {
+            base.OnPlayerEnter(player);
+            Audio.Play("event:/game/general/diamond_touch", player.Position); //TODO FIND BETTER SOUND EFFECTS: we may be going for an effect analogous to a refill but this is not a refill!
+            if(player != null && player.Dashes < player.MaxDashes)
+            {
+                Activate(player.Speed); //autoactivate on enter? kind of makes it seem like a refill, which is good because it makes it analogous to a familiar concept
+            }
         }
 
     }
