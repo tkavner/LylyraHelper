@@ -21,22 +21,28 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private bool fragileScissors;
         private Random r = new Random(); //for particle gen only
         private int particleEmitPoints;
-        private static ParticleType scissorScraps;
+        private static ParticleType paperSymbols;
 
-        public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/dashpaper", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", string flagName = "", bool noEffects = false)
+        public DashPaper(Vector2 position, int width, int height, bool safe, 
+            bool spawnScissors = true, 
+            bool fragileScissors = false, 
+            string texture = "objects/LylyraHelper/dashPaper/dashpaper", 
+            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", 
+            string flagName = "", 
+            bool noEffects = false)
         : base(position, width, height, safe, texture, gapTexture, flagName, noEffects)
         {
             thisType = this.GetType();
             this.spawnScissors = spawnScissors;
             this.fragileScissors = fragileScissors; 
-            if (scissorScraps == null)
+            if (paperSymbols == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
                     GFX.Game["particles/LylyraHelper/dashsymbol"],
                     GFX.Game["particles/LylyraHelper/dashsymbol"],
                     GFX.Game["particles/LylyraHelper/refillsymbol"],
                     GFX.Game["particles/LylyraHelper/doublerefillsymbol"]);
-                scissorScraps = new ParticleType()
+                paperSymbols = new ParticleType()
                 {
                     SourceChooser = sourceChooser,
                     Color = color,
@@ -89,15 +95,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        public DashPaper(EntityData data, Vector2 vector2) : this(data.Position + vector2, data.Width, data.Height, false, data.Bool("spawnScissors", true), data.Bool("fragileScissors", false))
+        public DashPaper(EntityData data, Vector2 vector2) : 
+            this(data.Position + vector2, data.Width, data.Height, false, 
+                spawnScissors:data.Bool("spawnScissors", true),
+                fragileScissors: data.Bool("fragileScissors", false), 
+                flagName:data.Attr("flagName", ""), 
+                noEffects:data.Bool("noEffects", false))
         {
-
+            
         }
 
         public override void Update()
         {
             base.Update();
-            if (spawnScissors && !noEffects)
+            if (!noEffects)
             {
                 int i = r.Next(0, (int) Width / 8);
                 int j = r.Next(0, (int) Height / 8);
@@ -105,7 +116,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 if (!skip[i, j] && particleEmitPoints > 40000)
                 {
                     particleEmitPoints -= 40000;
-                    SceneAs<Level>().ParticlesFG.Emit(scissorScraps, 1, Position + new Vector2(i * 8, j * 8), Vector2.Zero, Color.White);
+                    SceneAs<Level>().ParticlesFG.Emit(paperSymbols, 1, Position + new Vector2(i * 8, j * 8), Vector2.Zero, Color.White);
                 }
 
             }
