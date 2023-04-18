@@ -15,7 +15,8 @@ table.insert(paper.placements, {
 		width = 24,
         height = 24,
         fragileScissors = false,
-        spawnScissors = false
+        spawnScissors = false,
+		noEffects = false
     }
 })
 

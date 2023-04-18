@@ -14,8 +14,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public static ParticleType paperScraps;
         internal Color color = Calc.HexToColor("cac7e3");
 
-        public CuttablePaper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", string flagName = "")
-        : base(position, width, height, safe, texture, gapTexture, flagName)
+        public CuttablePaper(Vector2 position, int width, int height, bool safe, 
+            string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", 
+            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", 
+            string flagName = "",
+            bool noEffects = false)
+        : base(position, width, height, safe, texture, gapTexture, flagName, noEffects)
         {
             if (paperScraps == null)
             {
@@ -143,9 +147,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         if (TileExists(x, y1))
                         {
                             bool emptyTop = TileEmpty(i, y1 - 1);
-
                             bool emptyLeft = TileEmpty(i - 1, y1);
-
                             bool emptyRight = TileEmpty(i + 1, y1);
 
                             if (!emptyTop)
@@ -168,12 +170,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                         if (TileExists(x, y2))
                         {
-
                             bool emptyTop = TileEmpty(i, y2 + 1);
-
                             bool emptyLeft = TileEmpty(i - 1, y2);
-
                             bool emptyRight = TileEmpty(i + 1, y2);
+
                             if (!emptyTop)
                             {
                                 if (i == 0)

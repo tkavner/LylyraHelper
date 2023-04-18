@@ -23,8 +23,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private int particleEmitPoints;
         private static ParticleType scissorScraps;
 
-        public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/dashpaper", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", string flagName = "")
-        : base(position, width, height, safe, texture, gapTexture, flagName)
+        public DashPaper(Vector2 position, int width, int height, bool safe, bool spawnScissors = true, bool fragileScissors = false, string texture = "objects/LylyraHelper/dashPaper/dashpaper", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", string flagName = "", bool noEffects = false)
+        : base(position, width, height, safe, texture, gapTexture, flagName, noEffects)
         {
             thisType = this.GetType();
             this.spawnScissors = spawnScissors;
@@ -85,7 +85,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     int yOffset = height / 8 % 4 == 3 ? -3 : -2;
                     decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_center_{0}_{1}", xSize, ySize), 
                         new Vector2((int)Math.Round(width / 16F) + xOffset, (int)Math.Round(height / 16F) + yOffset), new Vector2(4, 4)));
-
                 }
             }
         }
@@ -98,7 +97,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Update()
         {
             base.Update();
-            if (spawnScissors)
+            if (spawnScissors && !noEffects)
             {
                 int i = r.Next(0, (int) Width / 8);
                 int j = r.Next(0, (int) Height / 8);

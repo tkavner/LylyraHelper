@@ -77,15 +77,21 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal static int[][] holeEmpty = new int[][] { new int[] { 2, 2 } };
 
         public Type thisType;
+        internal bool noEffects;
         private string flagName;
 
-        public Paper(Vector2 position, int width, int height, bool safe, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", string flagName = "")
+        public Paper(Vector2 position, int width, int height, bool safe, 
+            string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", 
+            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", 
+            string flagName = "", 
+            bool noEffects = false)
         : base(position)
         {
             thisType = this.GetType();
             base.Collider = new Hitbox(width, height);
             Collidable = true;
             Visible = true;
+            this.noEffects = noEffects;
             this.flagName = flagName.Trim();
 
             Depth = Depths.SolidsBelow + 200;
