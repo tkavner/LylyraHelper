@@ -106,7 +106,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             sprite = new Sprite(GFX.Game, "objects/LylyraHelper/scissors/");
             sprite.AddLoop("spawn", "cut" + directionPath, 0.1F, new int[] { 0 });
             sprite.AddLoop("idle", "cut" + directionPath, 0.1F);
-
             sprite.AddLoop("break", "break" + directionPath, 0.1F);
             sprite.Play("spawn");
             Add(sprite);
@@ -335,6 +334,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             Cutting.RemoveAll(d =>
             {
+                if (!Scene.Contains(d))
+                {
+                    return true;
+                }
                 if (!d.CollidePaper(this) || collisionOverride)
                 {
 
@@ -394,14 +397,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             if (FallCutting.RemoveAll(d =>
              {
+                 if (!Scene.Contains(d))
+                 {
+                     cutStartPositions.Remove(d);
+                     return true;
+                 }
                  if ((!d.CollideCheck(this) || collisionOverride))
                  {
-                     if (!Scene.Contains(d))
-                     {
-                         cutStartPositions.Remove(d);
-
-                         return true;
-                     }
                      Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
                      Vector2 fb1Pos = resultArray[0];
                      Vector2 fb2Pos = resultArray[1];
@@ -580,6 +582,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             KevinCutting.RemoveAll(d =>
             {
+
+                if (!Scene.Contains(d))
+                {
+                    cutStartPositions.Remove(d);
+                    return true;
+                }
                 if ((!d.CollideCheck(this) || collisionOverride))
                 {
                     if (!Scene.Contains(d))
@@ -596,7 +604,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                     var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
                     List<StaticMover> staticMovers = (List<StaticMover>) cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                    var newReturnStack = Activator.CreateInstance(returnStack.GetType(), returnStack);
+                    var newReturnStack1 = Activator.CreateInstance(returnStack.GetType(), returnStack);
+                    var newReturnStack2 = Activator.CreateInstance(returnStack.GetType(), returnStack);
 
                     Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
 
@@ -623,7 +632,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     if (cb1Width >= 24 && cb1Height >= 24)
                     {
                         CrushBlock cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
-                        cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, returnStack);
+                        cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, newReturnStack1);
                         Scene.Add(cb1);
                         KevinCuttingActivationList.Add(cb1);
                         completelyRemoved = false;
@@ -631,7 +640,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     if (cb2Width >= 24 && cb2Height >= 24)
                     {
                         CrushBlock cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
-                        cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack);
+                        cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack2);
                         Scene.Add(cb2);
                         KevinCuttingActivationList.Add(cb2);
                         completelyRemoved = false;

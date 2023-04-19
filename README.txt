@@ -12,6 +12,7 @@ Legacy Stuff:
 CloudBlock: DashPaper / paper started as an attempt to create something called a "Cloudblock". If you see any reference to "CloudBlock" thats what this is about.
 Hole: Old System used in CloudBlocks / Paper. Should not exist anymore
 BigCloud and ChessBlock: ignore these for now pls. Subject to removal from repo.
+papercity.pin.bin: My test world. Recommend making your own.
 
 Current Stuff
 
