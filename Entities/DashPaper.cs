@@ -211,13 +211,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal override void AddPlayerEffects()
         {
             Player player = Scene.Tracker.GetEntity<Player>();
-            if (playerParticleEmitPoints++ >= 1)
+            if (playerParticleEmitPoints++ % 4 == 0)
             {
-                playerParticleEmitPoints = 0;
                 SceneAs<Level>().ParticlesFG.Emit(paperSymbols, 1, player.Center, player.Collider.HalfSize, Color.White);
             }
         }
 
-        
+
     }
 }

@@ -130,6 +130,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (Cutting.Count > 0 && timeElapsed > spawnGrace)
             {
                 CutPaper(true);
+                CutDreamBlocks(true);
+                CutKevins(true);
+                CutFallBlocks(true);
             }
             Collidable = false;
             yield return 0.75F;
@@ -342,11 +345,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             });
         }
 
-        private void CutDreamBlocks()
+        private void CutDreamBlocks(bool collisionOverride = false)
         {
             if (DreamCutting.RemoveAll(d =>
             {
-                if (!d.CollideCheck(this) && Scene.Contains(d))
+                if ((!d.CollideCheck(this) || collisionOverride) && Scene.Contains(d))
                 {
                     if (!Scene.Contains(d))
                     {
@@ -387,11 +390,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        private void CutFallBlocks()
+        private void CutFallBlocks(bool collisionOverride = false)
         {
             if (FallCutting.RemoveAll(d =>
              {
-                 if (!d.CollideCheck(this))
+                 if ((!d.CollideCheck(this) || collisionOverride))
                  {
                      if (!Scene.Contains(d))
                      {
@@ -409,6 +412,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                      int fb2Height = (int)resultArray[3].Y;
 
                      var tileTypeField = d.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
+                     List<StaticMover> staticMovers = (List<StaticMover>)d.GetType().GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
                      char tileTypeChar = (char)tileTypeField.GetValue(d);
 
                      if (tileTypeChar == '1')
@@ -427,12 +431,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
                      {
                          Audio.Play("event:/game/general/wall_break_stone", Position);
                      }
+                     bool completelyRemoved = true;
                      if (fb1Width >= 8 && fb1Height >= 8)
                      {
                          FallingBlock fb1 = new FallingBlock(fb1Pos, tileTypeChar, fb1Width, fb1Height, false, false, true);
                          Scene.Add(fb1);
 
 
+                         completelyRemoved = false;
                          fb1.Triggered = true;
                          fb1.FallDelay = 0;
                      }
@@ -441,8 +447,111 @@ namespace Celeste.Mod.LylyraHelper.Entities
                          FallingBlock fb2 = new FallingBlock(fb2Pos, tileTypeChar, fb2Width, fb2Height, false, false, true);
                          Scene.Add(fb2);
 
+                         completelyRemoved = false;
                          fb2.Triggered = true;
                          fb2.FallDelay = 0;
+                     }
+                     foreach (StaticMover mover in staticMovers)
+                     {
+                         if (completelyRemoved)
+                         {
+                             Scene.Remove(mover.Entity);
+                             continue;
+                         }
+                         mover.Platform = null;
+                         if (mover.Entity is Spikes)
+                         {
+                             //destroy all parts of spikes that aren't connected anymore.
+                             //switch depending on direction
+                             Spikes spike = mover.Entity as Spikes;
+                             switch (spike.Direction)
+                             {
+                                 case Spikes.Directions.Left:
+                                 case Spikes.Directions.Right:
+                                     //compare to left side edge (cb1Pos.X), then check for a hole on left side (cb1Pos.Y + cb1Height) to the top of the spikes
+                                     if (fb1Pos.X < d.Position.X && spike.Direction == Spikes.Directions.Left)
+                                     {
+                                         Scene.Remove(spike);
+                                     }
+                                     else if (fb2Pos.X + Width > d.Position.X + Width && spike.Direction == Spikes.Directions.Right)
+                                     {
+                                         Scene.Remove(spike);
+                                     }
+                                     else if (fb1Pos.Y + fb1Height < spike.Y + spike.Height) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
+                                     {
+
+                                         Scene.Remove(spike);
+
+                                         bool spikesOnCB1 = spike.Y < fb1Pos.Y + fb1Height;
+                                         bool spikesOnCB2 = spike.Y + spike.Height > fb2Pos.Y;
+                                         if (spikesOnCB1)
+                                         {
+                                             float spikePosY = spike.Y;
+                                             int spikeHeight = (int)(fb1Pos.Y + fb1Height - spike.Y);
+                                             if (spikeHeight >= 24)
+                                             {
+                                                 Spikes newSpike1 = new Spikes(new Vector2(spike.X, spikePosY), spikeHeight, spike.Direction, "default");
+                                                 Scene.Add(newSpike1);
+                                             }
+                                         }
+                                         if (spikesOnCB2)
+                                         {
+                                             float spikePosY = fb2Pos.Y;
+                                             int spikeHeight = (int)(spike.Y + spike.Height - fb2Pos.Y);
+                                             if (spikeHeight >= 24)
+                                             {
+                                                 Spikes newSpike1 = new Spikes(new Vector2(spike.X, spikePosY), spikeHeight, spike.Direction, "default");
+                                                 Scene.Add(newSpike1);
+                                             }
+                                         }
+
+                                     }
+                                     break;
+
+                                 case Spikes.Directions.Up:
+                                 case Spikes.Directions.Down:
+                                     //compare to right side edge (cb1Pos.X + cb1Width), then check for a hole on right side (cb1Pos.Y + cb1Height)
+                                     if (fb1Pos.Y > d.Position.Y)
+                                     {
+                                         Scene.Remove(spike);
+                                     }
+                                     else if (fb2Pos.Y + fb2Height < d.Position.Y + Height)
+                                     {
+                                         Scene.Remove(spike);
+                                     }
+                                     else if (fb1Pos.X + fb1Width < spike.X + spike.Width) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
+                                     {
+                                         Scene.Remove(spike);
+
+                                         bool spikesOnCB1 = spike.X < fb1Pos.X + fb1Width;
+                                         bool spikesOnCB2 = spike.X + spike.Width > fb2Pos.X;
+                                         if (spikesOnCB1)
+                                         {
+                                             float spikePosX = spike.X;
+                                             int spikeWidth = (int)(fb1Pos.X + fb1Width - spike.X);
+                                             if (spikeWidth >= 24)
+                                             {
+
+                                                 Spikes newSpike = new Spikes(new Vector2(spikePosX, spike.Y), spikeWidth, spike.Direction, "default");
+                                                 Scene.Add(newSpike);
+                                             }
+                                         }
+                                         if (spikesOnCB2)
+                                         {
+                                             float spikePosX = fb2Pos.X;
+                                             int spikeWidth = (int)(spike.X + spike.Width - fb2Pos.X);
+                                             if (spikeWidth >= 24)
+                                             {
+                                                 Spikes newSpike = new Spikes(new Vector2(spikePosX, spike.Y), spikeWidth, spike.Direction, "default");
+                                                 Scene.Add(newSpike);
+                                             }
+
+                                         }
+                                     }
+                                     break;
+
+                             }
+                         }
                      }
                      AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("444444"));
                      Scene.Remove(d);
@@ -456,7 +565,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        private void CutKevins()
+        private void CutKevins(bool collisionOverride = false)
         {
             if (KevinCuttingActivationList.RemoveAll(d =>
              {
@@ -471,7 +580,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             KevinCutting.RemoveAll(d =>
             {
-                if (!d.CollideCheck(this))
+                if ((!d.CollideCheck(this) || collisionOverride))
                 {
                     if (!Scene.Contains(d))
                     {
@@ -486,11 +595,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     bool chillOut = (bool)cbType.GetField("chillOut", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
 
                     var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                    List<StaticMover> staticMovers = (List<StaticMover>) cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
                     var newReturnStack = Activator.CreateInstance(returnStack.GetType(), returnStack);
 
                     Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
 
                     //Process private fields
+
+                    
+
                     CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
 
                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
@@ -501,18 +614,19 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                     int cb2Width = (int)resultArray[3].X;
                     int cb2Height = (int)resultArray[3].Y;
-                    //create cloned crushblocks + set data
 
+                    //create cloned crushblocks + set data
                     Scene.Remove(d);
 
                     Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
+                    bool completelyRemoved = true;
                     if (cb1Width >= 24 && cb1Height >= 24)
                     {
                         CrushBlock cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
                         cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, returnStack);
                         Scene.Add(cb1);
-
                         KevinCuttingActivationList.Add(cb1);
+                        completelyRemoved = false;
                     }
                     if (cb2Width >= 24 && cb2Height >= 24)
                     {
@@ -520,6 +634,110 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack);
                         Scene.Add(cb2);
                         KevinCuttingActivationList.Add(cb2);
+                        completelyRemoved = false;
+                    }
+
+                    foreach (StaticMover mover in staticMovers)
+                    {
+                        if (completelyRemoved)
+                        {
+                            Scene.Remove(mover.Entity);
+                            continue;
+                        }
+                        mover.Platform = null;
+                        if (mover.Entity is Spikes)
+                        {
+                            //destroy all parts of spikes that aren't connected anymore.
+                            //switch depending on direction
+                            Spikes spike = mover.Entity as Spikes;
+                            switch (spike.Direction)
+                            {
+                                case Spikes.Directions.Left:
+                                case Spikes.Directions.Right:
+                                    //compare to left side edge (cb1Pos.X), then check for a hole on left side (cb1Pos.Y + cb1Height) to the top of the spikes
+                                    if (cb1Pos.X < d.Position.X && spike.Direction == Spikes.Directions.Left)
+                                    {
+                                        Scene.Remove(spike);
+                                    }
+                                    else if (cb2Pos.X + Width > d.Position.X + Width && spike.Direction == Spikes.Directions.Right)
+                                    {
+                                        Scene.Remove(spike);
+                                    }
+                                    else if (cb1Pos.Y + cb1Height < spike.Y + spike.Height) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
+                                    {
+
+                                        Scene.Remove(spike);
+
+                                        bool spikesOnCB1 = spike.Y < cb1Pos.Y + cb1Height;
+                                        bool spikesOnCB2 = spike.Y + spike.Height > cb2Pos.Y;
+                                        if (spikesOnCB1)
+                                        {
+                                            float spikePosY = spike.Y;
+                                            int spikeHeight = (int)(cb1Pos.Y + cb1Height - spike.Y);
+                                            if (spikeHeight >= 24)
+                                            {
+                                                Spikes newSpike1 = new Spikes(new Vector2(spike.X, spikePosY), spikeHeight, spike.Direction, "default");
+                                                Scene.Add(newSpike1);
+                                            }
+                                        }
+                                        if (spikesOnCB2)
+                                        {
+                                            float spikePosY = cb2Pos.Y;
+                                            int spikeHeight = (int)(spike.Y + spike.Height - cb2Pos.Y);
+                                            if (spikeHeight >= 24)
+                                            {
+                                                Spikes newSpike1 = new Spikes(new Vector2(spike.X, spikePosY), spikeHeight, spike.Direction, "default");
+                                                Scene.Add(newSpike1);
+                                            }
+                                        }
+
+                                    }
+                                    break;
+                                    
+                                case Spikes.Directions.Up:
+                                case Spikes.Directions.Down:
+                                    //compare to right side edge (cb1Pos.X + cb1Width), then check for a hole on right side (cb1Pos.Y + cb1Height)
+                                    if (cb1Pos.Y > d.Position.Y)
+                                    {
+                                        Scene.Remove(spike);
+                                    }
+                                    else if (cb2Pos.Y + cb2Height < d.Position.Y + Height)
+                                    {
+                                        Scene.Remove(spike);
+                                    }
+                                    else if (cb1Pos.X + cb1Width < spike.X + spike.Width) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
+                                    {
+                                        Scene.Remove(spike);
+
+                                        bool spikesOnCB1 = spike.X < cb1Pos.X + cb1Width;
+                                        bool spikesOnCB2 = spike.X + spike.Width > cb2Pos.X;
+                                        if (spikesOnCB1)
+                                        {
+                                            float spikePosX = spike.X;
+                                            int spikeWidth = (int)(cb1Pos.X + cb1Width - spike.X);
+                                            if (spikeWidth >= 24)
+                                            {
+
+                                                Spikes newSpike = new Spikes(new Vector2(spikePosX, spike.Y), spikeWidth, spike.Direction, "default");
+                                                Scene.Add(newSpike);
+                                            }
+                                        }
+                                        if (spikesOnCB2)
+                                        {
+                                            float spikePosX = cb2Pos.X;
+                                            int spikeWidth = (int)(spike.X + spike.Width - cb2Pos.X);
+                                            if (spikeWidth >= 24)
+                                            {
+                                                Spikes newSpike = new Spikes(new Vector2(spikePosX, spike.Y), spikeWidth, spike.Direction, "default");
+                                                Scene.Add(newSpike);
+                                            }
+                                                
+                                        }
+                                    }
+                                    break;
+
+                            }
+                        }
                     }
 
                     AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("62222b"));
