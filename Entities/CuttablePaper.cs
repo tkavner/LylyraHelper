@@ -1,4 +1,5 @@
-﻿using Celeste.Mod.LylyraHelper.Intefaces;
+﻿using Celeste.Mod.LylyraHelper.Components;
+using Celeste.Mod.LylyraHelper.Intefaces;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -30,7 +31,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 paperScraps = new ParticleType()
                 {
                     SourceChooser = sourceChooser,
-                    Color = color,
+                    Color = Calc.HexToColor("cac7e3"),
                     Acceleration = new Vector2(0f, 4f),
                     LifeMin = 0.8f,
                     LifeMax = 1.6f,
@@ -47,10 +48,19 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
+        internal static void Unload()
+        {
+        }
+
+        internal static void Load()
+        {
+            
+        }
+
         //TODO: Add ability to accomodate half cut (eg: scissors start on paper)
         public bool Cut(Vector2 cutPosition, Vector2 direction, int gapWidth, Vector2 cutStartPosition)
         {
-            Vector2[] arrayResults = Scissors.CalcCuts(Position, new Vector2(Width, Height), cutPosition, direction, gapWidth); //cuts gives where the new block should exist, we want where it should not
+            Vector2[] arrayResults = Slicer.CalcCuts(Position, new Vector2(Width, Height), cutPosition, direction, gapWidth); //cuts gives where the new block should exist, we want where it should not
             Vector2 p1, p2; //these points represent the cut area
             if (direction.X != 0) //horizontal cut, vertical gap
             {
