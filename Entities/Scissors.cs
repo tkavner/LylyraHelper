@@ -98,7 +98,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
             else
             {
-                this.directionalCollider = new Hitbox(10, 1f, -5f, -10f);
+                this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
                 directionPath = "up";
             }
             this.Position = initialPosition = Position;
@@ -126,7 +126,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             sprite.Play("break");
 
             //Partial cut non solid entities
-            if (Cutting.Count > 0 && timeElapsed > spawnGrace)
+            if ((Cutting.Count + DreamCutting.Count + KevinCutting.Count + KevinCuttingActivationList.Count + FallCutting.Count > 0) && timeElapsed > spawnGrace)
             {
                 CutPaper(true);
                 CutDreamBlocks(true);
@@ -236,10 +236,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             foreach (DreamBlock d in base.Scene.Tracker.GetEntities<DreamBlock>())
             {
-                int x1 = (int)d.Position.X;
+                int x1 = (int) d.Position.X;
                 int x2 = (int)(Position.X);
 
-                int y1 = (int)d.Position.Y;
+                int y1 = (int) d.Position.Y;
                 int y2 = (int)(Position.Y);
                 if (!DreamCutting.Contains(d) && this.CollideCheck(d))
                 {
@@ -352,12 +352,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             if (DreamCutting.RemoveAll(d =>
             {
+
                 if ((!d.CollideCheck(this) || collisionOverride) && Scene.Contains(d))
                 {
-                    if (!Scene.Contains(d))
-                    {
-                        return true;
-                    }
                     Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, CutDirection, cutSize);
 
                     Vector2 db1Pos = resultArray[0];
@@ -382,7 +379,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scene.Remove(d);
                     cutStartPositions.Remove(d);
                     Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
-
+                    Logger.Log(LogLevel.Error, "Lylyra", "Got this far");
                     AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("000000"));
                     return true;
                 }
