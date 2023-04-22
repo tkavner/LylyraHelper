@@ -20,11 +20,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
             Scissors.Load();
+            CuttablePaper.Load();
         }
 
         public override void Unload()
         {
             Scissors.Unload();
+            CuttablePaper.Unload();
         }
 
         public override void LoadContent(bool firstLoad)
