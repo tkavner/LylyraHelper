@@ -15,6 +15,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
     public class AddSlicerOnStartTrigger : Trigger
     {
         private Vector2 direction;
+        private bool sliceOnImpact;
 
         public AddSlicerOnStartTrigger(EntityData data, Vector2 offset) : base(data, offset)
         {
@@ -34,6 +35,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             {
                 direction = -Vector2.UnitX;
             }
+            sliceOnImpact = data.Bool("SliceOnImpact", false);
         }
 
         public override void Update()
@@ -49,10 +51,10 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                 Collider cRight = new Hitbox(e.Collider.Width + 5, e.Height + 0, 0, 0);
                 if (e is CrushBlock)
                 {
-                    e.Add(new Slicer(Vector2.UnitX, (int)e.Height + 8, SceneAs<Level>(), 5, cRight));
-                    e.Add(new Slicer(-Vector2.UnitY, (int)e.Width + 8, SceneAs<Level>(), 5, cUp));
-                    e.Add(new Slicer(-Vector2.UnitX, (int)e.Height + 8, SceneAs<Level>(), 5, cLeft));
-                    e.Add(new Slicer(Vector2.UnitY, (int)e.Width + 8, SceneAs<Level>(), 5, cDown));
+                    e.Add(new Slicer(Vector2.UnitX, (int)e.Height + 8, SceneAs<Level>(), 5, cRight, sliceOnImpact: sliceOnImpact));
+                    e.Add(new Slicer(-Vector2.UnitY, (int)e.Width + 8, SceneAs<Level>(), 5, cUp, sliceOnImpact: sliceOnImpact));
+                    e.Add(new Slicer(-Vector2.UnitX, (int)e.Height + 8, SceneAs<Level>(), 5, cLeft, sliceOnImpact: sliceOnImpact));
+                    e.Add(new Slicer(Vector2.UnitY, (int)e.Width + 8, SceneAs<Level>(), 5, cDown, sliceOnImpact: sliceOnImpact));
 
                 }
             }

@@ -24,16 +24,18 @@ namespace Celeste.Mod.LylyraHelper.Components
         private Dictionary<Entity, Vector2> sliceStartPositions = new Dictionary<Entity, Vector2>();
         private Level level;
         private int directionalOffset;
+        private bool sliceOnImpact;
 
         public int entitiesCut { get; private set; }
 
-        public Slicer(Vector2 Direction, int cutSize, Level level, int directionalOffset, Collider slicingCollider = null, bool active = true) :base(active, false)
+        public Slicer(Vector2 Direction, int cutSize, Level level, int directionalOffset, Collider slicingCollider = null, bool active = true, bool sliceOnImpact = false) : base(active, false)
         {
             this.slicingCollider = slicingCollider;
             this.Direction = Direction;
             this.cutSize = cutSize;
             this.level = level;
             this.directionalOffset = directionalOffset;
+            this.sliceOnImpact = sliceOnImpact;
 
             if (CuttablePaper.paperScraps == null)
             {
@@ -68,6 +70,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             Collider tempHold = Entity.Collider;
             if (slicingCollider != null) Entity.Collider = slicingCollider;
             CheckCollisions();
+
             Slice();
             Entity.Collider = tempHold;
         }
@@ -104,21 +107,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             foreach (DreamBlock d in base.Scene.Tracker.GetEntities<DreamBlock>())
             {
                 if (d == Entity) continue;
-                int x1 = (int)d.Position.X;
-                int x2 = (int)(Position.X);
-
-                int y1 = (int)d.Position.Y;
-                int y2 = (int)(Position.Y);
                 if (!slicingEntities.Contains(d) && d.CollideCheck(Entity))
                 {
-                    if (!(x1 == x2 ||
-                        y1 == y2 ||
-                        x1 + d.Width <= x2 ||
-                        y1 + d.Height <= y2))
-                    {
-                        slicingEntities.Add(d);
-                        sliceStartPositions.Add(d, Position);
-                    }
+                    slicingEntities.Add(d);
+                    sliceStartPositions.Add(d, Position);
                 }
             }
             foreach (Solid d in base.Scene.Tracker.GetEntities<Solid>())
@@ -128,22 +120,13 @@ namespace Celeste.Mod.LylyraHelper.Components
                 if (d.GetType() == typeof(CrushBlock) || d.GetType() == typeof(FallingBlock))
                 {
 
+                    Logger.Log(LogLevel.Error, "awe11111", "" + slicingEntities.Count);
                     if (!slicingEntities.Contains(d) && d.CollideCheck(Entity))
                     {
 
-                        int x1 = (int)d.Position.X;
-                        int x2 = (int)(Position.X);
-
-                        int y1 = (int)d.Position.Y;
-                        int y2 = (int)(Position.Y);
-                        if (!(x1 == x2 ||
-                            y1 == y2 ||
-                            x1 + d.Width <= x2 ||
-                            y1 + d.Height <= y2))
-                        {
-                            slicingEntities.Add(d);
-                            sliceStartPositions.Add(d, Position);
-                        }
+                        Logger.Log(LogLevel.Error, "awefawef", "" + slicingEntities.Count);
+                        slicingEntities.Add(d);
+                        sliceStartPositions.Add(d, Position);
                     }
                 }
                 else
@@ -161,10 +144,20 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         }
         //welcome to hell. Basically all cutting requires a wild amount of differing requirements to cut in half. Have fun.
-        public void Slice(bool collisionOverride = false) {
-            Vector2 Position = Entity.Position;
+        public void Slice(bool collisionOverride = false)
+        {
+            Vector2 Position = Entity.Center;
             float Width = Entity.Width;
             float Height = Entity.Width;
+
+            secondFrameActivation.RemoveAll(d =>
+            {
+                Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
+                cbType.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, -Direction);
+                cbType.GetMethod("Attack", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(d, new object[] { -Direction });
+                return true;
+            });
+
             entitiesCut += slicingEntities.RemoveAll(d =>
             {
                 if (!Scene.Contains(d))
@@ -175,7 +168,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 if (d is CuttablePaper)
                 {
                     CuttablePaper paper = d as CuttablePaper;
-                    if (!paper.CollidePaper(Entity) || collisionOverride)
+                    if (!paper.CollidePaper(Entity) || collisionOverride || sliceOnImpact)
                     {
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
                         bool toReturn = paper.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
@@ -186,7 +179,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
                 if (d is DreamBlock)
                 {
-                    if ((!d.CollideCheck(Entity) || collisionOverride) && Scene.Contains(d))
+                    if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact) && Scene.Contains(d))
                     {
                         Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Position, Direction, cutSize);
 
@@ -220,7 +213,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
                 if (d is CrushBlock)
                 {
-                    if ((!d.CollideCheck(Entity) || collisionOverride))
+                    if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact))
                     {
                         if (!Scene.Contains(d))
                         {
@@ -385,7 +378,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
                 if (d is FallingBlock)
                 {
-                    if ((!d.CollideCheck(Entity) || collisionOverride))
+                    if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact))
                     {
                         Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Position, Direction, cutSize);
                         Vector2 fb1Pos = resultArray[0];
