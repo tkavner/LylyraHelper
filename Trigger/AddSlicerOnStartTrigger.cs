@@ -16,14 +16,16 @@ namespace Celeste.Mod.LylyraHelper.Triggers
     {
         private Vector2 direction;
         private bool sliceOnImpact;
+        private string strdirection;
 
         public AddSlicerOnStartTrigger(EntityData data, Vector2 offset) : base(data, offset)
         {
-            string strdirection = data.Attr("Direction", "all");
+            strdirection = data.Attr("Direction", "all");
             if (strdirection == "up")
             {
                 direction = -Vector2.UnitY;
-            } else if (strdirection == "down")
+            }
+            else if (strdirection == "down")
             {
                 direction = Vector2.UnitY;
             }
@@ -34,6 +36,10 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             else if (strdirection == "left")
             {
                 direction = -Vector2.UnitX;
+            } 
+            else
+            {
+
             }
             sliceOnImpact = data.Bool("SliceOnImpact", false);
         }

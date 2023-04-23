@@ -21,7 +21,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 })]
     public class KnifeSpikes : Spikes
     {
-        private bool sliceOnImpact;
+        public bool sliceOnImpact { get; private set; }
 
         public static Entity LoadUp(Level level, LevelData levelData, Vector2 offset, EntityData data) => new KnifeSpikes(data, offset, Directions.Up);
         public static Entity LoadDown(Level level, LevelData levelData, Vector2 offset, EntityData data) => new KnifeSpikes(data, offset, Directions.Down);
@@ -31,6 +31,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base(data, offset, dir)
         {
             sliceOnImpact = data.Bool("SliceOnImpact", false);
+        }
+
+        public KnifeSpikes(Vector2 position, int size, Directions direction, string type, bool sliceOnImpact) : base(position, size, direction, type)
+        {
+            this.sliceOnImpact = sliceOnImpact;
         }
 
         public override void Added(Scene scene)
