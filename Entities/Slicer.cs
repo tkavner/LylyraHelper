@@ -129,7 +129,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 else if (d.GetType() == typeof(CrushBlock) || d.GetType() == typeof(FallingBlock) || d.GetType() == typeof(DreamBlock) || d is CrystalStaticSpinner)
                 {
 
-                    if (!slicingEntities.Contains(d) && d.CollideCheck(Entity))
+                    if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
@@ -211,7 +211,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private bool SliceDreamBlock(DreamBlock dreamBlock, bool collisionOverride)
         {
-            Vector2[] resultArray = CalcCuts(dreamBlock.Position, new Vector2(dreamBlock.Width, dreamBlock.Height), Entity.Position, Direction, cutSize);
+            Vector2[] resultArray = CalcCuts(dreamBlock.Position, new Vector2(dreamBlock.Width, dreamBlock.Height), Entity.Center, Direction, cutSize);
 
             Vector2 db1Pos = resultArray[0];
             Vector2 db2Pos = resultArray[1];
@@ -234,7 +234,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             Scene.Remove(dreamBlock);
             sliceStartPositions.Remove(dreamBlock);
-            Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Position);
+            Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
             AddParticles(dreamBlock.Position, new Vector2(dreamBlock.Width, dreamBlock.Height), Calc.HexToColor("000000"));
             return true;
         }
@@ -266,7 +266,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
                 CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
 
-                Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Position, Direction, cutSize);
+                Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Center, Direction, cutSize);
                 Vector2 cb1Pos = resultArray[0];
                 Vector2 cb2Pos = resultArray[1];
                 int cb1Width = (int)resultArray[2].X;
@@ -277,7 +277,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
                 //create cloned crushblocks + set data
 
-                Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Position);
+                Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
                 bool completelyRemoved = true;
                 if (cb1Width >= 24 && cb1Height >= 24)
                 {
@@ -314,14 +314,14 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact))
             {
-                Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Position, Direction, cutSize);
-                Vector2 fb1Pos = resultArray[0];
-                Vector2 fb2Pos = resultArray[1];
-                int fb1Width = (int)resultArray[2].X;
-                int fb1Height = (int)resultArray[2].Y;
+                Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Center, Direction, cutSize);
+                Vector2 cb1Pos = resultArray[0];
+                Vector2 cb2Pos = resultArray[1];
+                int cb1Width = (int)resultArray[2].X;
+                int cb1Height = (int)resultArray[2].Y;
 
-                int fb2Width = (int)resultArray[3].X;
-                int fb2Height = (int)resultArray[3].Y;
+                int cb2Width = (int)resultArray[3].X;
+                int cb2Height = (int)resultArray[3].Y;
 
                 var tileTypeField = d.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
                 List<StaticMover> staticMovers = (List<StaticMover>)d.GetType().GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
@@ -344,9 +344,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                     Audio.Play("event:/game/general/wall_break_stone", Entity.Position);
                 }
                 bool completelyRemoved = true;
-                if (fb1Width >= 8 && fb1Height >= 8)
+                if (cb1Width >= 8 && cb1Height >= 8)
                 {
-                    FallingBlock fb1 = new FallingBlock(fb1Pos, tileTypeChar, fb1Width, fb1Height, false, false, true);
+                    FallingBlock fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, false, false, true);
                     Scene.Add(fb1);
 
 
@@ -354,9 +354,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                     fb1.Triggered = true;
                     fb1.FallDelay = 0;
                 }
-                if (fb2Width >= 8 && fb2Height >= 8)
+                if (cb2Width >= 8 && cb2Height >= 8)
                 {
-                    FallingBlock fb2 = new FallingBlock(fb2Pos, tileTypeChar, fb2Width, fb2Height, false, false, true);
+                    FallingBlock fb2 = new FallingBlock(cb2Pos, tileTypeChar, cb2Width, cb2Height, false, false, true);
                     Scene.Add(fb2);
 
                     completelyRemoved = false;
@@ -365,7 +365,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
                 foreach (StaticMover mover in staticMovers)
                 {
-                    //HandleStaticMovers(completelyRemoved, d, mover, fb1Pos, fb2Pos, fb1Width, fb1Height, fb2Width, fb2Height);
+                    HandleStaticMovers(completelyRemoved, d, mover, cb1Pos, cb2Pos, cb1Width, cb1Height, cb2Width, cb2Height);
                 }
                 AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("444444"));
                 Scene.Remove(d);
@@ -601,6 +601,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             pos1 = pos2 = blockPos;
             size1 = new Vector2(blockSize.X, blockSize.Y);
             size2 = new Vector2(blockSize.X, blockSize.Y);
+            Logger.Log(LogLevel.Error, "LylyraHelperError", String.Format("Cut Pos ({0},{1}), Block Pos ({2},{3}), Block 2 Start({4},{5}), ({6},{7})", cutPos.X, cutPos.Y, blockPos.X, blockPos.Y, pos2.X, pos2.Y, cutPos.Y + gapWidth / 2, "something"));
+
             if (cutDir.X != 0) //cut is horizontal
             {
                 float delY = blockPos.Y + blockSize.Y - (cutPos.Y + gapWidth / 2);
@@ -634,7 +636,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                     size2.X = blockSize.X - 8;
                 }
             }
-
+            Logger.Log(LogLevel.Error, "LylyraHelperError", String.Format("Cut Pos ({0},{1}), Block Pos ({2},{3}), Block 2 Start({4},{5}), ({6},{7})", cutPos.X, cutPos.Y, blockPos.X, blockPos.Y, pos2.X, pos2.Y, size1.Y, size2.Y));
 
             return new Vector2[] { pos1, pos2, size1, size2 };
         }
