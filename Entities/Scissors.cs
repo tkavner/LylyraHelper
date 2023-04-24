@@ -201,6 +201,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Collider = directionalCollider;
             breaking = CollideCheck<SolidTiles>() || breaking;
             Collider = tempHold;
+
         }
 
         private Vector2 GetDirectionalPosition()

@@ -126,6 +126,19 @@ namespace Celeste.Mod.LylyraHelper.Components
                         if (!respawning) booster.PlayerReleased();
                     }
                 }
+                if (d is Bumper)
+                {
+                    Bumper bumper = d as Bumper;
+                    if (!slicingEntities.Contains(d) && d.CollideCheck(Entity))
+                    {
+                        Type boosterType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Bumper", true, true);
+                        bool respawning = ((float)boosterType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d) > 0);
+                        if (!respawning)
+                        {
+
+                        }
+                    }
+                }
                 else if (d.GetType() == typeof(CrushBlock) || d.GetType() == typeof(FallingBlock) || d.GetType() == typeof(DreamBlock) || d is CrystalStaticSpinner)
                 {
 
@@ -165,7 +178,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     sliceStartPositions.Remove(d);
                     return true;
                 }
-                //paper
                 if (d is CuttablePaper)
                 {
                     CuttablePaper paper = d as CuttablePaper;
@@ -194,18 +206,16 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                     else if (d is CrystalStaticSpinner)
                     {
-                        if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact))
-                        {
-                            (d as CrystalStaticSpinner).Destroy();
-                        }
+                        (d as CrystalStaticSpinner).Destroy();
+                        sliceStartPositions.Remove(d);
+                        return true;
                     }
                 }
 
                 //else this item should not be in the list because cutting it is not supported. Warn and have it removed.
                 Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Slicer attempting to slice unsupported Type: {0}.", d.GetType().Name));
 
-                sliceStartPositions.Remove(d);
-                return true;
+                return false;
             });
         }
 
@@ -375,9 +385,9 @@ namespace Celeste.Mod.LylyraHelper.Components
             return false;
         }
 
-        private void HandleStaticMovers(bool completelyRemoved, Entity parent, StaticMover mover, 
-            Vector2 cb1Pos, Vector2 cb2Pos, 
-            int cb1Width, int cb1Height, int cb2Width, int cb2Height, 
+        private void HandleStaticMovers(bool completelyRemoved, Entity parent, StaticMover mover,
+            Vector2 cb1Pos, Vector2 cb2Pos,
+            int cb1Width, int cb1Height, int cb2Width, int cb2Height,
             int minLength = 8)
         {
             if (completelyRemoved)
@@ -487,7 +497,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                             Scene.Remove(spike);
                             break;
                         }
-                        
+
                         if (cb1Pos.X + cb1Width < spike.X + spike.Width) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
                         {
                             Scene.Remove(spike);
