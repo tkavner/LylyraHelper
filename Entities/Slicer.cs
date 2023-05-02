@@ -6,8 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Celeste.Mod.LylyraHelper.Components
 {
@@ -26,6 +24,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         private Level level;
         private int directionalOffset;
         private bool sliceOnImpact;
+        private Action entityCallback;
 
         public int entitiesCut { get; private set; }
 
@@ -126,22 +125,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                         if (!respawning) booster.PlayerReleased();
                     }
                 }
-                if (d is Bumper)
-                {
-                    Bumper bumper = d as Bumper;
-                    if (!slicingEntities.Contains(d) && d.CollideCheck(Entity))
-                    {
-                        Type boosterType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Bumper", true, true);
-                        bool respawning = ((float)boosterType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d) > 0);
-                        if (!respawning)
-                        {
-
-                        }
-                    }
-                }
                 else if (d.GetType() == typeof(CrushBlock) || d.GetType() == typeof(FallingBlock) || d.GetType() == typeof(DreamBlock) || d is CrystalStaticSpinner)
                 {
-
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
                         slicingEntities.Add(d);
@@ -155,8 +140,14 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
 
         }
+
+        public void AddListener(Action p)
+        {
+            entityCallback = p;
+        }
+
         //Basically all cutting requires a wild amount of differing requirements to cut in half.
-        //probably reorganize this though.
+        //There's definitely cleanup to be done in here, but in general because we want two (almost) identical copies of objects, with lots of weird exceptions
         public void Slice(bool collisionOverride = false)
         {
             Vector2 Position = Entity.Center;
@@ -192,17 +183,20 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
                 else if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact) && Scene.Contains(d))
                 {
-                    if (d is DreamBlock)
+                    if (d is Solid)
                     {
-                        return SliceDreamBlock(d as DreamBlock, collisionOverride);
-                    }
-                    else if (d is CrushBlock)
-                    {
-                        return SliceKevin(d as CrushBlock, collisionOverride);
-                    }
-                    else if (d is FallingBlock)
-                    {
-                        return SliceFallingBlock(d as FallingBlock, collisionOverride);
+                        if (d is DreamBlock)
+                        {
+                            return SliceDreamBlock(d as DreamBlock, collisionOverride);
+                        }
+                        else if (d is CrushBlock)
+                        {
+                            return SliceKevin(d as CrushBlock, collisionOverride);
+                        }
+                        else if (d is FallingBlock)
+                        {
+                            return SliceFallingBlock(d as FallingBlock, collisionOverride);
+                        }
                     }
                     else if (d is CrystalStaticSpinner)
                     {
@@ -277,8 +271,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                 CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
 
                 Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Center, Direction, cutSize);
-                Vector2 cb1Pos = resultArray[0];
-                Vector2 cb2Pos = resultArray[1];
+                Vector2 cb1Pos = Vector2Int(resultArray[0]);
+                Vector2 cb2Pos = Vector2Int(resultArray[1]);
                 int cb1Width = (int)resultArray[2].X;
                 int cb1Height = (int)resultArray[2].Y;
 
@@ -288,28 +282,30 @@ namespace Celeste.Mod.LylyraHelper.Components
                 //create cloned crushblocks + set data
 
                 Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
-                bool completelyRemoved = true;
-                if (cb1Width >= 24 && cb1Height >= 24)
+                bool cb1Added = false;
+                if (cb1Added = cb1Width >= 24 && cb1Height >= 24)
                 {
                     CrushBlock cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
                     cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, newReturnStack1);
                     Scene.Add(cb1);
                     secondFrameActivation.Add(cb1);
-                    completelyRemoved = false;
+                    Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added Kevin cb1: ({0}, {1}), Size: ({2}, {3})", cb1Pos.X, cb1Pos.Y, cb1Width, cb1Height));
+                    
                 }
-                if (cb2Width >= 24 && cb2Height >= 24)
+                bool cb2Added = false;
+                if (cb2Added = cb2Width >= 24 && cb2Height >= 24)
                 {
                     CrushBlock cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
                     cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack2);
                     Scene.Add(cb2);
                     secondFrameActivation.Add(cb2);
+                    Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added Kevin cb2: ({0}, {1}), Size: ({2}, {3})", cb2Pos.X, cb2Pos.Y, cb2Width, cb2Height));
 
-                    completelyRemoved = false;
                 }
 
                 foreach (StaticMover mover in staticMovers)
                 {
-                    HandleStaticMovers(completelyRemoved, d, mover, cb1Pos, cb2Pos, cb1Width, cb1Height, cb2Width, cb2Height, 24);
+                    HandleStaticMover(cb1Added, cb2Added, d, mover, cb1Pos, cb2Pos, cb1Width, cb1Height, cb2Width, cb2Height, 24);
                 }
                 Scene.Remove(d);
                 AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("62222b"));
@@ -318,6 +314,11 @@ namespace Celeste.Mod.LylyraHelper.Components
                 return true;
             }
             return false;
+        }
+
+        private static Vector2 Vector2Int(Vector2 vector2)
+        {
+            return new Vector2((int) Math.Round(vector2.X), (int) Math.Round(vector2.Y));
         }
 
         private bool SliceFallingBlock(FallingBlock d, bool collisionOverride)
@@ -375,9 +376,12 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
                 foreach (StaticMover mover in staticMovers)
                 {
-                    HandleStaticMovers(completelyRemoved, d, mover, cb1Pos, cb2Pos, cb1Width, cb1Height, cb2Width, cb2Height);
+                    //HandleStaticMover(completelyRemoved, d, mover, cb1Pos, cb2Pos, cb1Width, cb1Height, cb2Width, cb2Height);
                 }
-                AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("444444"));
+                AddParticles(
+                    d.Position,
+                    new Vector2(d.Width, d.Height),
+                    Calc.HexToColor("444444"));
                 Scene.Remove(d);
                 sliceStartPositions.Remove(d);
                 return true;
@@ -385,16 +389,19 @@ namespace Celeste.Mod.LylyraHelper.Components
             return false;
         }
 
-        private void HandleStaticMovers(bool completelyRemoved, Entity parent, StaticMover mover,
+        private void HandleStaticMover(bool cb1Added, bool cb2Added, Entity parent, StaticMover mover,
             Vector2 cb1Pos, Vector2 cb2Pos,
             int cb1Width, int cb1Height, int cb2Width, int cb2Height,
             int minLength = 8)
         {
-            if (completelyRemoved)
+            if (!cb1Added && !cb2Added)
             {
                 Scene.Remove(mover.Entity);
                 return;
             }
+
+            //check cutting needs to happen, if not just glue mover next to item
+
             mover.Platform = null;
             if (mover.Entity is Spikes || mover.Entity is KnifeSpikes)
             {
@@ -441,11 +448,15 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
                                         Scene.Add(newSpike1);
+                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added KnifeSpikeLR cb1: ({0}, {1}), Length: {2}", cb1Pos.X, cb1Pos.Y, spikeHeight));
+
                                     }
                                     else
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
+                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeLR cb1: ({0}, {1}, Length: {2})", cb1Pos.X, cb1Pos.Y, spikeHeight));
+
                                     }
                                 }
                             }
@@ -471,11 +482,15 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
                                         Scene.Add(newSpike1);
+                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added KnifeSpikeLR cb2: ({0}, {1}), Length: {2}", cb2Pos.X, cb2Pos.Y, spikeHeight));
+
                                     }
                                     else
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
+                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeLR cb2: ({0}, {1}), Length: {2}", cb2Pos.X, cb2Pos.Y, spikeHeight));
+
                                     }
                                 }
                             }
@@ -528,11 +543,15 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
                                         Scene.Add(newSpike1);
+                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeUD cb1: ({0}, {1})", cb1Pos.X, cb1Pos.Y));
+
                                     }
                                     else
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
+                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeUD cb1: ({0}, {1})", cb1Pos.X, cb1Pos.Y));
+
                                     }
                                 }
                             }
@@ -560,14 +579,16 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
                                         Scene.Add(newSpike1);
+                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeUD cb2: ({0}, {1})", cb2Pos.X, cb2Pos.Y));
+
                                     }
                                     else
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
+                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeUD cb2: ({0}, {1})", cb2Pos.X, cb2Pos.Y));
+
                                     }
-                                    Spikes newSpike = new Spikes(new Vector2(spikePosX, spike.Y), spikeWidth, spike.Direction, overrideType);
-                                    Scene.Add(newSpike);
                                 }
                             }
                         }
@@ -658,17 +679,17 @@ namespace Celeste.Mod.LylyraHelper.Components
         }
 
 
-        public void Load()
+        public static void Load()
         {
             On.Celeste.Bumper.Update += BumperSlice;
         }
 
-        public void Unload()
+        public static void Unload()
         {
             On.Celeste.Bumper.Update -= BumperSlice;
         }
 
-        private void BumperSlice(On.Celeste.Bumper.orig_Update orig, Bumper self)
+        private static void BumperSlice(On.Celeste.Bumper.orig_Update orig, Bumper self)
         {
             orig.Invoke(self);
             List<Slicer> slicerList = self.CollideAllByComponent<Slicer>();
@@ -680,7 +701,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private void OnExplosion()
         {
-
+            if (entityCallback != null) entityCallback.Invoke();
         }
     }
 

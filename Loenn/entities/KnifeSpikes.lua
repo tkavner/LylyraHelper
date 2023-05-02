@@ -1,25 +1,23 @@
 local spikeHelper = require("helpers.spikes")
 
-local spikeUp = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikesUp", "up")
-spikeUp.Name = "LylyraHelper/KnifeSpikesUp"
-local spikeDown = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikesDown", "down")
-spikeDown.Name = "LylyraHelper/KnifeSpikesDown"
-local spikeLeft = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikesLeft", "left")
-spikeLeft.Name = "LylyraHelper/KnifeSpikesLeft"
-local spikeRight = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikesRight", "right")
-spikeRight.Name = "LylyraHelper/KnifeSpikesRight"
-local knifeSpikes = {}
+local timedTriggerSpikes = {}
 
-for _, placement in ipairs(spikeUp.placements) do
-	placement.data.SliceOnImpact = false
+local directions = {"Up", "Down", "Left", "Right"}
+
+-- for each spike direction, we'll let lönn's spike helper generate most of what we need and won't need to take care of
+-- then we can replace or modify what was already generated to finish up the plugins
+for _, dir in ipairs(directions) do
+    local dirLower = string.lower(dir)
+    local spikes = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikes" .. dir, dirLower, false, true)
+
+    for _, placement in ipairs(spikes.placements) do
+        placement.data.Delay = 0.4
+        placement.data.WaitForPlayer = false
+        placement.data.Grouped = false
+        placement.data.Rainbow = false
+    end
+
+    table.insert(timedTriggerSpikes, spikes)
 end
-for _, placement in ipairs(spikeDown.placements) do
-	placement.data.SliceOnImpact = false
-end
-for _, placement in ipairs(spikeLeft.placements) do
-	placement.data.SliceOnImpact = false
-end
-for _, placement in ipairs(spikeRight.placements) do
-	placement.data.SliceOnImpact = false
-end
-return {spikeUp, spikeDown, spikeLeft, spikeRight}
+
+return timedTriggerSpikes
