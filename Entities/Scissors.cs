@@ -28,11 +28,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private bool Moving = true;
         private bool playedAudio;
         private string directionPath;
-        private List<DreamBlock> DreamCutting = new List<DreamBlock>();
-        private List<FallingBlock> FallCutting = new List<FallingBlock>();
-        private List<CrushBlock> KevinCutting = new List<CrushBlock>();
 
-        private List<CrushBlock> KevinCuttingActivationList = new List<CrushBlock>();
 
         private Dictionary<Entity, Vector2> cutStartPositions = new Dictionary<Entity, Vector2>();
 
@@ -119,6 +115,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Add(shaker = new Shaker());
             Add(new Coroutine(Break()));
             Depth = Depths.Enemy - 400;
+            Collidable = true;
         }
 
         private IEnumerator Break()
@@ -128,7 +125,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             sprite.Play("break");
 
             //Partial cut non solid entities
-            if ((Cutting.Count + DreamCutting.Count + KevinCutting.Count + KevinCuttingActivationList.Count + FallCutting.Count > 0) && timeElapsed > spawnGrace)
+            if (timeElapsed > spawnGrace)
             {
                 slicer.Slice(true);
             }
@@ -143,6 +140,34 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.Added(scene);
             level = SceneAs<Level>();
             Add(slicer = new Slicer(CutDirection, cutSize, SceneAs<Level>(), 5, directionalCollider));
+            /*slicer.AddListener(() => {
+                //list of things that need to be changed:
+                //Cut direction
+                //sprite???
+                //
+                sprite.Scale *= -1;
+                CutDirection *= -1;
+                if (CutDirection.X > 0)
+                {
+                    directionPath = "right";
+                    this.directionalCollider = new Hitbox(1, 6f, 10f, -5f);
+                }
+                else if (CutDirection.X < 0)
+                {
+                    directionPath = "left";
+                    this.directionalCollider = new Hitbox(1, 6f, -10f, -5f);
+                }
+                else if (CutDirection.Y > 0)
+                {
+                    directionPath = "down";
+                    this.directionalCollider = new Hitbox(10, 1f, -5f, 10f);
+                }
+                else
+                {
+                    this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
+                    directionPath = "up";
+                }
+            });*/
         }
 
         private void OnPlayer(Player player)
@@ -184,16 +209,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             playedAudio = true;
                         }
                     }
-                    foreach (Solid d in base.Scene.Tracker.GetEntities<Solid>())
-                    {
-                        if (d is SolidTiles)
-                        {
-                            if (d.CollideCheck(this))
-                            {
-                                breaking = true;
-                            }
-                        }
-                    }
+                    
                     if (cutStartPositions.Count > 0 && timeElapsed > spawnGrace + 0.1F)
                     {
                         level.ParticlesFG.Emit(scissorShards, GetDirectionalPosition());
@@ -209,6 +225,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 }
 
             }
+            var tempHold = Collider;
+            Collider = directionalCollider;
+            breaking = CollideCheck<SolidTiles>() || breaking;
+            Collider = tempHold;
+
         }
 
         private Vector2 GetDirectionalPosition()
@@ -255,7 +276,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (!Moving && !breaking) sprite.Position += shaker.Value;
             base.Render();
             sprite.Position = placeholder;
-            
         }
 
         private static float Mod(float x, float m)
