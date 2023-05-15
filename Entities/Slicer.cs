@@ -220,9 +220,9 @@ namespace Celeste.Mod.LylyraHelper.Components
             });
         }
 
-        private bool SliceDreamBlock(DreamBlock dreamBlock, bool collisionOverride)
+        private bool SliceDreamBlock(DreamBlock original, bool collisionOverride)
         {
-            Vector2[] resultArray = CalcCuts(dreamBlock.Position, new Vector2(dreamBlock.Width, dreamBlock.Height), Entity.Center, Direction, cutSize);
+            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
 
             Vector2 db1Pos = resultArray[0];
             Vector2 db2Pos = resultArray[1];
@@ -233,20 +233,26 @@ namespace Celeste.Mod.LylyraHelper.Components
             int db2Height = (int)resultArray[3].Y;
             DreamBlock d1 = new DreamBlock(db1Pos, db1Width, db1Height, null, false, false);
             DreamBlock d2 = new DreamBlock(db2Pos, db2Width, db2Height, null, false, false);
-            if (db1Width >= 8 && db1Height >= 8)
-            {
+            bool db1Added = false;
+            bool db2Added = false;
 
-                Scene.Add(d1);
-            }
-            if (db2Width >= 8 && db2Height >= 8)
-            {
+            if (db1Width >= 8 && db1Height >= 8) Scene.Add(d1);
+            if (db2Width >= 8 && db2Height >= 8) Scene.Add(d2);
+            Scene.Remove(original);
+            sliceStartPositions.Remove(original);
 
-                Scene.Add(d2);
+            List<StaticMover> staticMovers = (List<StaticMover>)
+                FakeAssembly.GetFakeEntryAssembly().
+                GetType("Celeste.CrushBlock", true, true).
+                GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
+                GetValue(original);
+            foreach (StaticMover mover in staticMovers)
+            {
+                HandleStaticMover(db1Added, db2Added, original, mover, db1Pos, db2Pos, db1Width, db1Height, db2Width, db2Height, 8, d1, d2);
             }
-            Scene.Remove(dreamBlock);
-            sliceStartPositions.Remove(dreamBlock);
             Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
-            AddParticles(dreamBlock.Position, new Vector2(dreamBlock.Width, dreamBlock.Height), Calc.HexToColor("000000"));
+            AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("000000"));
+
             return true;
         }
 
@@ -289,8 +295,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                 //create cloned crushblocks + set data
 
                 Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
-                bool cb1Added = false;
                 CrushBlock cb1 = null;
+                bool cb1Added;
                 if (cb1Added = cb1Width >= 24 && cb1Height >= 24)
                 {
                     cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
@@ -300,8 +306,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                     Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added Kevin cb1: ({0}, {1}), Size: ({2}, {3})", cb1Pos.X, cb1Pos.Y, cb1Width, cb1Height));
 
                 }
-                bool cb2Added = false;
+
                 CrushBlock cb2 = null;
+                bool cb2Added;
                 if (cb2Added = cb2Width >= 24 && cb2Height >= 24)
                 {
                     cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
@@ -309,7 +316,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     Scene.Add(cb2);
                     secondFrameActivation.Add(cb2);
                     Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added Kevin cb2: ({0}, {1}), Size: ({2}, {3})", cb2Pos.X, cb2Pos.Y, cb2Width, cb2Height));
-
                 }
 
                 foreach (StaticMover mover in staticMovers)
@@ -371,8 +377,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, false, false, true);
                     Scene.Add(fb1);
-
-
                     cb1Added = true;
                     fb1.Triggered = true;
                     fb1.FallDelay = 0;
@@ -381,7 +385,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     fb2 = new FallingBlock(cb2Pos, tileTypeChar, cb2Width, cb2Height, false, false, true);
                     Scene.Add(fb2);
-
                     cb2Added = false;
                     fb2.Triggered = true;
                     fb2.FallDelay = 0;
