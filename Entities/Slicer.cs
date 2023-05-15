@@ -115,8 +115,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 if (d == Entity) continue;
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
 
-
-
                 //vanilla entity handling
                 if (d is Booster)
                 {
@@ -263,9 +261,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                 if (!Scene.Contains(d))
                 {
                     sliceStartPositions.Remove(d);
-
                     return true;
                 }
+
                 //get private fields
                 Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
                 bool canMoveVertically = (bool)cbType?.GetField("canMoveVertically", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
@@ -280,7 +278,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
 
                 //Process private fields
-
                 CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
                 cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, level);
                 Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Center, Direction, cutSize);
@@ -303,8 +300,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, newReturnStack1);
                     Scene.Add(cb1);
                     secondFrameActivation.Add(cb1);
-                    Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added Kevin cb1: ({0}, {1}), Size: ({2}, {3})", cb1Pos.X, cb1Pos.Y, cb1Width, cb1Height));
-
                 }
 
                 CrushBlock cb2 = null;
@@ -315,7 +310,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack2);
                     Scene.Add(cb2);
                     secondFrameActivation.Add(cb2);
-                    Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added Kevin cb2: ({0}, {1}), Size: ({2}, {3})", cb2Pos.X, cb2Pos.Y, cb2Width, cb2Height));
                 }
 
                 foreach (StaticMover mover in staticMovers)
@@ -421,7 +415,15 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             //cutting shouldnt happen
 
+
+            float furthestLeft = cb1 != null ? cb1Pos.X : cb2Pos.X;
+            float furthestRight = cb2 != null ? cb2Pos.X + cb2Width : cb1Pos.X + cb1Width;
+
+            float furthestUp = cb1 != null ? cb1Pos.Y : cb2Pos.Y;
+            float furthestDown = cb2 != null ? cb2Pos.X + cb2Height : cb1Pos.X + cb1Height;
+
             mover.Platform = null;
+            Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Solid", true, true);
             if (mover.Entity is Spikes || mover.Entity is KnifeSpikes)
             {
                 //destroy all parts of spikes that aren't connected anymore.
@@ -429,12 +431,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 Spikes spike = mover.Entity as Spikes;
                 Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
                 string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spike);
-
-                float furthestLeft = cb1 != null ? cb1Pos.X : cb2Pos.X;
-                float furthestRight = cb2 != null ? cb2Pos.X + cb2Width : cb1Pos.X + cb1Width;
-
-                float furthestUp = cb1 != null ? cb1Pos.Y : cb2Pos.Y;
-                float furthestDown = cb2 != null ? cb2Pos.X + cb2Height : cb1Pos.X + cb1Height;
 
                 if (Spikes.Directions.Left == spike.Direction && furthestLeft > spike.Position.X)
                 {
@@ -457,92 +453,14 @@ namespace Celeste.Mod.LylyraHelper.Components
                     return;
                 }
 
-                float
-                    cb1MajorAxisPos, cb1MinorAxisPos,
-                    cb1MajorAxisSize, cb1MinorAxisSize,
-                    cb2MajorAxisPos, cb2MinorAxisPos,
-                    cb2MajorAxisSize, cb2MinorAxisSize,
-                    spikesMajorAxisPos, spikesMinorAxisPos;
-
-                switch (spike.Direction)
-                {
-                    //tall spikes
-                    case Spikes.Directions.Left:
-                        cb1MajorAxisPos = cb1Pos.Y;
-                        cb1MinorAxisPos = cb1Pos.X;
-
-                        cb1MajorAxisSize = cb1Height;
-                        cb1MinorAxisSize = cb1Width;
-
-                        cb2MajorAxisPos = cb2Pos.Y;
-                        cb2MinorAxisPos = cb1Pos.X;
-
-                        cb2MajorAxisSize = cb1Height;
-                        cb2MinorAxisSize = cb2Width;
-
-                        spikesMajorAxisPos = spike.Y;
-                        spikesMinorAxisPos = spike.X;
-                        break;
-                    case Spikes.Directions.Right:
-                        cb1MajorAxisPos = cb1Pos.Y;
-                        cb1MinorAxisPos = cb1Pos.X + cb1Width;
-
-                        cb1MajorAxisSize = cb1Height;
-                        cb1MinorAxisSize = cb1Width;
-
-                        cb2MajorAxisPos = cb2Pos.Y;
-                        cb2MinorAxisPos = cb1Pos.X + cb1Width;
-
-                        cb2MajorAxisSize = cb1Height;
-                        cb2MinorAxisSize = cb2Width;
-
-                        spikesMajorAxisPos = spike.Y;
-                        spikesMinorAxisPos = spike.X;
-                        break;
-                    case Spikes.Directions.Up:
-                        cb1MajorAxisPos = cb1Pos.X;
-                        cb1MinorAxisPos = cb1Pos.Y;
-
-                        cb1MajorAxisSize = cb1Width;
-                        cb1MinorAxisSize = cb1Height;
-
-                        cb2MajorAxisPos = cb2Pos.X;
-                        cb2MinorAxisPos = cb1Pos.Y;
-
-                        cb2MajorAxisSize = cb2Width;
-                        cb2MinorAxisSize = cb1Height;
-
-                        spikesMajorAxisPos = spike.X;
-                        spikesMinorAxisPos = spike.Y;
-                        break;
-                    case Spikes.Directions.Down:
-                        cb1MajorAxisPos = cb1Pos.X;
-                        cb1MinorAxisPos = cb1Pos.Y + cb1Height;
-
-                        cb1MajorAxisSize = cb1Width;
-                        cb1MinorAxisSize = cb1Height;
-
-                        cb2MajorAxisPos = cb2Pos.X;
-                        cb2MinorAxisPos = cb1Pos.Y + cb1Height;
-
-                        cb2MajorAxisSize = cb2Width;
-                        cb2MinorAxisSize = cb1Height;
-
-                        spikesMajorAxisPos = spike.X;
-                        spikesMinorAxisPos = spike.Y;
-                        break;
-                }
-
                 bool spikesOnCB1 = spike.Y < cb1Pos.Y + cb1Height; //check if spikes start before the hole to see if part of them should be on cb1
                 bool spikesOnCB2 = spike.Y + spike.Height > cb2Pos.Y; //check if the spikes extend past the hole to see if part of them should be on cb2
-
 
                 if (cb1Pos.X < parent.Position.X && spike.Direction == Spikes.Directions.Left)
                 {
                     Scene.Remove(spike);
                     return;
                 }
-                Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
 
                 switch (spike.Direction)
                 {
@@ -635,11 +553,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                         }
                         else //this means spikes do not intersect the hole but are attached to a block still. Update Spike positions so they do not desync from their object as it respawns
                         {
-
-
                             if (spikesOnCB1)
                             {
-
                                 mover.Platform = cb1;
                                 List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
                                 staticMovers.Add(mover);
@@ -767,6 +682,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                         {
                             if (spikesOnCB1)
                             {
+                                mover.Platform = cb1;
+                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
+                                staticMovers.Add(mover);
                                 switch (spike.Direction)
                                 {
                                     case Spikes.Directions.Up:
@@ -779,7 +697,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                             }
                             else
                             {
-                                mover.Platform = cb1;
+                                mover.Platform = cb2;
                                 List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
                                 staticMovers.Add(mover);
                                 switch (spike.Direction)
@@ -796,10 +714,73 @@ namespace Celeste.Mod.LylyraHelper.Components
                         break;
                 }
             }
-            else
+            else if (mover.Entity is Spring)
             {
-                //Scene.Remove(mover.Entity);
-                //return;
+                Spring spring = mover.Entity as Spring;
+                if (Spring.Orientations.WallLeft == spring.Orientation && furthestLeft > spring.Position.X)
+                {
+                    Scene.Remove(spring);
+                    return;
+                }
+                else if (Spring.Orientations.WallRight == spring.Orientation && furthestRight < spring.Position.X)
+                {
+                    Scene.Remove(spring);
+                    return;
+                }
+                else if (Spring.Orientations.Floor == spring.Orientation && furthestUp > spring.Position.Y)
+                {
+                    Scene.Remove(spring);
+                    return;
+                }
+                //if the spring intersects the hole, delete it, else change its attached item
+                bool springOnCB1 = (spring.X < cb1Pos.X + cb1Width && Direction.X == 0) || (spring.Y < cb1Pos.Y + cb1Height && Direction.X != 0); //check if spikes start before the hole to see if part of them should be on cb1
+
+                if (Direction.X == 0) //y (up/down) movement
+                {
+                    if (spring.CollideRect(new Rectangle((int)(cb1Pos.X + cb1Width), (int)(cb1Pos.Y - 1), (int)(cb2Pos.X - (cb1Pos.X + cb1Width)), cb1Height + 2)))
+                    {
+                        Scene.Remove(spring);
+                        return;
+                    } else
+                    {
+                        if (springOnCB1)
+                        {
+                            mover.Platform = cb1;
+                            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
+                            staticMovers.Add(mover);
+                        } else
+                        {
+                            mover.Platform = cb2;
+                            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb2);
+                            staticMovers.Add(mover);
+                        }
+                    }
+                } 
+                else
+                {
+                    if (spring.CollideRect(new Rectangle((int)(cb1Pos.X - 1), (int)(cb1Pos.Y + cb1Height), cb1Width + 2, (int)(cb2Pos.Y - (cb1Pos.Y + cb1Height)))))
+                    {
+                        Scene.Remove(spring);
+                        return;
+                    }
+                    else
+                    {
+                        if (springOnCB1)
+                        {
+                            mover.Platform = cb1; 
+                            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
+                                GetValue(cb1);
+                            staticMovers.Add(mover);
+                        }
+                        else
+                        {
+                            mover.Platform = cb2;
+                            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
+                                GetValue(cb2);
+                            staticMovers.Add(mover);
+                        }
+                    }
+                }
             }
         }
 
