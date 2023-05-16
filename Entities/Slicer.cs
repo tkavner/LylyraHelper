@@ -88,7 +88,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
                 if (!slicingEntities.Contains(d))
                 {
-                    if (d.CollidePaper(Entity))
+                    if (d.CollideCheck(Entity))
                     {
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
@@ -103,7 +103,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
                 if (!slicingEntities.Contains(d))
                 {
-                    if (d.CollidePaper(Entity))
+                    if (d.CollideCheck(Entity))
                     {
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
@@ -178,7 +178,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 if (d is Paper && (cutComponent = d.Get<Cuttable>()) != null)
                 {
                     Paper paper = d as Paper;
-                    if (!paper.CollidePaper(Entity) || collisionOverride || sliceOnImpact)
+                    if (!paper.CollideCheck(Entity) || collisionOverride || sliceOnImpact)
                     {
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
                         bool toReturn = cutComponent.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);

@@ -26,14 +26,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private int playerParticleEmitPoints;
         private EventInstance audioToken;
 
-        public DashPaper(Vector2 position, int width, int height, bool safe,
+        public DashPaper(EntityData data, Vector2 offset, Vector2 position, int width, int height, bool safe,
             bool spawnScissors = true,
             bool fragileScissors = false,
             string texture = "objects/LylyraHelper/dashPaper/dashpaper",
             string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap",
             string flagName = "",
             bool noEffects = false)
-        : base(position, width, height, safe, texture, gapTexture, flagName, noEffects)
+        : base(data, offset, width, height, texture, gapTexture, flagName, noEffects)
         {
             thisType = this.GetType();
             this.spawnScissors = spawnScissors;
@@ -65,7 +65,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         }
 
         public DashPaper(EntityData data, Vector2 vector2) :
-            this(data.Position + vector2, data.Width, data.Height, false,
+            this(data, vector2, data.Position + vector2, data.Width, data.Height, false,
                 spawnScissors: data.Bool("spawnScissors", true),
                 fragileScissors: data.Bool("fragileScissors", false),
                 flagName: data.Attr("flagName", ""),
@@ -210,15 +210,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return false;
         }
 
-        internal override void AddPlayerEffects()
+        internal override void AddPlayerEffects(Player player)
         {
-            Player player = Scene.Tracker.GetEntity<Player>();
             if (playerParticleEmitPoints++ % 4 == 0)
             {
                 SceneAs<Level>().ParticlesFG.Emit(paperSymbols, 1, player.Center, player.Collider.HalfSize, Color.White);
             }
         }
-
-
     }
 }

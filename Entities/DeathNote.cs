@@ -14,7 +14,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
     [CustomEntity("LylyraHelper/DeathNote")]
     class DeathNote : Paper
     {
-        public DeathNote(EntityData data, Vector2 vector2) : base(data.Position + vector2, data.Width, data.Height, false, "objects/LylyraHelper/dashPaper/deathnote", "objects/LylyraHelper/dashPaper/deathnotegap")
+        public DeathNote(EntityData data, Vector2 offset) : base(data, offset, data.Width, data.Height, "objects/LylyraHelper/dashPaper/deathnote", "objects/LylyraHelper/dashPaper/deathnotegap")
         {
             thisType = this.GetType();
             Add(new Cuttable(this, Calc.HexToColor("8f0020")));
@@ -23,7 +23,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         internal override void OnPlayer(Player player)
         {
-            if (CollidePaper(player))
+            if (CollideCheck(player))
             {
                 player.Die((player.Position - Position).SafeNormalize());
             }

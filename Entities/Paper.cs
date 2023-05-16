@@ -1,5 +1,6 @@
 ﻿using Celeste;
 using Celeste.Mod;
+using LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace Celeste.Mod.LylyraHelper.Entities
 {
     [Tracked(true)]
-    public class Paper : Entity
+    public class Paper : Trigger
     {
         private Scene scene;
         private Vector2 groupOrigin;
@@ -76,15 +77,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal bool noEffects;
         private string flagName;
 
-        public Paper(Vector2 position, int width, int height, bool safe, 
+        public Paper(EntityData data, Vector2 offset, int width, int height,
             string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", 
             string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", 
             string flagName = "", 
             bool noEffects = false)
-        : base(position)
+        : base(data, offset)
         {
             thisType = this.GetType();
-            base.Collider = new Hitbox(width, height);
+            base.Collider = new PaperHitbox(this, width, height);
             Collidable = true;
             Visible = true;
             this.noEffects = noEffects;
@@ -278,46 +279,45 @@ namespace Celeste.Mod.LylyraHelper.Entities
         }
 
         bool previousState = false;
+        private bool invert = false;
 
         public override void Update()
         {
             base.Update();
             
-            Player player = Scene.Tracker.GetEntity<Player>();
-            bool playerCheck = CollidePaper(player);
-            if (!previousState && playerCheck) //false --> true (entering)
-            {
-                OnPlayerEnter(player);
-            }
-            else if (previousState && !playerCheck) //true --> false (leaving)
-            {
-                OnPlayerLeave(player);
-            }
-            previousState = playerCheck;
 
-            if (flagName != "")
-            {
-                SceneAs<Level>().Session.SetFlag(flagName, playerCheck);
-            }
-            if (playerCheck) AddPlayerEffects();
         }
 
-        internal virtual void OnPlayerLeave(Player player)
+        public override void OnLeave(Player player)
         {
-
+            if (flagName != "")
+            {
+                SceneAs<Level>().Session.SetFlag(flagName, invert);
+            }
         }
 
         //method only called when the player enters the player
-        internal virtual void OnPlayerEnter(Player player)
+        public override void OnEnter(Player player)
         {
+            if (flagName != "")
+            {
+                SceneAs<Level>().Session.SetFlag(flagName, !invert);
+            }
+        }
 
+        public override void OnStay(Player player)
+        {
+            AddPlayerEffects(player);
         }
 
         //Add Visual Effects for the player being on the paper
-        internal virtual void AddPlayerEffects()
+        internal virtual void AddPlayerEffects(Player player)
         {
             
         }
+
+
+
 
         public override void Render()
         {
@@ -380,90 +380,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return false;
         }
 
-        //really only used with the player so this should work?
-        public bool CollidePaper(Entity e)
-        {
-            if (e == null) return false;
-            return CollidePaper(e.Collider);
-        }
-
-        public bool CollidePaper(Collider c)
-        {
-
-            if (c is Circle)
-            {
-
-                return (CollidePaper(c as Circle));
-            }
-            else
-            if (c is Hitbox)
-            {
-
-                return (CollidePaper(c as Hitbox));
-            }
-            else if (c is ColliderList)
-            {
-
-                foreach (Collider collider in (c as ColliderList).colliders)
-                {
-                    bool toReturn = false;
-
-                    toReturn = CollidePaper(collider) || toReturn;
-                    return toReturn;
-                }
-            }
-            return false;
-        }
-
-        public bool CollidePaper(Hitbox c)
-        {
-            List<Vector2> pointsToCheck = new List<Vector2>();
-
-            for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1 += 8)
-            {
-                for (float f2 = c.AbsoluteTop - this.Position.Y; f2 < c.AbsoluteBottom - this.Position.Y; f2 += 8)
-                {
-                    pointsToCheck.Add(new Vector2(f1, f2));
-                }
-            }
-
-            foreach (Vector2 v in pointsToCheck)
-            {
-                int x = (int)v.X;
-                int y = (int)v.Y;
-                if (x >= 0 && y >= 0 && x < (int)Width && y < (int)Height)
-                {
-                    if (!this.skip[x / 8, y / 8])
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        public bool CollidePaper(Circle c)
-        {
-            for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1 += 8)
-            {
-                for (float f2 = c.AbsoluteTop - this.Position.Y; f2 < c.AbsoluteBottom - this.Position.Y; f2 += 8)
-                {
-
-                    int x = (int)f1;
-                    int y = (int)f2;
-                    if (x >= 0 && y >= 0 && (int)x < (int)Width && (int)y < (int)Height)
-                    {
-                        if (!this.skip[(int)(x / 8), (int)(y / 8)])
-                        {
-                            if (c.Collide(new Rectangle((int)(f1 + Position.X), (int)(f2 + Position.Y), (int)(8), (int)(8)))) return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
         /**
          * returns a set of tile coordinates from an array of choices, can be overriden to specify selection logic.
          */
@@ -492,7 +408,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             return TileExists((int)pos.X, (int)pos.Y);
         }
-
 
         public class Decoration
         {
