@@ -108,7 +108,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-
         public override void Update()
         {
             base.Update();
@@ -128,7 +127,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         internal override void OnDash(Vector2 direction)
         {
-            if (CanActivate())
+            if (Scene.Tracker.GetEntity<Player>().CollideCheck(this))
             {
                 Audio.Play("event:/char/madeline/jump");
                 Activate(direction);

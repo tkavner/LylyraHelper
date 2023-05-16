@@ -1,4 +1,5 @@
-﻿using Celeste.Mod.LylyraHelper.Entities;
+﻿using Celeste.Mod;
+using Celeste.Mod.LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -9,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace LylyraHelper.Entities
 {
+
+    //technically PaperHitbox is a type of Grid, however Grid colliding with Grid crashes the game, so we made our own
     public class PaperHitbox : Hitbox
     {
         private Paper Parent;
@@ -23,11 +26,13 @@ namespace LylyraHelper.Entities
         {
             List<Vector2> pointsToCheck = new List<Vector2>();
 
-            for (float f1 = hitbox.AbsoluteLeft - this.Position.X; f1 < hitbox.AbsoluteRight - this.Position.X; f1 += 8)
+            for (float f1 = hitbox.AbsoluteLeft - Parent.Position.X; f1 < hitbox.AbsoluteRight - Parent.Position.X; f1 += 8)
             {
-                for (float f2 = hitbox.AbsoluteTop - this.Position.Y; f2 < hitbox.AbsoluteBottom - this.Position.Y; f2 += 8)
+                for (float f2 = hitbox.AbsoluteTop - Parent.Position.Y; f2 < hitbox.AbsoluteBottom - Parent.Position.Y; f2 += 8)
                 {
                     pointsToCheck.Add(new Vector2(f1, f2));
+                    Logger.Log(LogLevel.Error, "LylyraHelper", String.Format("Collided Paper with Hitbox! {0}, {1}", f1 /8, f2 / 8));
+
                 }
             }
 
@@ -43,14 +48,16 @@ namespace LylyraHelper.Entities
                     }
                 }
             }
-            return base.Collide(hitbox);
+            Logger.Log(LogLevel.Error, "LylyraHelper", String.Format("Collided Paper with Hitbox! {0}", false));
+
+            return false;
         }
 
         public override bool Collide(Circle c)
         {
-            for (float f1 = c.AbsoluteLeft - this.Position.X; f1 < c.AbsoluteRight - this.Position.X; f1 += 8)
+            for (float f1 = c.AbsoluteLeft - Parent.Position.X; f1 < c.AbsoluteRight - Parent.Position.X; f1 += 8)
             {
-                for (float f2 = c.AbsoluteTop - this.Position.Y; f2 < c.AbsoluteBottom - this.Position.Y; f2 += 8)
+                for (float f2 = c.AbsoluteTop - Parent.Position.Y; f2 < c.AbsoluteBottom - Parent.Position.Y; f2 += 8)
                 {
 
                     int x = (int)f1;
@@ -69,6 +76,8 @@ namespace LylyraHelper.Entities
 
         private static bool CollidePaper(On.Monocle.Collider.orig_Collide_Collider orig, Collider self, Collider collider)
         {
+
+
             if (self is PaperHitbox || collider is PaperHitbox)
             {
                 PaperHitbox ph = null;
@@ -88,13 +97,14 @@ namespace LylyraHelper.Entities
                 {
                     return ph.Collide((Hitbox)other);
                 } 
-                else if (other is Hitbox)
+                else if (other is Hitbox hitbox)
                 {
-                    return ph.Collide((Hitbox)other);
+
+                    return ph.Collide(hitbox);
                 }
-                else if (other is Circle)
+                else if (other is Circle circle)
                 {
-                    return ph.Collide((Circle)other);
+                    return ph.Collide(circle);
                 }
                 else if (other is Grid)
                 {
@@ -106,12 +116,6 @@ namespace LylyraHelper.Entities
                 }
                 return false;
             }
-            else if(collider is PaperHitbox)
-            {
-                PaperHitbox ph = (self as PaperHitbox);
-
-                collider.Collide(self);
-            }
             return orig.Invoke(self, collider);
         }
 
@@ -120,7 +124,7 @@ namespace LylyraHelper.Entities
             On.Monocle.Collider.Collide_Collider += CollidePaper;
         }
 
-        public void Unload()
+        public static void Unload()
         {
             On.Monocle.Collider.Collide_Collider -= CollidePaper;
 

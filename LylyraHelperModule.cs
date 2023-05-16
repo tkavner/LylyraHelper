@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Components;
+using LylyraHelper.Entities;
 using Monocle;
 
 namespace Celeste.Mod.LylyraHelper.Entities
@@ -23,12 +24,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
             Scissors.Load();
             Slicer.Load();
+            PaperHitbox.Load();
         }
 
         public override void Unload()
         {
             Scissors.Unload();
             Slicer.Unload();
+            PaperHitbox.Unload();
         }
 
         public override void LoadContent(bool firstLoad)
