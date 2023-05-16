@@ -35,6 +35,10 @@ namespace LylyraHelper.Entities
 
                 }
             }
+            pointsToCheck.Add(new Vector2(hitbox.AbsoluteLeft - Parent.Position.X, hitbox.AbsoluteBottom - Parent.Position.Y));
+            pointsToCheck.Add(new Vector2(hitbox.AbsoluteRight - Parent.Position.X, hitbox.AbsoluteTop - Parent.Position.Y));
+            pointsToCheck.Add(new Vector2(hitbox.AbsoluteRight - Parent.Position.X, hitbox.AbsoluteBottom - Parent.Position.Y));
+
 
             foreach (Vector2 v in pointsToCheck)
             {
@@ -53,21 +57,32 @@ namespace LylyraHelper.Entities
             return false;
         }
 
-        public override bool Collide(Circle c)
+        public override bool Collide(Circle circle)
         {
-            for (float f1 = c.AbsoluteLeft - Parent.Position.X; f1 < c.AbsoluteRight - Parent.Position.X; f1 += 8)
-            {
-                for (float f2 = c.AbsoluteTop - Parent.Position.Y; f2 < c.AbsoluteBottom - Parent.Position.Y; f2 += 8)
-                {
 
-                    int x = (int)f1;
-                    int y = (int)f2;
-                    if (x >= 0 && y >= 0 && (int)x < (int)Width && (int)y < (int)Height)
+            List<Vector2> pointsToCheck = new List<Vector2>();
+
+            for (float f1 = circle.AbsoluteLeft - Parent.Position.X; f1 < circle.AbsoluteRight - Parent.Position.X; f1 += 8)
+            {
+                for (float f2 = circle.AbsoluteTop - Parent.Position.Y; f2 < circle.AbsoluteBottom - Parent.Position.Y; f2 += 8)
+                {
+                    pointsToCheck.Add(new Vector2(f1, f2));
+                    Logger.Log(LogLevel.Error, "LylyraHelper", String.Format("Collided Paper with Hitbox! {0}, {1}", f1 / 8, f2 / 8));
+
+                }
+            }
+            pointsToCheck.Add(new Vector2(circle.AbsoluteLeft - Parent.Position.X, circle.AbsoluteBottom - Parent.Position.Y));
+            pointsToCheck.Add(new Vector2(circle.AbsoluteRight - Parent.Position.X, circle.AbsoluteTop - Parent.Position.Y));
+            pointsToCheck.Add(new Vector2(circle.AbsoluteRight - Parent.Position.X, circle.AbsoluteBottom - Parent.Position.Y));
+            foreach (Vector2 v in pointsToCheck)
+            {
+                int x = (int)v.X;
+                int y = (int)v.Y;
+                if (x >= 0 && y >= 0 && x < (int)Width && y < (int)Height)
+                {
+                    if (!Parent.skip[x / 8, y / 8])
                     {
-                        if (!Parent.skip[(int)(x / 8), (int)(y / 8)])
-                        {
-                            if (c.Collide(new Rectangle((int)(f1 + Position.X), (int)(f2 + Position.Y), (int)(8), (int)(8)))) return true;
-                        }
+                        if (circle.Collide(new Rectangle((int)(x + Position.X), (int)(y + Position.Y), (int)(8), (int)(8)))) return true;
                     }
                 }
             }
