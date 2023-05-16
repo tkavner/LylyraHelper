@@ -16,7 +16,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 {
     [Tracked]
     [CustomEntity("LylyraHelper/DashPaper")]
-    public class DashPaper : CuttablePaper
+    public class DashPaper : Paper
     {
         private bool spawnScissors;
         private bool fragileScissors;
@@ -49,7 +49,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 paperSymbols = new ParticleType()
                 {
                     SourceChooser = sourceChooser,
-                    Color = color,
+                    Color = Color.White,
                     Acceleration = new Vector2(0f, 0f),
                     LifeMin = 0.4f,
                     LifeMax = 1.2f,

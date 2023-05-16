@@ -19,7 +19,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 {
     public class Scissors : Entity
     {
-        private List<CuttablePaper> Cutting = new List<CuttablePaper>();
+        private List<Paper> Cutting = new List<Paper>();
         private Vector2 CutDirection;
 
         private float timeElapsed;
@@ -256,7 +256,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private void AddParticles(Vector2 position, Vector2 range, Color color)
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            level.ParticlesFG.Emit(CuttablePaper.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
+            level.ParticlesFG.Emit(Cuttable.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
             
         }
 

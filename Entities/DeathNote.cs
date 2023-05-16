@@ -1,4 +1,5 @@
 ﻿using Celeste.Mod.Entities;
+using Celeste.Mod.LylyraHelper.Components;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -11,12 +12,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
 {
     [Tracked]
     [CustomEntity("LylyraHelper/DeathNote")]
-    class DeathNote : CuttablePaper
+    class DeathNote : Paper
     {
         public DeathNote(EntityData data, Vector2 vector2) : base(data.Position + vector2, data.Width, data.Height, false, "objects/LylyraHelper/dashPaper/deathnote", "objects/LylyraHelper/dashPaper/deathnotegap")
         {
             thisType = this.GetType();
-            color = Calc.HexToColor("8f0020");
+            Add(new Cuttable(this, Calc.HexToColor("8f0020")));
         }
 
 

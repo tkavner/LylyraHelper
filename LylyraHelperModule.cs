@@ -22,14 +22,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Logger.SetLogLevel("LylyraHelper", LogLevel.Verbose);
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
             Scissors.Load();
-            CuttablePaper.Load();
             Slicer.Load();
         }
 
         public override void Unload()
         {
             Scissors.Unload();
-            CuttablePaper.Unload();
 
             Slicer.Unload();
         }

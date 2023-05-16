@@ -13,7 +13,7 @@ namespace Celeste.Mod.LylyraHelper.Components
     {
         private Paper Parent;
         private Color Color = Calc.HexToColor("cac7e3");
-        private ParticleType paperScraps;
+        public static ParticleType paperScraps;
 
         public Cuttable(Paper parent, Color color) : base()
         {
