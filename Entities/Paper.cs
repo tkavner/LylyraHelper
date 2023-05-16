@@ -11,11 +11,9 @@ using System.Threading.Tasks;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
-
     [Tracked(true)]
     public class Paper : Entity
     {
-
         private Scene scene;
         private Vector2 groupOrigin;
         private List<Paper> group;
@@ -284,6 +282,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Update()
         {
             base.Update();
+            
             Player player = Scene.Tracker.GetEntity<Player>();
             bool playerCheck = CollidePaper(player);
             if (!previousState && playerCheck) //false --> true (entering)

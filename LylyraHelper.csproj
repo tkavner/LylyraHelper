@@ -56,7 +56,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Cuttable.cs" />
     <Compile Include="Entities\KnifeSpikes.cs" />
+    <Compile Include="Entities\PaperComponent.cs" />
     <Compile Include="Trigger\AddSlicerOnStartTrigger.cs" />
     <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />

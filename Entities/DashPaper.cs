@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Celeste.Mod.LylyraHelper.Components;
 using FMOD.Studio;
 using global::Celeste;
 using global::Celeste.Mod;
@@ -37,6 +38,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             thisType = this.GetType();
             this.spawnScissors = spawnScissors;
             this.fragileScissors = fragileScissors;
+            Add(new Cuttable(this, Calc.HexToColor("cac7e3")));
             if (paperSymbols == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(

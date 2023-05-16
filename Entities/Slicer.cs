@@ -174,13 +174,14 @@ namespace Celeste.Mod.LylyraHelper.Components
                     sliceStartPositions.Remove(d);
                     return true;
                 }
-                if (d is CuttablePaper)
+                Cuttable cutComponent;
+                if (d is Paper && (cutComponent = d.Get<Cuttable>()) != null)
                 {
-                    CuttablePaper paper = d as CuttablePaper;
+                    Paper paper = d as Paper;
                     if (!paper.CollidePaper(Entity) || collisionOverride || sliceOnImpact)
                     {
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
-                        bool toReturn = paper.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
+                        bool toReturn = cutComponent.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
                         sliceStartPositions.Remove(d);
                         return toReturn;
                     }
