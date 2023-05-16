@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
-    public class TriggerPaper : CuttablePaper
+    public class TriggerPaper : Paper
     {
         private Trigger trigger;
 
-        public TriggerPaper(Vector2 position, int width, int height, bool safe, string triggerName, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string[] triggerParams = null) : base(position, width, height, safe, texture)
+        public TriggerPaper(EntityData data, Vector2 offset, Vector2 position, int width, int height, string triggerName, string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", string[] triggerParams = null) : 
+            base(data, offset,  width, height, texture)
         {
             
         }

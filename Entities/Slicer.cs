@@ -37,13 +37,13 @@ namespace Celeste.Mod.LylyraHelper.Components
             this.directionalOffset = directionalOffset;
             this.sliceOnImpact = sliceOnImpact;
 
-            if (CuttablePaper.paperScraps == null)
+            if (Cuttable.paperScraps == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
                     GFX.Game["particles/LylyraHelper/dashpapershard00"],
                     GFX.Game["particles/LylyraHelper/dashpapershard01"],
                     GFX.Game["particles/LylyraHelper/dashpapershard02"]);
-                CuttablePaper.paperScraps = new ParticleType()
+                Cuttable.paperScraps = new ParticleType()
                 {
                     SourceChooser = sourceChooser,
                     Color = Calc.HexToColor("cac7e3"),
@@ -81,14 +81,14 @@ namespace Celeste.Mod.LylyraHelper.Components
             StaticMover sm = Entity.Get<StaticMover>();
             Vector2 Position = Entity.Position;
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for speed)
-            foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DashPaper>())
+            foreach (Paper d in base.Scene.Tracker.GetEntities<DashPaper>())
             {
                 if (d == Entity) continue;
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
 
                 if (!slicingEntities.Contains(d))
                 {
-                    if (d.CollidePaper(Entity))
+                    if (d.CollideCheck(Entity))
                     {
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
@@ -96,14 +96,14 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
             }
 
-            foreach (CuttablePaper d in base.Scene.Tracker.GetEntities<DeathNote>())
+            foreach (Paper d in base.Scene.Tracker.GetEntities<DeathNote>())
             {
                 if (d == Entity) continue;
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
 
                 if (!slicingEntities.Contains(d))
                 {
-                    if (d.CollidePaper(Entity))
+                    if (d.CollideCheck(Entity))
                     {
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
@@ -174,13 +174,14 @@ namespace Celeste.Mod.LylyraHelper.Components
                     sliceStartPositions.Remove(d);
                     return true;
                 }
-                if (d is CuttablePaper)
+                Cuttable cutComponent;
+                if (d is Paper && (cutComponent = d.Get<Cuttable>()) != null)
                 {
-                    CuttablePaper paper = d as CuttablePaper;
-                    if (!paper.CollidePaper(Entity) || collisionOverride || sliceOnImpact)
+                    Paper paper = d as Paper;
+                    if (!paper.CollideCheck(Entity) || collisionOverride || sliceOnImpact)
                     {
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
-                        bool toReturn = paper.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
+                        bool toReturn = cutComponent.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
                         sliceStartPositions.Remove(d);
                         return toReturn;
                     }
@@ -787,7 +788,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         private void AddParticles(Vector2 position, Vector2 range, Color color)
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            level.ParticlesFG.Emit(CuttablePaper.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
+            level.ParticlesFG.Emit(Cuttable.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
 
         }
 

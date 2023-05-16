@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Components;
+using LylyraHelper.Entities;
 using Monocle;
 
 namespace Celeste.Mod.LylyraHelper.Entities
@@ -22,26 +23,21 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Logger.SetLogLevel("LylyraHelper", LogLevel.Verbose);
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
             Scissors.Load();
-            CuttablePaper.Load();
             Slicer.Load();
+            PaperHitbox.Load();
         }
 
         public override void Unload()
         {
             Scissors.Unload();
-            CuttablePaper.Unload();
-
             Slicer.Unload();
+            PaperHitbox.Unload();
         }
 
         public override void LoadContent(bool firstLoad)
         {
             base.LoadContent(firstLoad);
-
             _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
-            foreach (string s in _CustomEntitySpriteBank.SpriteData.Keys) {
-                Logger.Log("LylyraModule", s);
-            }
         }
     }
 }

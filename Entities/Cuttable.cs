@@ -1,5 +1,4 @@
-﻿using Celeste.Mod.LylyraHelper.Components;
-using Celeste.Mod.LylyraHelper.Intefaces;
+﻿using Celeste.Mod.LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -8,20 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Celeste.Mod.LylyraHelper.Entities
+namespace Celeste.Mod.LylyraHelper.Components
 {
-    public class CuttablePaper : Paper, ICuttable
+    public class Cuttable : PaperComponent
     {
+        private Paper Parent;
+        private Color Color = Calc.HexToColor("cac7e3");
         public static ParticleType paperScraps;
-        internal Color color = Calc.HexToColor("cac7e3");
 
-        public CuttablePaper(Vector2 position, int width, int height, bool safe, 
-            string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", 
-            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", 
-            string flagName = "",
-            bool noEffects = false)
-        : base(position, width, height, safe, texture, gapTexture, flagName, noEffects)
+        public Cuttable(Paper parent, Color color) : base()
         {
+            Parent = parent;
+            Color = color;
             if (paperScraps == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
@@ -48,18 +45,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        internal static void Unload()
-        {
-        }
-
-        internal static void Load()
-        {
-            
-        }
-
-        //TODO: Add ability to accomodate half cut (eg: scissors start on paper)
         public bool Cut(Vector2 cutPosition, Vector2 direction, int gapWidth, Vector2 cutStartPosition)
         {
+            Vector2 Position = Parent.Position;
+            float Width = Parent.Width;
+            float Height = Parent.Height;
             Vector2[] arrayResults = Slicer.CalcCuts(Position, new Vector2(Width, Height), cutPosition, direction, gapWidth); //cuts gives where the new block should exist, we want where it should not
             Vector2 p1, p2; //these points represent the cut area
             if (direction.X != 0) //horizontal cut, vertical gap
@@ -109,7 +99,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 if (cutStartPosition.Y > p1.Y) p1.Y = (int)cutStartPosition.Y;
             }
 
-
             p1 -= Position;
             p2 -= Position;
             p1 /= 8;
@@ -126,7 +115,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     if (i >= 0 && j >= 0 && i < (int)Width / 8 && j < (int)Height / 8)
                     {
-                        if (!skip[i, j])
+                        if (!Parent.skip[i, j])
                         {
                             if (i < furthestLeft) furthestLeft = i;
                             if (i > furthestRight) furthestRight = i;
@@ -134,11 +123,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             if (j < furthestTop) furthestTop = j;
                             if (j > furthestDown) furthestDown = j;
 
-                            SceneAs<Level>().ParticlesFG.Emit(paperScraps, 1, Position + new Vector2(i * 8 + 4, j * 8 + 4), new Vector2(4), color);
+                            SceneAs<Level>().ParticlesFG.Emit(paperScraps, 1, Position + new Vector2(i * 8 + 4, j * 8 + 4), new Vector2(4), Color);
                         }
-                        
-                        skip[i, j] = true;
-                        holeTiles[i, j] = holeEmpty[0];
+
+                        Parent.skip[i, j] = true;
+                        Parent.holeTiles[i, j] = Paper.holeEmpty[0];
                     }
                 }
             }
@@ -147,61 +136,63 @@ namespace Celeste.Mod.LylyraHelper.Entities
             int counter2 = 0;
             //fix top and bottom holes
             if (direction.X != 0) for (int i = (int)p1.X - 1; i < p2.X + 1; i++)
-                {
-                    for (int j = 0; j <= 1; j++)
-                    {
+            {
+                     for (int j = 0; j <= 1; j++)
+                     {
                         int x = i;
                         int y1 = (int)p1.Y - j;
                         int y2 = (int)p2.Y + j - 1;
-                        if (TileExists(x, y1))
+                        if (Parent.TileExists(x, y1))
                         {
-                            bool emptyTop = TileEmpty(i, y1 - 1);
-                            bool emptyLeft = TileEmpty(i - 1, y1);
-                            bool emptyRight = TileEmpty(i + 1, y1);
+                            bool emptyTop = Parent.TileEmpty(i, y1 - 1);
+                            bool emptyLeft = Parent.TileEmpty(i - 1, y1);
+                            bool emptyRight = Parent.TileEmpty(i + 1, y1);
 
                             if (!emptyTop)
                             {
                                 if (i == 0)
                                 {
-                                    holeTiles[i, y1] = holeTopSideLeftEdge[0];
+                                    Parent.holeTiles[i, y1] = Paper.holeTopSideLeftEdge[0];
                                 }
                                 else if (i == (int)Width / 8 - 1)
                                 {
-                                    holeTiles[i, y1] = holeTopSideLeftEdge[0];
+                                    Parent.holeTiles[i, y1] = Paper.holeTopSideLeftEdge[0];
                                 }
                                 else
                                 {
-                                    holeTiles[i, y1] = holeTopSide[(counter1++ % holeTopSide.Length)];
+                                    Parent.holeTiles[i, y1] = Paper.holeTopSide[(counter1++ % Paper.holeTopSide.Length)];
                                 }
                             }
-                            else if (emptyTop && emptyLeft && emptyRight) holeTiles[i, y1] = holeEmpty[0];
+                            else if (emptyTop && emptyLeft && emptyRight) Parent.holeTiles[i, y1] = Paper.holeEmpty[0];
                         }
 
-                        if (TileExists(x, y2))
+                        if (Parent.TileExists(x, y2))
                         {
-                            bool emptyTop = TileEmpty(i, y2 + 1);
-                            bool emptyLeft = TileEmpty(i - 1, y2);
-                            bool emptyRight = TileEmpty(i + 1, y2);
+                            bool emptyTop = Parent.TileEmpty(i, y2 + 1);
+                            bool emptyLeft = Parent.TileEmpty(i - 1, y2);
+                            bool emptyRight = Parent.TileEmpty(i + 1, y2);
 
                             if (!emptyTop)
                             {
                                 if (i == 0)
                                 {
-                                    holeTiles[i, y2] = holeBottomSideLeftEdge[0];
+                                    Parent.holeTiles[i, y2] = Paper.holeBottomSideLeftEdge[0];
                                 }
-                                else if (i == (int) Width / 8 - 1)
+                                else if (i == (int)Width / 8 - 1)
                                 {
-                                    holeTiles[i, y2] = holeBottomSideRightEdge[0];
-                                } else
+                                    Parent.holeTiles[i, y2] = Paper.holeBottomSideRightEdge[0];
+                                }
+                                else
                                 {
-                                    holeTiles[i, y2] = holeBottomSide[(counter2++ % holeBottomSide.Length)];
+                                    Parent.holeTiles[i, y2] = Paper.holeBottomSide[(counter2++ % Paper.holeBottomSide.Length)];
                                 }
                             }
-                            else if (emptyTop && emptyLeft && emptyRight) holeTiles[i, y2] = holeEmpty[0];
+                            else if (emptyTop && emptyLeft && emptyRight) Parent.holeTiles[i, y2] = Paper.holeEmpty[0];
                         }
                     }
                 }
-            else 
+            else
+            {
                 //left and right
                 for (int i = (int)p1.Y - 1; i < p2.Y + 1; i++)
                 {
@@ -211,63 +202,59 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         int y = i;
                         int x1 = (int)p1.X - j;
                         int x2 = (int)p2.X + j - 1;
-                        if (TileExists(x1, y))
+                        if (Parent.TileExists(x1, y))
                         {
-                            bool emptyTop = TileEmpty(x1 - 1, y);
+                            bool emptyTop = Parent.TileEmpty(x1 - 1, y);
 
-                            bool emptyLeft = TileEmpty(x1, y - 1);
+                            bool emptyLeft = Parent.TileEmpty(x1, y - 1);
 
-                            bool emptyRight = TileEmpty(x1, y + 1);
-                            if (!emptyTop) {
-                                if (i == 0)
-                                {
-                                    holeTiles[x1, y] = holeLeftSideTopEdge[0];
-                                }
-                                else if (i == (int)Height / 8 - 1)
-                                {
-                                    holeTiles[x1, y] = holeLeftSideBottomEdge[0];
-                                }
-                                else
-                                {
-                                    holeTiles[x1, y] = holeLeftSide[(counter1++ % holeLeftSide.Length)];
-                                }
-                            } 
-                            else if (emptyTop && emptyLeft && emptyRight) holeTiles[x1, y] = holeEmpty[0];
-                        }
-                        //right
-                        if (TileExists(x2, y))
-                        {
-                            bool emptyTop = TileEmpty(x2 + 1, y);
-                            bool emptyLeft = TileEmpty(x2, y - 1);
-
-                            bool emptyRight = TileEmpty(x2, y + 1);
+                            bool emptyRight = Parent.TileEmpty(x1, y + 1);
                             if (!emptyTop)
                             {
                                 if (i == 0)
                                 {
-                                    holeTiles[x2, y] = holeRightSideTopEdge[0];
+                                    Parent.holeTiles[x1, y] = Paper.holeLeftSideTopEdge[0];
                                 }
                                 else if (i == (int)Height / 8 - 1)
                                 {
-                                    holeTiles[x2, y] = holeRightSideBottomEdge[0];
+                                    Parent.holeTiles[x1, y] = Paper.holeLeftSideBottomEdge[0];
                                 }
                                 else
                                 {
-                                    holeTiles[x2, y] = holeRightSide[(counter2++ % holeRightSide.Length)];
+                                    Parent.holeTiles[x1, y] = Paper.holeLeftSide[(counter1++ % Paper.holeLeftSide.Length)];
                                 }
                             }
-                            else if (emptyTop && emptyLeft && emptyRight) holeTiles[x2, y] = holeEmpty[0];
+                            else if (emptyTop && emptyLeft && emptyRight) Parent.holeTiles[x1, y] = Paper.holeEmpty[0];
+                        }
+                        //right
+                        if (Parent.TileExists(x2, y))
+                        {
+                            bool emptyTop = Parent.TileEmpty(x2 + 1, y);
+                            bool emptyLeft = Parent.TileEmpty(x2, y - 1);
+
+                            bool emptyRight = Parent.TileEmpty(x2, y + 1);
+                            if (!emptyTop)
+                            {
+                                if (i == 0)
+                                {
+                                    Parent.holeTiles[x2, y] = Paper.holeRightSideTopEdge[0];
+                                }
+                                else if (i == (int)Height / 8 - 1)
+                                {
+                                    Parent.holeTiles[x2, y] = Paper.holeRightSideBottomEdge[0];
+                                }
+                                else
+                                {
+                                    Parent.holeTiles[x2, y] = Paper.holeRightSide[(counter2++ % Paper.holeRightSide.Length)];
+                                }
+                            }
+                            else if (emptyTop && emptyLeft && emptyRight) Parent.holeTiles[x2, y] = Paper.holeEmpty[0];
                         }
                     }
                 }
-
+            }
             return true;
         }
-        public void AddParticles(Vector2 position, Vector2 range)
-        {
-            int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            SceneAs<Level>().ParticlesFG.Emit(paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
 
-        }
     }
 }

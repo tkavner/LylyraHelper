@@ -56,12 +56,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Cuttable.cs" />
     <Compile Include="Entities\KnifeSpikes.cs" />
+    <Compile Include="Entities\PaperComponent.cs" />
+    <Compile Include="Entities\PaperHitbox.cs" />
     <Compile Include="Trigger\AddSlicerOnStartTrigger.cs" />
     <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />
     <Compile Include="Entities\Slicer.cs" />
-    <Compile Include="Entities\CuttablePaper.cs" />
     <Compile Include="Entities\CuttingHelper.cs" />
     <Compile Include="Entities\ICuttable.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
