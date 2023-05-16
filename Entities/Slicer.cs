@@ -134,12 +134,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                         sliceStartPositions.Add(d, Position);
                     }
                 }
-                else
-                {
-
-                }
             }
-
         }
 
         public void AddListener(Action p)
@@ -396,7 +391,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             return false;
         }
-
+        //currently handles vanilla static movers (basically just spikes and springs)
         private void HandleStaticMover(bool cb1Added, bool cb2Added, Entity parent, StaticMover mover,
             Vector2 cb1Pos, Vector2 cb2Pos,
             int cb1Width, int cb1Height, int cb2Width, int cb2Height,
@@ -407,13 +402,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 Scene.Remove(mover.Entity);
                 return;
             }
-
-            //check cutting needs to happen, if not just glue mover next to item
-
-            //cutting should happen
-
-            //cutting shouldnt happen
-
 
             float furthestLeft = cb1 != null ? cb1Pos.X : cb2Pos.X;
             float furthestRight = cb2 != null ? cb2Pos.X + cb2Width : cb1Pos.X + cb1Width;
