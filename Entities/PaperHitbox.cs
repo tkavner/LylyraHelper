@@ -60,8 +60,6 @@ namespace LylyraHelper.Entities
                 for (float f2 = circle.AbsoluteTop - Parent.Position.Y; f2 < circle.AbsoluteBottom - Parent.Position.Y; f2 += 8)
                 {
                     pointsToCheck.Add(new Vector2(f1, f2));
-                    Logger.Log(LogLevel.Error, "LylyraHelper", String.Format("Collided Paper with Hitbox! {0}, {1}", f1 / 8, f2 / 8));
-
                 }
             }
             pointsToCheck.Add(new Vector2(circle.AbsoluteLeft - Parent.Position.X, circle.AbsoluteBottom - Parent.Position.Y));

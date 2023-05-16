@@ -162,7 +162,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 cbType.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, -Direction);
                 cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, level);
                 cbType.GetMethod("Attack", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(d, new object[] { -Direction });
-                Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Activated Kevin: ({0}, {1}))", d.Position.X, d.Position.Y));
 
                 return true;
             });
@@ -213,7 +212,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
 
                 //else this item should not be in the list because cutting it is not supported. Warn and have it removed.
-                Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Slicer attempting to slice unsupported Type: {0}.", d.GetType().Name));
 
                 return false;
             });
@@ -506,14 +504,11 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added KnifeSpikeLR cb1: ({0}, {1}), Length: {2}", cb1Pos.X, cb1Pos.Y, spikeHeight));
                                     }
                                     else
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeLR cb1: ({0}, {1}, Length: {2})", cb1Pos.X, cb1Pos.Y, spikeHeight));
-
                                     }
                                 }
                             }
@@ -539,14 +534,12 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added KnifeSpikeLR cb2: ({0}, {1}), Length: {2}", cb2Pos.X, cb2Pos.Y, spikeHeight));
 
                                     }
                                     else
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeLR cb2: ({0}, {1}), Length: {2}", cb2Pos.X, cb2Pos.Y, spikeHeight));
 
                                     }
                                 }
@@ -563,12 +556,10 @@ namespace Celeste.Mod.LylyraHelper.Components
                                 {
                                     case Spikes.Directions.Left:
                                         spike.Position = new Vector2(cb1Pos.X, spike.Y);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Moved Spikes cb1: ({0}, {1})", cb1Pos.X, spike.Y));
 
                                         break;
                                     case Spikes.Directions.Right:
                                         spike.Position = new Vector2(cb1Pos.X + cb1Width, spike.Y);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Moved Spikes cb1: ({0}, {1})", cb1Pos.X + cb1Width, spike.Y));
                                         break;
                                 }
                             }
@@ -632,13 +623,11 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeUD cb1: ({0}, {1})", cb1Pos.X, cb1Pos.Y));
                                     }
                                     else
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeUD cb1: ({0}, {1})", cb1Pos.X, cb1Pos.Y));
                                     }
                                 }
                             }
@@ -666,15 +655,12 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeUD cb2: ({0}, {1})", cb2Pos.X, cb2Pos.Y));
 
                                     }
                                     else
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Warn, "LylyraHelper", String.Format("Added SpikeUD cb2: ({0}, {1})", cb2Pos.X, cb2Pos.Y));
-
                                     }
                                 }
                             }
@@ -820,7 +806,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             pos1 = pos2 = blockPos;
             size1 = new Vector2(blockSize.X, blockSize.Y);
             size2 = new Vector2(blockSize.X, blockSize.Y);
-            Logger.Log(LogLevel.Error, "LylyraHelperError", String.Format("Cut Pos ({0},{1}), Block Pos ({2},{3}), Block 2 Start({4},{5}), ({6},{7})", cutPos.X, cutPos.Y, blockPos.X, blockPos.Y, pos2.X, pos2.Y, cutPos.Y + gapWidth / 2, "something"));
 
             if (cutDir.X != 0) //cut is horizontal
             {
@@ -855,7 +840,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     size2.X = blockSize.X - 8;
                 }
             }
-            Logger.Log(LogLevel.Error, "LylyraHelperError", String.Format("Cut Pos ({0},{1}), Block Pos ({2},{3}), Block 2 Start({4},{5}), ({6},{7})", cutPos.X, cutPos.Y, blockPos.X, blockPos.Y, pos2.X, pos2.Y, size1.Y, size2.Y));
 
             return new Vector2[] { pos1, pos2, size1, size2 };
         }
