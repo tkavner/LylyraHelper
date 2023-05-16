@@ -316,9 +316,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             
         }
 
-
-
-
         public override void Render()
         {
             base.Render();
@@ -447,8 +444,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
         }
 
-        internal virtual void AddDecorations()
-        {
-        }
+        internal virtual void AddDecorations(){}
     }
 }

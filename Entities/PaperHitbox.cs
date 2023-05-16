@@ -21,7 +21,6 @@ namespace LylyraHelper.Entities
             Parent = paper;
         }
 
-
         public override bool Collide(Hitbox hitbox)
         {
             List<Vector2> pointsToCheck = new List<Vector2>();
@@ -31,14 +30,11 @@ namespace LylyraHelper.Entities
                 for (float f2 = hitbox.AbsoluteTop - Parent.Position.Y; f2 < hitbox.AbsoluteBottom - Parent.Position.Y; f2 += 8)
                 {
                     pointsToCheck.Add(new Vector2(f1, f2));
-                    Logger.Log(LogLevel.Error, "LylyraHelper", String.Format("Collided Paper with Hitbox! {0}, {1}", f1 /8, f2 / 8));
-
                 }
             }
             pointsToCheck.Add(new Vector2(hitbox.AbsoluteLeft - Parent.Position.X, hitbox.AbsoluteBottom - Parent.Position.Y));
             pointsToCheck.Add(new Vector2(hitbox.AbsoluteRight - Parent.Position.X, hitbox.AbsoluteTop - Parent.Position.Y));
             pointsToCheck.Add(new Vector2(hitbox.AbsoluteRight - Parent.Position.X, hitbox.AbsoluteBottom - Parent.Position.Y));
-
 
             foreach (Vector2 v in pointsToCheck)
             {
@@ -52,14 +48,11 @@ namespace LylyraHelper.Entities
                     }
                 }
             }
-            Logger.Log(LogLevel.Error, "LylyraHelper", String.Format("Collided Paper with Hitbox! {0}", false));
-
             return false;
         }
 
         public override bool Collide(Circle circle)
         {
-
             List<Vector2> pointsToCheck = new List<Vector2>();
 
             for (float f1 = circle.AbsoluteLeft - Parent.Position.X; f1 < circle.AbsoluteRight - Parent.Position.X; f1 += 8)
@@ -74,6 +67,7 @@ namespace LylyraHelper.Entities
             pointsToCheck.Add(new Vector2(circle.AbsoluteLeft - Parent.Position.X, circle.AbsoluteBottom - Parent.Position.Y));
             pointsToCheck.Add(new Vector2(circle.AbsoluteRight - Parent.Position.X, circle.AbsoluteTop - Parent.Position.Y));
             pointsToCheck.Add(new Vector2(circle.AbsoluteRight - Parent.Position.X, circle.AbsoluteBottom - Parent.Position.Y));
+
             foreach (Vector2 v in pointsToCheck)
             {
                 int x = (int)v.X;
@@ -91,8 +85,6 @@ namespace LylyraHelper.Entities
 
         private static bool CollidePaper(On.Monocle.Collider.orig_Collide_Collider orig, Collider self, Collider collider)
         {
-
-
             if (self is PaperHitbox || collider is PaperHitbox)
             {
                 PaperHitbox ph = null;
