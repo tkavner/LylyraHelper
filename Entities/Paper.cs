@@ -1,5 +1,7 @@
 ﻿using Celeste;
 using Celeste.Mod;
+using Celeste.Mod.LylyraHelper.Components;
+using Celeste.Mod.LylyraHelper.Intefaces;
 using LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -13,7 +15,7 @@ using System.Threading.Tasks;
 namespace Celeste.Mod.LylyraHelper.Entities
 {
     [Tracked(true)]
-    public class Paper : Trigger
+    public class Paper : Trigger, ICuttable
     {
         private Scene scene;
         private Vector2 groupOrigin;
@@ -445,5 +447,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
         }
 
         internal virtual void AddDecorations(){}
+
+        bool ICuttable.Cut(Vector2 cutPosition, Vector2 direction, int gapWidth, Vector2 cutStartPosition)
+        {
+            Cuttable cuttable = Get<Cuttable>();
+            return cuttable != null ? cuttable.Cut(cutPosition, direction, gapWidth, cutStartPosition) : true;
+        }
     }
 }

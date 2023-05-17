@@ -1,5 +1,6 @@
 ﻿using Celeste.Mod.Helpers;
 using Celeste.Mod.LylyraHelper.Entities;
+using Celeste.Mod.LylyraHelper.Intefaces;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.ModInterop;
@@ -112,13 +113,23 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                 }
             }
+
             foreach (Entity d in base.Scene.Entities)
             {
                 if (d == Entity) continue;
 
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
                 //custom entities from other mods
-                if (CustomSlicingActions.ContainsKey(d.GetType()))
+                if (d is ICuttable icut)
+                {
+                    if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
+                    {
+                        slicingEntities.Add(d);
+                        sliceStartPositions.Add(d, Position);
+                        continue;
+                    }
+                }
+                else if (CustomSlicingActions.ContainsKey(d.GetType()))
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
@@ -183,14 +194,12 @@ namespace Celeste.Mod.LylyraHelper.Components
                     sliceStartPositions.Remove(d);
                     return true;
                 }
-                Cuttable cutComponent;
-                if (d is Paper && (cutComponent = d.Get<Cuttable>()) != null)
+                if (d is ICuttable icut)
                 {
-                    Paper paper = d as Paper;
-                    if (!paper.CollideCheck(Entity) || collisionOverride || sliceOnImpact)
+                    if (!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact)
                     {
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
-                        bool toReturn = cutComponent.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
+                        bool toReturn = icut.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
                         sliceStartPositions.Remove(d);
                         return toReturn;
                     }
