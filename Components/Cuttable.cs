@@ -71,7 +71,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 if (cutPosition.X > p1.X) p1.X = (int)cutPosition.X;
             }
-
             if (direction.Y > 0)
             {
                 if (cutPosition.Y < p2.Y) p2.Y = (int)cutPosition.Y;
