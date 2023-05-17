@@ -65,6 +65,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
+
         public override void Update()
         {
             base.Update();
@@ -212,7 +213,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                         else if (d is CrushBlock)
                         {
                             SliceKevin(d as CrushBlock);
-                            return true; 
+                            return true;
                         }
                         else if (d is FallingBlock)
                         {
@@ -261,7 +262,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 GetValue(original);
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(original, d1, d2, mover, 8);
+                HandleStaticMover(Scene, Direction, Entity, original, d1, d2, mover, 8);
             }
             Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("000000"));
@@ -270,68 +271,68 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private void SliceKevin(CrushBlock original)
         {
-                if (!Scene.Contains(original))
-                {
-                    sliceStartPositions.Remove(original);
-                    return;
-                }
-
-                //get private fields
-                Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
-                bool canMoveVertically = (bool)cbType?.GetField("canMoveVertically", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-                bool canMoveHorizontally = (bool)cbType?.GetField("canMoveHorizontally", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-                bool chillOut = (bool)cbType.GetField("chillOut", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-
-                var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-                var newReturnStack1 = Activator.CreateInstance(returnStack.GetType(), returnStack);
-                var newReturnStack2 = Activator.CreateInstance(returnStack.GetType(), returnStack);
-
-                Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-
-                //Process private fields
-                CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
-                cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(original, level);
-                Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
-                Vector2 cb1Pos = Vector2Int(resultArray[0]);
-                Vector2 cb2Pos = Vector2Int(resultArray[1]);
-                int cb1Width = (int)resultArray[2].X;
-                int cb1Height = (int)resultArray[2].Y;
-
-                int cb2Width = (int)resultArray[3].X;
-                int cb2Height = (int)resultArray[3].Y;
-
-                //create cloned crushblocks + set data
-
-                Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
-                CrushBlock cb1 = null;
-                bool cb1Added;
-                if (cb1Added = cb1Width >= 24 && cb1Height >= 24)
-                {
-                    cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
-                    cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, newReturnStack1);
-                    Scene.Add(cb1);
-                    secondFrameActivation.Add(cb1);
-                }
-
-                CrushBlock cb2 = null;
-                bool cb2Added;
-                if (cb2Added = cb2Width >= 24 && cb2Height >= 24)
-                {
-                    cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
-                    cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack2);
-                    Scene.Add(cb2);
-                    secondFrameActivation.Add(cb2);
-                }
-
-                foreach (StaticMover mover in staticMovers)
-                {
-                    HandleStaticMover(original, cb1, cb2, mover, 24);
-                }
-                Scene.Remove(original);
-                AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("62222b"));
-
+            if (!Scene.Contains(original))
+            {
                 sliceStartPositions.Remove(original);
+                return;
+            }
+
+            //get private fields
+            Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
+            bool canMoveVertically = (bool)cbType?.GetField("canMoveVertically", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            bool canMoveHorizontally = (bool)cbType?.GetField("canMoveHorizontally", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            bool chillOut = (bool)cbType.GetField("chillOut", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+
+            var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            var newReturnStack1 = Activator.CreateInstance(returnStack.GetType(), returnStack);
+            var newReturnStack2 = Activator.CreateInstance(returnStack.GetType(), returnStack);
+
+            Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+
+            //Process private fields
+            CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
+            cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(original, level);
+            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
+            Vector2 cb1Pos = Vector2Int(resultArray[0]);
+            Vector2 cb2Pos = Vector2Int(resultArray[1]);
+            int cb1Width = (int)resultArray[2].X;
+            int cb1Height = (int)resultArray[2].Y;
+
+            int cb2Width = (int)resultArray[3].X;
+            int cb2Height = (int)resultArray[3].Y;
+
+            //create cloned crushblocks + set data
+
+            Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
+            CrushBlock cb1 = null;
+            bool cb1Added;
+            if (cb1Added = cb1Width >= 24 && cb1Height >= 24)
+            {
+                cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
+                cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, newReturnStack1);
+                Scene.Add(cb1);
+                secondFrameActivation.Add(cb1);
+            }
+
+            CrushBlock cb2 = null;
+            bool cb2Added;
+            if (cb2Added = cb2Width >= 24 && cb2Height >= 24)
+            {
+                cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
+                cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack2);
+                Scene.Add(cb2);
+                secondFrameActivation.Add(cb2);
+            }
+
+            foreach (StaticMover mover in staticMovers)
+            {
+                HandleStaticMover(Scene, Direction, Entity, original, cb1, cb2, mover, 24);
+            }
+            Scene.Remove(original);
+            AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("62222b"));
+
+            sliceStartPositions.Remove(original);
         }
 
         private static Vector2 Vector2Int(Vector2 vector2)
@@ -341,64 +342,65 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private void SliceFallingBlock(FallingBlock original)
         {
-                Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
-                Vector2 cb1Pos = resultArray[0];
-                Vector2 cb2Pos = resultArray[1];
-                int cb1Width = (int)resultArray[2].X;
-                int cb1Height = (int)resultArray[2].Y;
+            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
+            Vector2 cb1Pos = resultArray[0];
+            Vector2 cb2Pos = resultArray[1];
+            int cb1Width = (int)resultArray[2].X;
+            int cb1Height = (int)resultArray[2].Y;
 
-                int cb2Width = (int)resultArray[3].X;
-                int cb2Height = (int)resultArray[3].Y;
+            int cb2Width = (int)resultArray[3].X;
+            int cb2Height = (int)resultArray[3].Y;
 
-                var tileTypeField = original.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
-                List<StaticMover> staticMovers = (List<StaticMover>)original.GetType().GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-                char tileTypeChar = (char)tileTypeField.GetValue(original);
+            var tileTypeField = original.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
+            List<StaticMover> staticMovers = (List<StaticMover>)original.GetType().GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            char tileTypeChar = (char)tileTypeField.GetValue(original);
 
-                if (tileTypeChar == '1')
-                {
-                    Audio.Play("event:/game/general/wall_break_dirt", Entity.Position);
-                }
-                else if (tileTypeChar == '3')
-                {
-                    Audio.Play("event:/game/general/wall_break_ice", Entity.Position);
-                }
-                else if (tileTypeChar == '9')
-                {
-                    Audio.Play("event:/game/general/wall_break_wood", Entity.Position);
-                }
-                else
-                {
-                    Audio.Play("event:/game/general/wall_break_stone", Entity.Position);
-                }
-                FallingBlock fb1 = null;
-                FallingBlock fb2 = null;
-                if (cb1Width >= 8 && cb1Height >= 8)
-                {
-                    fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, false, false, true);
-                    Scene.Add(fb1);
-                    fb1.Triggered = true;
-                    fb1.FallDelay = 0;
-                }
-                if (cb2Width >= 8 && cb2Height >= 8)
-                {
-                    fb2 = new FallingBlock(cb2Pos, tileTypeChar, cb2Width, cb2Height, false, false, true);
-                    Scene.Add(fb2);
-                    fb2.Triggered = true;
-                    fb2.FallDelay = 0;
-                }
-                foreach (StaticMover mover in staticMovers)
+            if (tileTypeChar == '1')
             {
-                HandleStaticMover(original, fb1, fb2, mover, 8);
+                Audio.Play("event:/game/general/wall_break_dirt", Entity.Position);
             }
-                AddParticles(
-                    original.Position,
-                    new Vector2(original.Width, original.Height),
-                    Calc.HexToColor("444444"));
-                Scene.Remove(original);
-                sliceStartPositions.Remove(original);
+            else if (tileTypeChar == '3')
+            {
+                Audio.Play("event:/game/general/wall_break_ice", Entity.Position);
+            }
+            else if (tileTypeChar == '9')
+            {
+                Audio.Play("event:/game/general/wall_break_wood", Entity.Position);
+            }
+            else
+            {
+                Audio.Play("event:/game/general/wall_break_stone", Entity.Position);
+            }
+            FallingBlock fb1 = null;
+            FallingBlock fb2 = null;
+            if (cb1Width >= 8 && cb1Height >= 8)
+            {
+                fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, false, false, true);
+                Scene.Add(fb1);
+                fb1.Triggered = true;
+                fb1.FallDelay = 0;
+            }
+            if (cb2Width >= 8 && cb2Height >= 8)
+            {
+                fb2 = new FallingBlock(cb2Pos, tileTypeChar, cb2Width, cb2Height, false, false, true);
+                Scene.Add(fb2);
+                fb2.Triggered = true;
+                fb2.FallDelay = 0;
+            }
+            foreach (StaticMover mover in staticMovers)
+            {
+                HandleStaticMover(Scene, Direction, Entity, original, fb1, fb2, mover, 8);
+            }
+            AddParticles(
+                original.Position,
+                new Vector2(original.Width, original.Height),
+                Calc.HexToColor("444444"));
+            Scene.Remove(original);
+            sliceStartPositions.Remove(original);
         }
+
         //currently handles vanilla static movers (basically just spikes and springs)
-        private void HandleStaticMover(Entity parent, Solid cb1, Solid cb2, StaticMover mover, int minLength)
+        private static void HandleStaticMover(Scene Scene, Vector2 Direction, Entity Entity, Entity parent, Solid cb1, Solid cb2, StaticMover mover, int minLength, DynamicData dynData = null)
         {
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
@@ -437,7 +439,11 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             mover.Platform = null;
             Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Solid", true, true);
-            if (mover.Entity is Spikes || mover.Entity is KnifeSpikes)
+            if (CustomStaticHandlerActions.ContainsKey(mover.Entity.GetType()))
+            {
+                CustomStaticHandlerActions[mover.Entity.GetType()].Invoke(mover.Entity, dynData);
+            }
+            else if (mover.Entity is Spikes || mover.Entity is KnifeSpikes)
             {
                 //destroy all parts of spikes that aren't connected anymore.
                 //switch depending on direction
@@ -749,7 +755,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                             mover.Platform = cb1;
                             List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
                             staticMovers.Add(mover);
-                        } 
+                        }
                         else if (cb2Added)
                         {
                             mover.Platform = cb2;
@@ -762,7 +768,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                             return;
                         }
                     }
-                } 
+                }
                 else
                 {
                     if (spring.CollideRect(new Rectangle((int)(cb1Pos.X - 1), (int)(cb1Pos.Y + cb1Height), cb1Width + 2, (int)(cb2Pos.Y - (cb1Pos.Y + cb1Height)))))
@@ -774,12 +780,12 @@ namespace Celeste.Mod.LylyraHelper.Components
                     {
                         if (cb1Added && springOnCB1)
                         {
-                            mover.Platform = cb1; 
+                            mover.Platform = cb1;
                             List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
                                 GetValue(cb1);
                             staticMovers.Add(mover);
                         }
-                        else if(cb2Added)
+                        else if (cb2Added)
                         {
                             mover.Platform = cb2;
                             List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
@@ -901,7 +907,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         }
 
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomSlicingActions = new Dictionary<Type, Action<Entity, DynamicData>>();
-        private static Dictionary<Type, Action<Entity, DynamicData>> CustomStaticHandlerSlicingActions = new Dictionary<Type, Action<Entity, DynamicData>>();
+        private static Dictionary<Type, Action<Entity, DynamicData>> CustomStaticHandlerActions = new Dictionary<Type, Action<Entity, DynamicData>>();
         public static void UnregisterSlicerAction(Type type, Action<Entity, DynamicData> action)
         {
             CustomSlicingActions.Add(type, action);
@@ -910,6 +916,24 @@ namespace Celeste.Mod.LylyraHelper.Components
         public static void RegisterSlicerAction(Type type, Action<Entity, DynamicData> action)
         {
             CustomSlicingActions.Add(type, action);
+        }
+
+        public static void UnregisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
+        {
+            CustomStaticHandlerActions.Remove(type);
+        }
+
+        public static void RegisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
+        {
+            CustomStaticHandlerActions.Add(type, action);
+        }
+
+        public static void ModinteropHandleStaticMover(DynamicData dynData, Solid original, Solid cb1, Solid cb2, StaticMover mover, int minLength) 
+        {
+            Scene Scene = dynData.Get("Scene") as Scene;
+            Vector2 Direction = (Vector2)dynData.Get("Direction");
+            Entity Entity = dynData.Get("Entity") as Entity;
+            HandleStaticMover(Scene, Direction, Entity, original, cb1, cb2, mover, minLength);
         }
     }
 }

@@ -45,7 +45,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
         }
 
-
         [ModExportName("LylyraHelper.Slicer")]
         private static class ModExports
         {
@@ -57,6 +56,22 @@ namespace Celeste.Mod.LylyraHelper.Entities
             public static void UnregisterSlicerAction(Type type, Action<Entity, DynamicData> action)
             {
                 Slicer.UnregisterSlicerAction(type, action);
+            }
+
+            public static void RegisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
+            {
+                Slicer.RegisterSlicerStaticHandler(type, action);
+            }
+
+            public static void UnregisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
+            {
+                Slicer.UnregisterSlicerStaticHandler(type, action);
+            }
+
+            //this method handles attached static movers (like spikes) for Solids. Convenience Method.
+            public static void HandleStaticMover(DynamicData dynData, Solid original, Solid cb1, Solid cb2, StaticMover mover, int minLength)
+            {
+                Slicer.ModinteropHandleStaticMover(dynData, original, cb1, cb2, mover, minLength);
             }
         }
 
