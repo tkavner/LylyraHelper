@@ -2,6 +2,8 @@
 using Celeste.Mod.LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
+using MonoMod.ModInterop;
+using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,7 +79,6 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private void CheckCollisions()
         {
-
             StaticMover sm = Entity.Get<StaticMover>();
             Vector2 Position = Entity.Position;
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for speed)
@@ -113,10 +114,20 @@ namespace Celeste.Mod.LylyraHelper.Components
             foreach (Entity d in base.Scene.Entities)
             {
                 if (d == Entity) continue;
-                if (sm != null && sm.Entity != null && sm.Entity == d) continue;
 
+                if (sm != null && sm.Entity != null && sm.Entity == d) continue;
+                //custom entities from other mods
+                if (CustomSlicingActions.ContainsKey(d.GetType()))
+                {
+                    if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
+                    {
+                        slicingEntities.Add(d);
+                        sliceStartPositions.Add(d, Position);
+                        continue;
+                    }
+                }
                 //vanilla entity handling
-                if (d is Booster)
+                else if (d is Booster)
                 {
                     Booster booster = d as Booster;
                     if (!slicingEntities.Contains(d) && d.CollideCheck(Entity))
@@ -143,6 +154,9 @@ namespace Celeste.Mod.LylyraHelper.Components
         }
 
         //Basically all cutting requires a wild amount of differing requirements to cut in half.
+        //This is because we're essentially cloning the object, which is a very complicated issue in computer programming.
+        //We have to go through on a case by case basis because some objects require some of their fields to be deep copies (see: CrushBlock ReturnStack), while others should absolutely not be.
+        //for modded objects, we can work under the assumption 
         //There's definitely cleanup to be done in here, but in general because we want two (almost) identical copies of objects, with lots of weird exceptions
         public void Slice(bool collisionOverride = false)
         {
@@ -185,17 +199,25 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     if (d is Solid)
                     {
-                        if (d is DreamBlock)
+                        if (CustomSlicingActions.ContainsKey(d.GetType()))
                         {
-                            return SliceDreamBlock(d as DreamBlock, collisionOverride);
+                            CustomSlicingActions[d.GetType()].Invoke(d, new DynamicData(this));
+                            return true;
+                        }
+                        else if (d is DreamBlock)
+                        {
+                            SliceDreamBlock(d as DreamBlock);
+                            return true;
                         }
                         else if (d is CrushBlock)
                         {
-                            return SliceKevin(d as CrushBlock, collisionOverride);
+                            SliceKevin(d as CrushBlock);
+                            return true; 
                         }
                         else if (d is FallingBlock)
                         {
-                            return SliceFallingBlock(d as FallingBlock, collisionOverride);
+                            SliceFallingBlock(d as FallingBlock);
+                            return true;
                         }
                     }
                     else if (d is CrystalStaticSpinner)
@@ -212,7 +234,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             });
         }
 
-        private bool SliceDreamBlock(DreamBlock original, bool collisionOverride)
+        private void SliceDreamBlock(DreamBlock original)
         {
             Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
 
@@ -223,10 +245,9 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             int db2Width = (int)resultArray[3].X;
             int db2Height = (int)resultArray[3].Y;
+
             DreamBlock d1 = new DreamBlock(db1Pos, db1Width, db1Height, null, false, false);
             DreamBlock d2 = new DreamBlock(db2Pos, db2Width, db2Height, null, false, false);
-            bool db1Added = false;
-            bool db2Added = false;
 
             if (db1Width >= 8 && db1Height >= 8) Scene.Add(d1);
             if (db2Width >= 8 && db2Height >= 8) Scene.Add(d2);
@@ -235,46 +256,43 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             List<StaticMover> staticMovers = (List<StaticMover>)
                 FakeAssembly.GetFakeEntryAssembly().
-                GetType("Celeste.CrushBlock", true, true).
+                GetType("Celeste.Solid", true, true).
                 GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
                 GetValue(original);
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(db1Added, db2Added, original, mover, db1Pos, db2Pos, db1Width, db1Height, db2Width, db2Height, 8, d1, d2);
+                HandleStaticMover(original, d1, d2, mover, 8);
             }
             Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("000000"));
 
-            return true;
         }
 
-        private bool SliceKevin(CrushBlock d, bool collisionOverride)
+        private void SliceKevin(CrushBlock original)
         {
-            if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact))
-            {
-                if (!Scene.Contains(d))
+                if (!Scene.Contains(original))
                 {
-                    sliceStartPositions.Remove(d);
-                    return true;
+                    sliceStartPositions.Remove(original);
+                    return;
                 }
 
                 //get private fields
                 Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
-                bool canMoveVertically = (bool)cbType?.GetField("canMoveVertically", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                bool canMoveHorizontally = (bool)cbType?.GetField("canMoveHorizontally", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                bool chillOut = (bool)cbType.GetField("chillOut", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                bool canMoveVertically = (bool)cbType?.GetField("canMoveVertically", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+                bool canMoveHorizontally = (bool)cbType?.GetField("canMoveHorizontally", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+                bool chillOut = (bool)cbType.GetField("chillOut", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
 
-                var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
                 var newReturnStack1 = Activator.CreateInstance(returnStack.GetType(), returnStack);
                 var newReturnStack2 = Activator.CreateInstance(returnStack.GetType(), returnStack);
 
-                Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                Vector2 crushDir = (Vector2)cbType?.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
 
                 //Process private fields
                 CrushBlock.Axes axii = (canMoveVertically && canMoveHorizontally) ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
-                cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, level);
-                Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Center, Direction, cutSize);
+                cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(original, level);
+                Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
                 Vector2 cb1Pos = Vector2Int(resultArray[0]);
                 Vector2 cb2Pos = Vector2Int(resultArray[1]);
                 int cb1Width = (int)resultArray[2].X;
@@ -308,15 +326,12 @@ namespace Celeste.Mod.LylyraHelper.Components
 
                 foreach (StaticMover mover in staticMovers)
                 {
-                    HandleStaticMover(cb1Added, cb2Added, d, mover, cb1Pos, cb2Pos, cb1Width, cb1Height, cb2Width, cb2Height, 24, cb1, cb2);
+                    HandleStaticMover(original, cb1, cb2, mover, 24);
                 }
-                Scene.Remove(d);
-                AddParticles(d.Position, new Vector2(d.Width, d.Height), Calc.HexToColor("62222b"));
+                Scene.Remove(original);
+                AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("62222b"));
 
-                sliceStartPositions.Remove(d);
-                return true;
-            }
-            return false;
+                sliceStartPositions.Remove(original);
         }
 
         private static Vector2 Vector2Int(Vector2 vector2)
@@ -324,11 +339,9 @@ namespace Celeste.Mod.LylyraHelper.Components
             return new Vector2((int)Math.Round(vector2.X), (int)Math.Round(vector2.Y));
         }
 
-        private bool SliceFallingBlock(FallingBlock d, bool collisionOverride)
+        private void SliceFallingBlock(FallingBlock original)
         {
-            if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact))
-            {
-                Vector2[] resultArray = CalcCuts(d.Position, new Vector2(d.Width, d.Height), Entity.Center, Direction, cutSize);
+                Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
                 Vector2 cb1Pos = resultArray[0];
                 Vector2 cb2Pos = resultArray[1];
                 int cb1Width = (int)resultArray[2].X;
@@ -337,9 +350,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                 int cb2Width = (int)resultArray[3].X;
                 int cb2Height = (int)resultArray[3].Y;
 
-                var tileTypeField = d.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
-                List<StaticMover> staticMovers = (List<StaticMover>)d.GetType().GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                char tileTypeChar = (char)tileTypeField.GetValue(d);
+                var tileTypeField = original.GetType().GetField("TileType", BindingFlags.NonPublic | BindingFlags.Instance);
+                List<StaticMover> staticMovers = (List<StaticMover>)original.GetType().GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+                char tileTypeChar = (char)tileTypeField.GetValue(original);
 
                 if (tileTypeChar == '1')
                 {
@@ -357,15 +370,12 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     Audio.Play("event:/game/general/wall_break_stone", Entity.Position);
                 }
-                bool cb1Added = false;
-                bool cb2Added = false;
                 FallingBlock fb1 = null;
                 FallingBlock fb2 = null;
                 if (cb1Width >= 8 && cb1Height >= 8)
                 {
                     fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, false, false, true);
                     Scene.Add(fb1);
-                    cb1Added = true;
                     fb1.Triggered = true;
                     fb1.FallDelay = 0;
                 }
@@ -373,38 +383,54 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     fb2 = new FallingBlock(cb2Pos, tileTypeChar, cb2Width, cb2Height, false, false, true);
                     Scene.Add(fb2);
-                    cb2Added = false;
                     fb2.Triggered = true;
                     fb2.FallDelay = 0;
                 }
                 foreach (StaticMover mover in staticMovers)
-                {
-                    HandleStaticMover(cb1Added, cb2Added, d, mover, cb1Pos, cb2Pos, cb1Width, cb1Height, cb2Width, cb2Height, 24, fb1, fb2);
-                }
-                AddParticles(
-                    d.Position,
-                    new Vector2(d.Width, d.Height),
-                    Calc.HexToColor("444444"));
-                Scene.Remove(d);
-                sliceStartPositions.Remove(d);
-                return true;
+            {
+                HandleStaticMover(original, fb1, fb2, mover, 8);
             }
-            return false;
+                AddParticles(
+                    original.Position,
+                    new Vector2(original.Width, original.Height),
+                    Calc.HexToColor("444444"));
+                Scene.Remove(original);
+                sliceStartPositions.Remove(original);
         }
         //currently handles vanilla static movers (basically just spikes and springs)
-        private void HandleStaticMover(bool cb1Added, bool cb2Added, Entity parent, StaticMover mover,
-            Vector2 cb1Pos, Vector2 cb2Pos,
-            int cb1Width, int cb1Height, int cb2Width, int cb2Height,
-            int minLength = 8, Solid cb1 = null, Solid cb2 = null)
+        private void HandleStaticMover(Entity parent, Solid cb1, Solid cb2, StaticMover mover, int minLength)
         {
+            bool cb1Added = cb1 != null;
+            bool cb2Added = cb2 != null;
+
+            Vector2 cb1Pos = Vector2.Zero;
+            Vector2 cb2Pos = Vector2.Zero;
+            int cb1Width = 0;
+            int cb1Height = 0;
+            int cb2Width = 0;
+            int cb2Height = 0;
+
+            if (cb1Added)
+            {
+                cb1Pos = cb1.Position;
+                cb1Width = (int)cb1.Width;
+                cb1Height = (int)cb1.Height;
+            }
+            if (cb2Added)
+            {
+                cb2Pos = cb2.Position;
+                cb2Width = (int)cb2.Width;
+                cb2Height = (int)cb2.Height;
+            }
+
             if (!cb1Added && !cb2Added)
             {
                 Scene.Remove(mover.Entity);
                 return;
             }
 
-            float furthestLeft = cb1 != null ? cb1Pos.X : cb2Pos.X;
-            float furthestRight = cb2 != null ? cb2Pos.X + cb2Width : cb1Pos.X + cb1Width;
+            float furthestLeft = cb1Added ? cb1Pos.X : cb2Pos.X;
+            float furthestRight = cb2Added ? cb2Pos.X + cb2Width : cb1Pos.X + cb1Width;
 
             float furthestUp = cb1 != null ? cb1Pos.Y : cb2Pos.Y;
             float furthestDown = cb2 != null ? cb2Pos.X + cb2Height : cb1Pos.X + cb1Height;
@@ -718,16 +744,22 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     } else
                     {
-                        if (springOnCB1)
+                        if (cb1Added && springOnCB1)
                         {
                             mover.Platform = cb1;
                             List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
                             staticMovers.Add(mover);
-                        } else
+                        } 
+                        else if (cb2Added)
                         {
                             mover.Platform = cb2;
                             List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb2);
                             staticMovers.Add(mover);
+                        }
+                        else
+                        {
+                            Scene.Remove(spring);
+                            return;
                         }
                     }
                 } 
@@ -740,22 +772,31 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                     else
                     {
-                        if (springOnCB1)
+                        if (cb1Added && springOnCB1)
                         {
                             mover.Platform = cb1; 
                             List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
                                 GetValue(cb1);
                             staticMovers.Add(mover);
                         }
-                        else
+                        else if(cb2Added)
                         {
                             mover.Platform = cb2;
                             List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
                                 GetValue(cb2);
                             staticMovers.Add(mover);
                         }
+                        else
+                        {
+                            Scene.Remove(spring);
+                            return;
+                        }
                     }
                 }
+            }
+            else if (mover.Entity is TriggerSpikes) //trigger spikes, incredibly enough, do not inheret from tr
+            {
+
             }
         }
 
@@ -763,7 +804,6 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
             level.ParticlesFG.Emit(Cuttable.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
-
         }
 
         private Vector2 GetDirectionalPosition()
@@ -774,7 +814,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             else if (Direction.X < 0)
             {
-
                 return Entity.Position + new Vector2(-directionalOffset, 0);
             }
             else if (Direction.Y > 0)
@@ -786,7 +825,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 return Entity.Position + new Vector2(0, -directionalOffset);
             }
         }
-
 
         public static Vector2[] CalcCuts(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int cutSize = 8)
         {
@@ -832,12 +870,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             return new Vector2[] { pos1, pos2, size1, size2 };
         }
 
-
         private static float Mod(float x, float m)
         {
             return (x % m + m) % m;
         }
-
 
         public static void Load()
         {
@@ -863,6 +899,17 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             if (entityCallback != null) entityCallback.Invoke();
         }
-    }
 
+        private static Dictionary<Type, Action<Entity, DynamicData>> CustomSlicingActions = new Dictionary<Type, Action<Entity, DynamicData>>();
+        private static Dictionary<Type, Action<Entity, DynamicData>> CustomStaticHandlerSlicingActions = new Dictionary<Type, Action<Entity, DynamicData>>();
+        public static void UnregisterSlicerAction(Type type, Action<Entity, DynamicData> action)
+        {
+            CustomSlicingActions.Add(type, action);
+        }
+
+        public static void RegisterSlicerAction(Type type, Action<Entity, DynamicData> action)
+        {
+            CustomSlicingActions.Add(type, action);
+        }
+    }
 }

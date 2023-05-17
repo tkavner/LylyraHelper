@@ -3,6 +3,9 @@ using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Components;
 using LylyraHelper.Entities;
 using Monocle;
+using MonoMod.ModInterop;
+using MonoMod.Utils;
+using System;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
@@ -25,6 +28,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors.Load();
             Slicer.Load();
             PaperHitbox.Load();
+            typeof(ModExports).ModInterop();
+
         }
 
         public override void Unload()
@@ -39,5 +44,21 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.LoadContent(firstLoad);
             _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
         }
+
+
+        [ModExportName("LylyraHelper.Slicer")]
+        private static class ModExports
+        {
+            public static void RegisterSlicerAction(Type type, Action<Entity, DynamicData> action)
+            {
+                Slicer.RegisterSlicerAction(type, action);
+            }
+
+            public static void UnregisterSlicerAction(Type type, Action<Entity, DynamicData> action)
+            {
+                Slicer.UnregisterSlicerAction(type, action);
+            }
+        }
+
     }
 }
