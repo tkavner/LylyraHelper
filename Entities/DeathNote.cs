@@ -14,7 +14,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
     [CustomEntity("LylyraHelper/DeathNote")]
     class DeathNote : Paper
     {
-        public DeathNote(EntityData data, Vector2 offset) : base(data, offset, data.Width, data.Height, "objects/LylyraHelper/dashPaper/deathnote", "objects/LylyraHelper/dashPaper/deathnotegap")
+        public DeathNote(EntityData data, Vector2 offset) : base(data, offset, "objects/LylyraHelper/dashPaper/deathnote", "objects/LylyraHelper/dashPaper/deathnotegap")
         {
             thisType = this.GetType();
             Add(new Cuttable(this, Calc.HexToColor("8f0020")));

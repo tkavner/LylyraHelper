@@ -79,19 +79,19 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal bool noEffects;
         private string flagName;
 
-        public Paper(EntityData data, Vector2 offset, int width, int height,
+        public Paper(EntityData data, Vector2 offset, 
             string texture = "objects/LylyraHelper/dashPaper/cloudblocknew", 
-            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap", 
-            string flagName = "", 
-            bool noEffects = false)
+            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap")
         : base(data, offset)
         {
+            int width = data.Width;
+            int height = data.Height;
             thisType = this.GetType();
             base.Collider = new PaperHitbox(this, width, height);
             Collidable = true;
             Visible = true;
-            this.noEffects = noEffects;
-            this.flagName = flagName.Trim();
+            this.noEffects = data.Bool("noEffects");
+            this.flagName = data.Attr("flag");
             invert = data.Bool("invertFlag", false);
 
             Depth = Depths.SolidsBelow + 200;

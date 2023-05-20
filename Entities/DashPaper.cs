@@ -26,19 +26,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private static ParticleType paperSymbols;
         private int playerParticleEmitPoints;
 
-        public DashPaper(EntityData data, Vector2 offset, Vector2 position, int width, int height, bool safe,
-            bool spawnScissors = true,
-            bool fragileScissors = false,
-            string texture = "objects/LylyraHelper/dashPaper/dashpaper",
-            string gapTexture = "objects/LylyraHelper/dashPaper/cloudblockgap",
-            string flagName = "",
-            bool noEffects = false)
-        : base(data, offset, width, height, texture, gapTexture, flagName, noEffects)
+
+        public DashPaper(EntityData data, Vector2 offset):
+            base(data, offset,
+             texture: "objects/LylyraHelper/dashPaper/dashpaper",
+             gapTexture: "objects/LylyraHelper/dashPaper/dashpapergap")
         {
             thisType = this.GetType();
-            this.spawnScissors = spawnScissors;
-            this.fragileScissors = fragileScissors;
+            this.spawnScissors = data.Bool("spawnScissors", true);
+            this.fragileScissors = data.Bool("fragileScissors", false);
             noTrail = data.Bool("noTrail", false);
+            noEffects = data.Bool("noEffects", false));
             Add(new Cuttable(this, Calc.HexToColor("cac7e3")));
             if (paperSymbols == null)
             {
@@ -63,16 +61,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     UseActualDeltaTime = true
                 };
             }
-        }
-
-        public DashPaper(EntityData data, Vector2 vector2) :
-            this(data, vector2, data.Position + vector2, data.Width, data.Height, false,
-                spawnScissors: data.Bool("spawnScissors", true),
-                fragileScissors: data.Bool("fragileScissors", false),
-                flagName: data.Attr("flag", ""),
-                noEffects: data.Bool("noEffects", false))
-        {
-
         }
         internal override void AddDecorations()
         {
