@@ -36,7 +36,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             this.spawnScissors = data.Bool("spawnScissors", true);
             this.fragileScissors = data.Bool("fragileScissors", false);
             noTrail = data.Bool("noTrail", false);
-            noEffects = data.Bool("noEffects", false));
+            noEffects = data.Bool("noEffects", false);
             Add(new Cuttable(this, Calc.HexToColor("cac7e3")));
             if (paperSymbols == null)
             {

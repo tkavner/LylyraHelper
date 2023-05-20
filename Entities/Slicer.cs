@@ -27,11 +27,12 @@ namespace Celeste.Mod.LylyraHelper.Components
         private Level level;
         private int directionalOffset;
         private bool sliceOnImpact;
+        private bool fragile;
         private Action entityCallback;
 
         public int entitiesCut { get; private set; }
 
-        public Slicer(Vector2 Direction, int cutSize, Level level, int directionalOffset, Collider slicingCollider = null, bool active = true, bool sliceOnImpact = false) : base(active, false)
+        public Slicer(Vector2 Direction, int cutSize, Level level, int directionalOffset, Collider slicingCollider = null, bool active = true, bool sliceOnImpact = false, bool fragile = false) : base(active, false)
         {
             this.slicingCollider = slicingCollider;
             this.Direction = Direction;
@@ -39,6 +40,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             this.level = level;
             this.directionalOffset = directionalOffset;
             this.sliceOnImpact = sliceOnImpact;
+            this.fragile = fragile;
 
             if (Cuttable.paperScraps == null)
             {
