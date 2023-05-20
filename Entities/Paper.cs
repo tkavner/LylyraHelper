@@ -92,6 +92,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Visible = true;
             this.noEffects = noEffects;
             this.flagName = flagName.Trim();
+            invert = data.Bool("invertFlag", false);
 
             Depth = Depths.SolidsBelow + 200;
             skip = new bool[width / 8, height / 8];

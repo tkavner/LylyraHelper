@@ -17,9 +17,12 @@ table.insert(paper.placements, {
     data = {
 		width = 24,
         height = 24,
-        fragileScissors = false,
-        spawnScissors = false,
-		noEffects = false
+        spawnScissors = true,
+		fragileScissors = false,
+		noParticleEffects = false,
+        noTrail = false,
+		flag = "",
+		invertFlag = false
     }
 })
 
@@ -111,9 +114,6 @@ function paper.sprite(room, entity)
 	
     local x, y = entity.x or 0, entity.y or 0
 	local frameTexture = frameTextures["none"]
-	if (entity.spawnScissors) then
-		frameTexture = frameTextures["scissors"]
-	end
     local width, height = entity.width or 24, entity.height or 24
 	local tileSize = 8
     local tileWidth = 8

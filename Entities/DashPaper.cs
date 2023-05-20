@@ -20,11 +20,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
     {
         private bool spawnScissors;
         private bool fragileScissors;
+        private bool noTrail;
         private Random r = new Random(); //for particle gen only
         private int particleEmitPoints;
         private static ParticleType paperSymbols;
         private int playerParticleEmitPoints;
-        private EventInstance audioToken;
 
         public DashPaper(EntityData data, Vector2 offset, Vector2 position, int width, int height, bool safe,
             bool spawnScissors = true,
@@ -38,6 +38,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             thisType = this.GetType();
             this.spawnScissors = spawnScissors;
             this.fragileScissors = fragileScissors;
+            noTrail = data.Bool("noTrail", false);
             Add(new Cuttable(this, Calc.HexToColor("cac7e3")));
             if (paperSymbols == null)
             {
@@ -68,7 +69,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             this(data, vector2, data.Position + vector2, data.Width, data.Height, false,
                 spawnScissors: data.Bool("spawnScissors", true),
                 fragileScissors: data.Bool("fragileScissors", false),
-                flagName: data.Attr("flagName", ""),
+                flagName: data.Attr("flag", ""),
                 noEffects: data.Bool("noEffects", false))
         {
 
@@ -211,7 +212,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         internal override void AddPlayerEffects(Player player)
         {
-            if (playerParticleEmitPoints++ % 4 == 0)
+            if (!noTrail && playerParticleEmitPoints++ % 4 == 0)
             {
                 SceneAs<Level>().ParticlesFG.Emit(paperSymbols, 1, player.Center, player.Collider.HalfSize, Color.White);
             }
