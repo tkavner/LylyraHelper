@@ -18,3 +18,9 @@ entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_reflection=Knife Spik
 
 #Dash Paper
 
+entities.LylyraHelper/DashPaper.attributes.description.SpawnScissors=If checked, spawn Scissors on dash. Scissors spawn behind the player and move in the cardinal direction(s) dashed (Diagonal dashes spawn)
+entities.LylyraHelper/DashPaper.attributes.description.noParticleEffects=If checked, this entity does not emit particle effects (besides player trail effects)
+entities.LylyraHelper/DashPaper.attributes.description.noTrail=If checked, this entity will not add a trail of particle effects to the player when the player is inside the paper.
+#entities.LylyraHelper/DashPaper.attributes.description.FragileScissors=
+#entities.LylyraHelper/DashPaper.attributes.description.Flag=The name of the session flag to set. Flag is set to true
+#entities.LylyraHelper/DashPaper.attributes.description.Flag=If checked, the dash paper will 

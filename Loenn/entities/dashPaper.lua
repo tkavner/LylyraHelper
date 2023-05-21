@@ -18,11 +18,10 @@ table.insert(paper.placements, {
 		width = 24,
         height = 24,
         spawnScissors = false,
-		fragileScissors = false,
 		noParticleEffects = false,
         noTrail = false,
-		flag = "",
-		invertFlag = false
+		--flag = "",
+		--invertFlag = false
     }
 })
 
@@ -33,11 +32,10 @@ table.insert(paper.placements,
 		width = 24,
         height = 24,
         spawnScissors = true,
-		fragileScissors = false,
 		noParticleEffects = false,
         noTrail = false,
-		flag = "",
-		invertFlag = false
+		--flag = "",
+		--invertFlag = false
     }
 })
 
@@ -113,6 +111,8 @@ local decorations = {
 		wide = "objects/LylyraHelper/dashpaper/dash_paper_decoration_bottom_32"
 	}
 }
+
+local scissorsTexture = "objects/LylyraHelper/scissors/cutright00"
 
 local ninePatchOptions = {
     mode = "fill",
@@ -195,6 +195,20 @@ function paper.sprite(room, entity)
 			local centerDecoration = drawableSprite.fromTexture(decorations["center"][borderSize], {x = x + width / 2 + xOffset * 8, y = y + height / 2 + yOffset * 8, atlas = atlas})
 			centerDecoration:setJustification(0.0, 0.0)
 			table.insert(sprites, centerDecoration)
+		end
+	end
+	if entity.spawnScissors then
+		
+		if width == 24 then
+			scissorsSprite = drawableSprite.fromTexture(scissorsTexture, {x = x + width / 2 - 12, y = y + height / 2 - 32, atlas = atlas})
+			scissorsSprite:setJustification(0.0, 0.0)
+			scissorsSprite:useRelativeQuad(11, 0, 24, 64, false, false)
+			
+			table.insert(sprites, scissorsSprite)
+		else
+			local scissorsSprite = drawableSprite.fromTexture(scissorsTexture, {x = x + width / 2 - 24, y = y + height / 2 - 32, atlas = atlas})
+			scissorsSprite:setJustification(0.0, 0.0)
+			table.insert(sprites, scissorsSprite)
 		end
 	end
 	
