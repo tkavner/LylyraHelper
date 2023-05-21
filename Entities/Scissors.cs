@@ -173,7 +173,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private void OnPlayer(Player player)
         {
-            if (timeElapsed > spawnGrace)
+            if (timeElapsed > spawnGrace && !SaveData.Instance.Assists.Invincible)
             {
                 player.Die((player.Position - Position).SafeNormalize());
                 Moving = false;
