@@ -346,7 +346,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             sliceStartPositions.Remove(original);
         }
 
-        public void Flip(Vector2 cutDirection, Collider directionalCollider)
+        //flips the slicer to face the new cutdirection. Can also supply a new directional collider.
+        public void Flip(Vector2 cutDirection, Collider directionalCollider = null)
         {
             slicingCollider = directionalCollider;
             Direction = cutDirection;
