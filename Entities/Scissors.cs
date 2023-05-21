@@ -283,7 +283,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     scissors.OnExplosion();
                     Type bumperType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Bumper", true, true);
 
-                    float respawnTimer = (float) bumperType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                    float respawnTimer = (float) bumperType.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
                     bool fireMode = (bool)bumperType?.GetField("fireMode", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
 
                     if (fireMode)
@@ -292,12 +292,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         Wiggler wiggler = (Wiggler)bumperType?.GetField("wiggler", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
                         Vector2 hitDir = (Vector2)bumperType?.GetField("hitDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
                         Vector2 vector = (scissors.Center - self.Center).SafeNormalize();
-                        hitDir = (Vector2)bumperType?.GetField("hitDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        bumperType?.GetField("hitDir", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, vector);
                         wiggler.Start();
                         Audio.Play("event:/game/09_core/hotpinball_activate", self.Position);
-                        bumperType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, respawnTimer);
+                        bumperType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, 0.6F);
                         self.SceneAs<Level>().Particles.Emit(Bumper.P_FireHit, 12, self.Center + vector * 12f, Vector2.One * 3f, vector.Angle());
-
+                        
                     }
                     else if (respawnTimer <= 0f)
                     {
@@ -315,7 +315,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         Sprite sprite = (Sprite)bumperType?.GetField("sprite", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
                         Sprite spriteEvil = (Sprite)bumperType?.GetField("spriteEvil", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
                         Vector2 vector = (scissors.Center - self.Center).SafeNormalize();
-                        bumperType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, respawnTimer);
+                        bumperType.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, 0.6F);
                         sprite.Play("hit", restart: true);
                         spriteEvil.Play("hit", restart: true);
                         light.Visible = false;
@@ -329,28 +329,30 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public void OnExplosion()
         {
-            explosionCooldown = 0.6F;
-            sprite.Scale *= -1;
-            CutDirection *= -1;
-            if (CutDirection.X > 0)
-            {
-                directionPath = "right";
-                this.directionalCollider = new Hitbox(1, 6f, 10f, -5f);
-            }
-            else if (CutDirection.X < 0)
-            {
-                directionPath = "left";
-                this.directionalCollider = new Hitbox(1, 6f, -10f, -5f);
-            }
-            else if (CutDirection.Y > 0)
-            {
-                directionPath = "down";
-                this.directionalCollider = new Hitbox(10, 1f, -5f, 10f);
-            }
-            else
-            {
-                this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
-                directionPath = "up";
+            if (explosionCooldown <= 0.0F) {
+                explosionCooldown = 0.6F;
+                sprite.Scale *= -1;
+                CutDirection *= -1;
+                if (CutDirection.X > 0)
+                {
+                    directionPath = "right";
+                    this.directionalCollider = new Hitbox(1, 6f, 10f, -5f);
+                }
+                else if (CutDirection.X < 0)
+                {
+                    directionPath = "left";
+                    this.directionalCollider = new Hitbox(1, 6f, -10f, -5f);
+                }
+                else if (CutDirection.Y > 0)
+                {
+                    directionPath = "down";
+                    this.directionalCollider = new Hitbox(10, 1f, -5f, 10f);
+                }
+                else
+                {
+                    this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
+                    directionPath = "up";
+                }
             }
         }
 
