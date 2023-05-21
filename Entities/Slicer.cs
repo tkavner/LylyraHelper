@@ -20,7 +20,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         private List<Entity> slicingEntities = new List<Entity>();
         //some entities take a frame advancement to activate properly (Such as Kevins). This list is for those entities.
         private List<Entity> secondFrameActivation = new List<Entity>();
-        private Collider slicingCollider;
+        public Collider slicingCollider { get; set; }
         private Vector2 Direction;
         private int cutSize;
         private Dictionary<Entity, Vector2> sliceStartPositions = new Dictionary<Entity, Vector2>();
@@ -344,6 +344,12 @@ namespace Celeste.Mod.LylyraHelper.Components
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("62222b"));
 
             sliceStartPositions.Remove(original);
+        }
+
+        public void Flip(Vector2 cutDirection, Collider directionalCollider)
+        {
+            slicingCollider = directionalCollider;
+            Direction = cutDirection;
         }
 
         private static Vector2 Vector2Int(Vector2 vector2)

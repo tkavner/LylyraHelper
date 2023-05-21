@@ -353,6 +353,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
                     directionPath = "up";
                 }
+                slicer.Flip(CutDirection, directionalCollider);
+                Add(slicer = new Slicer(CutDirection, cutSize, SceneAs<Level>(), 5, directionalCollider));
             }
         }
 
