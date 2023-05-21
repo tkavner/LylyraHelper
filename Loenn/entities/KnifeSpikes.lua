@@ -1,6 +1,8 @@
 local spikeHelper = require("helpers.spikes")
+local utils = require("utils")
+local logging = require("logging")
 
-local timedTriggerSpikes = {}
+local knifeSpikes = {}
 
 local directions = {"Up", "Down", "Left", "Right"}
 
@@ -8,16 +10,9 @@ local directions = {"Up", "Down", "Left", "Right"}
 -- then we can replace or modify what was already generated to finish up the plugins
 for _, dir in ipairs(directions) do
     local dirLower = string.lower(dir)
-    local spikes = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikes" .. dir, dirLower, false, true)
+    local spikes = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikes" .. dir, dirLower, false, false)
 
-    for _, placement in ipairs(spikes.placements) do
-        placement.data.Delay = 0.4
-        placement.data.WaitForPlayer = false
-        placement.data.Grouped = false
-        placement.data.Rainbow = false
-    end
-
-    table.insert(timedTriggerSpikes, spikes)
+    table.insert(knifeSpikes, spikes)
 end
 
-return timedTriggerSpikes
+return knifeSpikes

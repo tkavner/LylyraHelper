@@ -17,6 +17,21 @@ table.insert(paper.placements, {
     data = {
 		width = 24,
         height = 24,
+        spawnScissors = false,
+		fragileScissors = false,
+		noParticleEffects = false,
+        noTrail = false,
+		flag = "",
+		invertFlag = false
+    }
+})
+
+table.insert(paper.placements,
+{
+	name = "Dash Paper (With Scissors)",
+    data = {
+		width = 24,
+        height = 24,
         spawnScissors = true,
 		fragileScissors = false,
 		noParticleEffects = false,
@@ -25,6 +40,7 @@ table.insert(paper.placements, {
 		invertFlag = false
     }
 })
+
 
 local leftTopCorners = {  }
 leftTopCorners[0] = { 0, 0 }
