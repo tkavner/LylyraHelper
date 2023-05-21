@@ -1,12 +1,12 @@
-local addSlicerOnStartTrigger = {}
-addSlicerOnStartTrigger.name = "LylyraHelper/AddSlicerOnStartTrigger"
-addSlicerOnStartTrigger.placements = {}
+local addSlicerOnLoadTrigger = {}
+addSlicerOnLoadTrigger.name = "LylyraHelper/AddSlicerOnLoadTrigger"
+addSlicerOnLoadTrigger.placements = {}
 
 local directions = {"Up", "Down", "Right", "Left", "All"}
 
 for _, dir in ipairs(directions) do
 	local placement = {
-		name = "AddSlicerOnStartTrigger ("..dir..")",
+		name = "AddSlicerOnLoadTrigger ("..dir..")",
 		data = {
 			sliceOnImpact = false,
 			singleUse = false,
@@ -15,8 +15,8 @@ for _, dir in ipairs(directions) do
 			roomwide = false
 		}
 	}
-	table.insert(addSlicerOnStartTrigger.placements, placement)
+	table.insert(addSlicerOnLoadTrigger.placements, placement)
 end
 
 
-return addSlicerOnStartTrigger
+return addSlicerOnLoadTrigger
