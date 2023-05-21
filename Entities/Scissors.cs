@@ -17,6 +17,7 @@ using static Celeste.Mod.LylyraHelper.Entities.Paper;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
+    [Tracked]
     public class Scissors : Entity
     {
         private List<Paper> Cutting = new List<Paper>();
@@ -260,14 +261,94 @@ namespace Celeste.Mod.LylyraHelper.Entities
             
         }
 
-        internal static void Load()
+
+        public static void Load()
         {
-            
+            On.Celeste.Bumper.Update += BumperSlice;
         }
 
-        internal static void Unload()
+        public static void Unload()
         {
+            On.Celeste.Bumper.Update -= BumperSlice;
             scissorShards = null;
+        }
+
+        private static void BumperSlice(On.Celeste.Bumper.orig_Update orig, Bumper self)
+        {
+            orig.Invoke(self);
+            self.CollideDo<Scissors>(
+                scissors => {
+                    scissors.OnExplosion();
+                    Type bumperType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Bumper", true, true);
+
+                    float respawnTimer = (float) bumperType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                    bool fireMode = (bool)bumperType?.GetField("fireMode", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+
+                    if (fireMode)
+                    {
+
+                        Wiggler wiggler = (Wiggler)bumperType?.GetField("wiggler", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        Vector2 hitDir = (Vector2)bumperType?.GetField("hitDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        Vector2 vector = (scissors.Center - self.Center).SafeNormalize();
+                        hitDir = (Vector2)bumperType?.GetField("hitDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        wiggler.Start();
+                        Audio.Play("event:/game/09_core/hotpinball_activate", self.Position);
+                        bumperType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, respawnTimer);
+                        self.SceneAs<Level>().Particles.Emit(Bumper.P_FireHit, 12, self.Center + vector * 12f, Vector2.One * 3f, vector.Angle());
+
+                    }
+                    else if (respawnTimer <= 0f)
+                    {
+                        if ((self.Scene as Level).Session.Area.ID == 9)
+                        {
+                            Audio.Play("event:/game/09_core/pinballbumper_hit", self.Position);
+                        }
+                        else
+                        {
+                            Audio.Play("event:/game/06_reflection/pinballbumper_hit", self.Position);
+                        }
+
+                        VertexLight light = (VertexLight)bumperType?.GetField("light", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        BloomPoint bloom = (BloomPoint)bumperType?.GetField("bloom", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        Sprite sprite = (Sprite)bumperType?.GetField("sprite", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        Sprite spriteEvil = (Sprite)bumperType?.GetField("spriteEvil", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        Vector2 vector = (scissors.Center - self.Center).SafeNormalize();
+                        bumperType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, respawnTimer);
+                        sprite.Play("hit", restart: true);
+                        spriteEvil.Play("hit", restart: true);
+                        light.Visible = false;
+                        bloom.Visible = false;
+                        self.SceneAs<Level>().DirectionalShake(vector, 0.15f);
+                        self.SceneAs<Level>().Displacement.AddBurst(self.Center, 0.3f, 8f, 32f, 0.8f);
+                        self.SceneAs<Level>().Particles.Emit(Bumper.P_Launch, 12, self.Center + vector * 12f, Vector2.One * 3f, vector.Angle());
+                    }
+                });
+        }
+
+        public void OnExplosion()
+        {
+            sprite.Scale *= -1;
+            CutDirection *= -1;
+            if (CutDirection.X > 0)
+            {
+                directionPath = "right";
+                this.directionalCollider = new Hitbox(1, 6f, 10f, -5f);
+            }
+            else if (CutDirection.X < 0)
+            {
+                directionPath = "left";
+                this.directionalCollider = new Hitbox(1, 6f, -10f, -5f);
+            }
+            else if (CutDirection.Y > 0)
+            {
+                directionPath = "down";
+                this.directionalCollider = new Hitbox(10, 1f, -5f, 10f);
+            }
+            else
+            {
+                this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
+                directionPath = "up";
+            }
         }
 
         public override void Render()

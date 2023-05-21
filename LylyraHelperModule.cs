@@ -26,7 +26,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Logger.SetLogLevel("LylyraHelper", LogLevel.Verbose);
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
             Scissors.Load();
-            Slicer.Load();
             PaperHitbox.Load();
             typeof(ModExports).ModInterop();
 
@@ -35,7 +34,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Unload()
         {
             Scissors.Unload();
-            Slicer.Unload();
             PaperHitbox.Unload();
         }
 

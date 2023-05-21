@@ -892,30 +892,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             return (x % m + m) % m;
         }
 
-        public static void Load()
-        {
-            On.Celeste.Bumper.Update += BumperSlice;
-        }
-
-        public static void Unload()
-        {
-            On.Celeste.Bumper.Update -= BumperSlice;
-        }
-
-        private static void BumperSlice(On.Celeste.Bumper.orig_Update orig, Bumper self)
-        {
-            orig.Invoke(self);
-            List<Slicer> slicerList = self.CollideAllByComponent<Slicer>();
-            foreach (Slicer s in slicerList)
-            {
-                s.OnExplosion();
-            }
-        }
-
-        private void OnExplosion()
-        {
-            if (entityCallback != null) entityCallback.Invoke();
-        }
+        
 
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomSlicingActions = new Dictionary<Type, Action<Entity, DynamicData>>();
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomStaticHandlerActions = new Dictionary<Type, Action<Entity, DynamicData>>();
