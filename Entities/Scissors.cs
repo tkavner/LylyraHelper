@@ -46,6 +46,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private float spawnGrace = 0.5F;
         public static ParticleType scissorShards;
         private Slicer slicer;
+        private float explosionCooldown;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -189,6 +190,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             if (timeElapsed != oldElapsed) //check for frame advacement
             {
+                explosionCooldown -= timeElapsed - oldElapsed;
                 if (Moving)
                 {
                     if (oldElapsed == 0)
@@ -327,6 +329,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public void OnExplosion()
         {
+            explosionCooldown = 0.6F;
             sprite.Scale *= -1;
             CutDirection *= -1;
             if (CutDirection.X > 0)
