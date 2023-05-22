@@ -11,7 +11,9 @@ local directions = {"Up", "Down", "Left", "Right"}
 for _, dir in ipairs(directions) do
     local dirLower = string.lower(dir)
     local spikes = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikes" .. dir, dirLower, false, false)
-
+	for _, placement in ipairs(spikes.placements) do
+		placement.data.sliceOnImpact = false
+	end
     table.insert(knifeSpikes, spikes)
 end
 
