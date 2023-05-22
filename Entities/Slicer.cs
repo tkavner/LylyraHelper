@@ -258,13 +258,11 @@ namespace Celeste.Mod.LylyraHelper.Components
             int db2Width = (int)resultArray[3].X;
             int db2Height = (int)resultArray[3].Y;
 
-            DreamBlock d1 = new DreamBlock(db1Pos, db1Width, db1Height, null, false, false);
-            DreamBlock d2 = new DreamBlock(db2Pos, db2Width, db2Height, null, false, false);
+            DreamBlock d1 = null;
+            DreamBlock d2 = null;
 
-            if (db1Width >= 8 && db1Height >= 8) Scene.Add(d1);
-            if (db2Width >= 8 && db2Height >= 8) Scene.Add(d2);
-            Scene.Remove(original);
-            sliceStartPositions.Remove(original);
+            if (db1Width >= 8 && db1Height >= 8 && original.CollideRect(new Rectangle((int)db1Pos.X, (int)db1Pos.Y, db1Width, db1Height))) Scene.Add(d1 = new DreamBlock(db1Pos, db1Width, db1Height, null, false, false));
+            if (db2Width >= 8 && db2Height >= 8 && original.CollideRect(new Rectangle((int)db2Pos.X, (int)db2Pos.Y, db2Width, db2Height))) Scene.Add(d2 = new DreamBlock(db2Pos, db2Width, db2Height, null, false, false));
 
             List<StaticMover> staticMovers = (List<StaticMover>)
                 FakeAssembly.GetFakeEntryAssembly().
@@ -275,6 +273,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 HandleStaticMover(Scene, Direction, Entity, original, d1, d2, mover, 8);
             }
+            Scene.Remove(original);
+            sliceStartPositions.Remove(original);
             Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("000000"));
 
@@ -318,7 +318,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
             CrushBlock cb1 = null;
             bool cb1Added;
-            if (cb1Added = cb1Width >= 24 && cb1Height >= 24)
+            if (cb1Added = (cb1Width >= 24 && cb1Height >= 24 && original.CollideRect(new Rectangle((int)cb1Pos.X, (int)cb1Pos.Y, cb1Width, cb1Height))))
             {
                 cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
                 cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, newReturnStack1);
@@ -328,7 +328,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             CrushBlock cb2 = null;
             bool cb2Added;
-            if (cb2Added = cb2Width >= 24 && cb2Height >= 24)
+            if (cb2Added = (cb2Width >= 24 && cb2Height >= 24 && original.CollideRect(new Rectangle((int) cb2Pos.X, (int) cb2Pos.Y, cb2Width, cb2Height))))
             {
                 cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
                 cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack2);
@@ -430,6 +430,14 @@ namespace Celeste.Mod.LylyraHelper.Components
             int cb2Width = 0;
             int cb2Height = 0;
 
+            if (!cb1Added && !cb2Added)
+            {
+
+                Logger.Log(LogLevel.Error, "LylyraHelper", "blarg4");
+                Scene.Remove(mover.Entity);
+                return;
+            }
+
             if (cb1Added)
             {
                 cb1Pos = cb1.Position;
@@ -443,11 +451,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 cb2Height = (int)cb2.Height;
             }
 
-            if (!cb1Added && !cb2Added)
-            {
-                Scene.Remove(mover.Entity);
-                return;
-            }
 
             float furthestLeft = cb1Added ? cb1Pos.X : cb2Pos.X;
             float furthestRight = cb2Added ? cb2Pos.X + cb2Width : cb1Pos.X + cb1Width;
@@ -534,7 +537,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                                     {
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
-                                        Logger.Log(LogLevel.Error, "LylyraHelper", "blarg2");
 
                                     }
                                 }
