@@ -818,7 +818,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                 }
             }
-            else if (mover.Entity is TriggerSpikes) //trigger spikes, incredibly enough, do not inheret from tr
+            /*else if (mover.Entity is TriggerSpikes) //trigger spikes, incredibly enough, do not inheret from spikes, and contain a private array of a private struct type. this is what we call "awful"
             {
                 //destroy all parts of spikes that aren't connected anymore.
                 //switch depending on direction
@@ -1032,7 +1032,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                         }
                         break;
                 }
-            }
+            }*/
         }
 
         private void AddParticles(Vector2 position, Vector2 range, Color color)
