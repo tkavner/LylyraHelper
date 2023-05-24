@@ -6,6 +6,7 @@ using Monocle;
 using MonoMod.ModInterop;
 using MonoMod.Utils;
 using System;
+using System.Collections.Generic;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
@@ -21,6 +22,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private SpriteBank _CustomEntitySpriteBank;
         public  static LylyraHelperModule Instance;
 
+
         public override void Load()
         {
             Logger.SetLogLevel("LylyraHelper", LogLevel.Verbose);
@@ -28,7 +30,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors.Load();
             PaperHitbox.Load();
             typeof(ModExports).ModInterop();
-
         }
 
         public override void Unload()

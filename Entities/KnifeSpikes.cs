@@ -30,7 +30,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public KnifeSpikes(EntityData data, Vector2 offset, Directions dir) : 
             base(data, offset, dir)
         {
-            sliceOnImpact = data.Bool("SliceOnImpact", false);
+            sliceOnImpact = data.Bool("sliceOnImpact", false);
         }
 
         public KnifeSpikes(Vector2 position, int size, Directions direction, string type, bool sliceOnImpact) : base(position, size, direction, type)

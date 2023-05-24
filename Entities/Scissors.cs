@@ -142,34 +142,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.Added(scene);
             level = SceneAs<Level>();
             Add(slicer = new Slicer(CutDirection, cutSize, SceneAs<Level>(), 5, directionalCollider));
-            /*slicer.AddListener(() => {
-                //list of things that need to be changed:
-                //Cut direction
-                //sprite???
-                //
-                sprite.Scale *= -1;
-                CutDirection *= -1;
-                if (CutDirection.X > 0)
-                {
-                    directionPath = "right";
-                    this.directionalCollider = new Hitbox(1, 6f, 10f, -5f);
-                }
-                else if (CutDirection.X < 0)
-                {
-                    directionPath = "left";
-                    this.directionalCollider = new Hitbox(1, 6f, -10f, -5f);
-                }
-                else if (CutDirection.Y > 0)
-                {
-                    directionPath = "down";
-                    this.directionalCollider = new Hitbox(10, 1f, -5f, 10f);
-                }
-                else
-                {
-                    this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
-                    directionPath = "up";
-                }
-            });*/
         }
 
         private void OnPlayer(Player player)
