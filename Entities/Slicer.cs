@@ -456,7 +456,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             float furthestRight = cb2Added ? cb2Pos.X + cb2Width : cb1Pos.X + cb1Width;
 
             float furthestUp = cb1Added ? cb1Pos.Y : cb2Pos.Y;
-            float furthestDown = cb2Added ? cb2Pos.X + cb2Height : cb1Pos.X + cb1Height;
+            float furthestDown = cb2Added ? cb2Pos.Y + cb2Height : cb1Pos.Y + cb1Height;
 
             mover.Platform = null;
             Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Solid", true, true);
@@ -472,9 +472,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                 Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
                 string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spike);
                 bool useYCoordinates = (spike.Direction == Spikes.Directions.Left || spike.Direction == Spikes.Directions.Right) || Direction.X != 0;
-
+                
                 bool spikesOnCB1 = cb1Added && (spike.Y < cb1Pos.Y + cb1Height && useYCoordinates) || (spike.X < cb1Pos.X + cb1Width && !useYCoordinates); //check if spikes start before the hole to see if part of them should be on cb1
-                bool spikesOnCB2 = cb2Added &&(spike.Y + spike.Height > cb2Pos.Y && useYCoordinates) || (spike.X + spike.Width > cb2Pos.X && !useYCoordinates); //check if the spikes extend past the hole to see if part of them should be on cb2
+                bool spikesOnCB2 = cb2Added && (spike.Y + spike.Height > cb2Pos.Y && useYCoordinates) || (spike.X + spike.Width > cb2Pos.X && !useYCoordinates); //check if the spikes extend past the hole to see if part of them should be on cb2
                 int grace = 5;
                 if (Spikes.Directions.Left == spike.Direction && furthestLeft > spike.Position.X + grace)
                 {

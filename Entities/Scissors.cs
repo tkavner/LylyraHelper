@@ -42,6 +42,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private bool breaking;
         private float breakTimer;
         private Collider directionalCollider;
+        private Hitbox directionalColliderHalf1;
+        private Hitbox directionalColliderHalf2;
         private Vector2 initialPosition;
         private float spawnGrace = 0.5F;
         public static ParticleType scissorShards;
@@ -59,8 +61,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (scissorShards == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
-                    GFX.Game["particles/LylyraHelper/scissorshard00"], 
-                    GFX.Game["particles/LylyraHelper/scissorshard01"], 
+                    GFX.Game["particles/LylyraHelper/scissorshard00"],
+                    GFX.Game["particles/LylyraHelper/scissorshard01"],
                     GFX.Game["particles/LylyraHelper/scissorshard02"]);
                 scissorShards = new ParticleType()
                 {
@@ -84,21 +86,29 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (direction.X > 0)
             {
                 directionPath = "right";
-                this.directionalCollider = new Hitbox(1, 6f, 10f, -5f);
+                this.directionalCollider = new Hitbox(1, 6f, 10f, -3f);
+                this.directionalColliderHalf1 = new Hitbox(1, 3f, 10f, -3f);
+                this.directionalColliderHalf2 = new Hitbox(1, 3f, 10f, 0f);
             }
             else if (direction.X < 0)
             {
                 directionPath = "left";
-                this.directionalCollider = new Hitbox(1, 6f, -10f, -5f);
+                this.directionalCollider = new Hitbox(1, 6f, -10f, -3f);
+                this.directionalColliderHalf1 = new Hitbox(1, 3f, -10f, -3f);
+                this.directionalColliderHalf2 = new Hitbox(1, 3f, -10f, 0f);
             }
             else if (direction.Y > 0)
             {
                 directionPath = "down";
-                this.directionalCollider = new Hitbox(10, 1f, -5f, 10f);
+                this.directionalCollider = new Hitbox(6f, 1f, -3f, 10f);
+                this.directionalColliderHalf1 = new Hitbox(5, 1f, -3f, 10f);
+                this.directionalColliderHalf2 = new Hitbox(5, 1f, 0f, 10F);
             }
             else
             {
-                this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
+                this.directionalCollider = new Hitbox(6f, 1f, -3f, -10f);
+                this.directionalColliderHalf1 = new Hitbox(5, 1f, -3f, -10f);
+                this.directionalColliderHalf2 = new Hitbox(5, 1f, 0f, -10f);
                 directionPath = "up";
             }
             this.Position = initialPosition = Position;
@@ -184,7 +194,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             playedAudio = true;
                         }
                     }
-                    
+
                     if (cutStartPositions.Count > 0 && timeElapsed > spawnGrace + 0.1F)
                     {
                         level.ParticlesFG.Emit(scissorShards, GetDirectionalPosition());
@@ -201,9 +211,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             }
             var tempHold = Collider;
-            Collider = directionalCollider;
-            breaking = CollideCheck<SolidTiles>() || breaking;
+            Collider = directionalColliderHalf1;
+            bool flag1 = CollideCheck<SolidTiles>();
             Collider = tempHold;
+
+            Collider = directionalColliderHalf2;
+            bool flag2 = CollideCheck<SolidTiles>();
+            Collider = tempHold;
+
+            breaking = (flag1 && flag2) || breaking;
 
         }
 
