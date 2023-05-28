@@ -27,6 +27,13 @@
         <Anim id="break" path="breakleft" delay="0.1" frames="0-7"/>
     </scissorsleft>
 
+	<laserCutter path="objects/LylyraHelper/laserCutter/" start="idle">
+		<Loop id="idle" path="idle" delay="0.1" frames="0"/>
+		<Anim id="fire" path="fire" delay="0.1" frames="0-10" goto="firecont" />
+		<Loop id="firecont" path="firecont" delay="0.1" frames="0-1"/>
+		<Anim id="reset" path="reset" delay="0.1" frames="0-10" goto="idle"/>
+	</laserCutter>
+
     <bigcloud path="objects/LylyraHelper/scissors/" start="idle">
         <Anim id="spawn" path="scissors" delay="0.1" frames="6-10"/>
         <Loop id="idle" path="scissors" delay="0.1" frames="0"/>

@@ -75,7 +75,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             Collider tempHold = Entity.Collider;
             if (slicingCollider != null) Entity.Collider = slicingCollider;
-            CheckCollisions();
+            if(this.Entity.Collidable) CheckCollisions();
 
             Slice();
             Entity.Collider = tempHold;
@@ -86,7 +86,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             StaticMover sm = Entity.Get<StaticMover>();
             Vector2 Position = Entity.Position;
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for speed)
-            foreach (Paper d in base.Scene.Tracker.GetEntities<DashPaper>())
+            foreach (Paper d in Scene.Tracker.GetEntities<DashPaper>())
             {
                 if (d == Entity) continue;
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
@@ -95,6 +95,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     if (d.CollideCheck(Entity))
                     {
+                        Logger.Log(LogLevel.Error, "LylyraHelper", "added dashpaper");
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
                     }
@@ -126,6 +127,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
+                        Logger.Log(LogLevel.Error, "LylyraHelper", "added icuttable");
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
                         continue;
@@ -198,8 +200,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
                 if (d is ICuttable icut)
                 {
-                    if (!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact)
+                    if ((!d.CollideCheck(Entity)) || collisionOverride || sliceOnImpact)
                     {
+                        Logger.Log(LogLevel.Error, "LylyraHelper", "cut icuttable");
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
                         bool toReturn = icut.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
                         sliceStartPositions.Remove(d);
@@ -207,7 +210,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                     return false;
                 }
-                else if ((!d.CollideCheck(Entity) || collisionOverride || sliceOnImpact) && Scene.Contains(d))
+                else if (((!d.CollideCheck(Entity)) || collisionOverride || sliceOnImpact) && Scene.Contains(d))
                 {
                     if (d is Solid)
                     {
@@ -433,7 +436,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             if (!cb1Added && !cb2Added)
             {
 
-                Logger.Log(LogLevel.Error, "LylyraHelper", "blarg4");
                 Scene.Remove(mover.Entity);
                 return;
             }
@@ -1047,19 +1049,19 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             if (Direction.X > 0)
             {
-                return Entity.Position + new Vector2(directionalOffset, 0);
+                return Entity.Center + new Vector2(directionalOffset, 0);
             }
             else if (Direction.X < 0)
             {
-                return Entity.Position + new Vector2(-directionalOffset, 0);
+                return Entity.Center + new Vector2(-directionalOffset, 0);
             }
             else if (Direction.Y > 0)
             {
-                return Entity.Position + new Vector2(0, directionalOffset);
+                return Entity.Center + new Vector2(0, directionalOffset);
             }
             else
             {
-                return Entity.Position + new Vector2(0, -directionalOffset);
+                return Entity.Center + new Vector2(0, -directionalOffset);
             }
         }
 

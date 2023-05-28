@@ -42,6 +42,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             base.LoadContent(firstLoad);
             _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
+
+                
+
+
+            Logger.Log("LylyraHelper", "" + _CustomEntitySpriteBank.SpriteData.Values.Count);
+
+            foreach(string name in _CustomEntitySpriteBank.SpriteData.Keys)
+            {
+                Logger.Log("LylyraHelper", "" + name);
+            }
+
         }
 
         [ModExportName("LylyraHelper.Slicer")]
