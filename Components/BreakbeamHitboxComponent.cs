@@ -89,33 +89,6 @@ namespace LylyraHelper.Other
             }
         }
 
-        private Rectangle GetOrientedRectangle(int length, int width = 0, int offset = 0)
-        {
-            if (width == 0) width = RawWidth;
-            if (Orientation == "up")
-            {
-                Logger.Log(LogLevel.Error, "LylyraHelper", "Parent.Center.X: " + Parent.Center.X +
-                       "Parent.Center.Y: " + Parent.Center.Y
-                       + "length" + (int)(length));
-                return new Rectangle((int)Parent.Center.X, (int) Parent.Center.Y - length, width, length);
-            }
-            else if (Orientation == "down")
-            {
-                return new Rectangle(width, length, offset, 0);
-            }
-            else if (Orientation == "right")
-            {
-                return new Rectangle(length, width, -length, offset);
-            }
-            else if (Orientation == "left")
-            {
-                return new Rectangle(length, width, 0, offset);
-            }
-            else
-            {
-                throw new Exception("Invalid Breakbeam Orientation: " + Orientation);
-            }
-        }
         public override void Update()
         {
             base.Update();
@@ -177,12 +150,12 @@ namespace LylyraHelper.Other
                 {
                     int low = 0;
                     int high = GetEdgeScreenLength();
-                    int cycles = 10 + (int) Math.Log(GetEdgeScreenLength(), 2); //the 10 is just to be sure idk
+                    int cycles = 10 + (int) Math.Log(GetEdgeScreenLength(), 2);
                     while (cycles-- > 0)
                     {
 
                         int pivot = (int)(low + (high - low) / 2f);
-                        ResizeHitbox(h, pivot, i * scale - RawWidth / scale * 2); 
+                        ResizeHitbox(h, pivot, i * scale - hitboxes.Length * scale / 2); 
 
                         if (pivot == low)
                             break;
@@ -196,7 +169,6 @@ namespace LylyraHelper.Other
                         }
                     }
                 }
-                Logger.Log(LogLevel.Error, "Lylyra", string.Format("{0} {1} {2} {3}", (int)h.AbsoluteLeft, (int)h.AbsoluteTop, (int)h.Width, (int)h.Height));
 
             }
         }

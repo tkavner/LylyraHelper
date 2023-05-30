@@ -11,9 +11,22 @@ using System.Threading.Tasks;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
-    [CustomEntity("LylyraHelper/LaserCutter")]
+    [CustomEntity(new string[]
+{
+    "LylyraHelper/LaserCutterPulse = LoadPulse",
+    "LylyraHelper/LaserCutterBreakbeam = LoadBreakbeam",
+    "LylyraHelper/LaserCutterInFront = LoadInFront",
+    "LylyraHelper/LaserCutterFlag = LoadFlag"
+})]
     public class LaserCutter : Solid
     {
+
+
+        public static Entity LoadPulse(Level level, LevelData levelData, Vector2 offset, EntityData data) => new LaserCutter(data, offset, FiringMode.Pulse);
+        public static Entity LoadBreakbeam(Level level, LevelData levelData, Vector2 offset, EntityData data) => new LaserCutter(data, offset, FiringMode.Breakbeam);
+        public static Entity LoadInFront(Level level, LevelData levelData, Vector2 offset, EntityData data) => new LaserCutter(data, offset, FiringMode.bbnls);
+        public static Entity LoadFlag(Level level, LevelData levelData, Vector2 offset, EntityData data) => new LaserCutter(data, offset, FiringMode.Flag);
+
         public class Laser : Entity
         {
             private Slicer Slicer;
@@ -269,41 +282,15 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Hitbox shortHitboxSecondary;
         internal Collider bigHitbox;
 
-        public LaserCutter(EntityData data, Vector2 offset) :
+        public LaserCutter(EntityData data, Vector2 offset, FiringMode fm) :
             base(data.Position + offset, 32, 32, false)
         {
             direction = data.Attr("direction", "Up").ToLower();
             cutSize = data.Int("cutSize", 16);
-            string strmode = data.Attr("mode", "breakbeamlos");
             breakbeamThickness = data.Int("breakBeamThickness", 32);
-            bool flag0 = (strmode.ToLower() == "breakbeamlos");
             Logger.Log(LogLevel.Error, "LylyraHelper", direction);
-            Logger.Log(LogLevel.Error, "LylyraHelper", strmode);
-            Logger.Log(LogLevel.Error, "LylyraHelper", "" + flag0);
             firingLength = data.Float("firingLength", 1F);
-            if (strmode.ToLower() == "breakbeamlos")
-            {
-                mode = FiringMode.Breakbeam;
-            }
-            else if (strmode.ToLower() == "breakbeam")
-            {
-                mode = FiringMode.bbnls;
-            }
-            else if (strmode.ToLower() == "flag")
-            {
-                mode = FiringMode.Flag;
-                flagName = data.Attr("flag", "laser_cutter_activate");
-                cooldown_time = data.Float("frequency", 2.0F);
-            }
-            else if (strmode.ToLower() == "pulse")
-            {
-                mode = FiringMode.Pulse;
-                cooldown_time = data.Float("frequency", 2.0F);
-            } 
-            else
-            {
-                throw new Exception("Invalid Laser Cutter Firing Mode: " + strmode);
-            }
+            mode = fm;
             Add(sprite = LylyraHelperModule.SpriteBank.Create("laserCutter"));
             sprite.Play("idle");
 
@@ -400,10 +387,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(Width / 2, 4)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                     case "left":
-                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, 4)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, Height / 2 + 4)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                     case "right":
-                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, 4)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, Height / 2 + 4)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                 }
 
