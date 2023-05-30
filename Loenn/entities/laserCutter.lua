@@ -13,7 +13,7 @@ laserCutter.placements = {}
 
 
 local directions = {"Up", "Down", "Left", "Right"}
-local modes = {"Flag", "Pulse", "Breakbeam"}
+local modes = {"Flag", "Pulse", "Breakbeamlos", "Breakbeam"}
 
 for _, dir in ipairs(directions) do
 	
@@ -27,7 +27,8 @@ for _, dir in ipairs(directions) do
 				frequency = 2.0,
 				flag = "laser_cutter_activate",
 				firingLength = 1.0,
-				direction = dir
+				direction = dir,
+				breakBeamThickness=32
 			}
 		})
 	end

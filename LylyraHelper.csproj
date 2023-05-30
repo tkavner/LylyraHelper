@@ -60,6 +60,7 @@
     <Compile Include="Entities\KnifeSpikes.cs" />
     <Compile Include="Components\PaperComponent.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
+    <Compile Include="Components\BreakbeamHitboxComponent.cs" />
     <Compile Include="Other\PaperHitbox.cs" />
     <Compile Include="Trigger\AddSlicerOnLoadTrigger.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />

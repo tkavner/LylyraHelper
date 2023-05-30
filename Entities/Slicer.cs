@@ -76,7 +76,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             Collider tempHold = Entity.Collider;
             if (slicingCollider != null) Entity.Collider = slicingCollider;
             if(this.Entity.Collidable) CheckCollisions();
-
+            
             Slice();
             Entity.Collider = tempHold;
         }

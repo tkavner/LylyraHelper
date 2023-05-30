@@ -2,6 +2,7 @@
 using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Components;
 using LylyraHelper.Entities;
+using LylyraHelper.Other;
 using Monocle;
 using MonoMod.ModInterop;
 using MonoMod.Utils;

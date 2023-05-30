@@ -1,5 +1,6 @@
 ﻿using Celeste.Mod.Entities;
 using Celeste.Mod.LylyraHelper.Components;
+using LylyraHelper.Other;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -193,12 +194,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
         }
         public enum FiringMode
         {
-            Breakbeam, Flag, Pulse
+            bbnls, Breakbeam, Flag, Pulse
         }
 
         public class Breakbeam : Entity
         {
             private LaserCutter Parent;
+
 
             public Breakbeam(Vector2 Position, LaserCutter parent, Vector2 size) : base(Position)
             {
@@ -206,10 +208,43 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Parent = parent;
             }
 
+            public Breakbeam(Vector2 Position, LaserCutter parent, int width, string orientation, Vector2 Offset) : base(Position)
+            {
+                Collider = new ColliderList();
+                Add(new BreakbeamHitboxComponent(width, orientation, parent.SceneAs<Level>(), parent, (ColliderList) Collider, Offset));
+                Add(new PlayerCollider(OnPlayer, Collider));
+                Parent = parent;
+            }
+
+            private Hitbox GetOrientedHitbox(int length, string Orientation, int width = 0, int offset = 0)
+            {
+                if (Orientation == "up")
+                {
+                    return new Hitbox(width, length, offset, -length);
+                }
+                else if (Orientation == "down")
+                {
+                    return new Hitbox(width, length, offset, 0);
+                }
+                else if (Orientation == "right")
+                {
+                    return new Hitbox(length, width, -length, offset);
+                }
+                else if (Orientation == "left")
+                {
+                    return new Hitbox(length, width, 0, offset);
+                }
+                else
+                {
+                    throw new Exception("Invalid Breakbeam Orientation: " + Orientation);
+                }
+            }
+
             public void OnPlayer(Player player)
             {
                 Parent.Fire();
             }
+
         }
 
 
@@ -238,13 +273,21 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base(data.Position + offset, 32, 32, false)
         {
             direction = data.Attr("direction", "Up").ToLower();
-            Logger.Log(LogLevel.Error, "LylyraHelper", direction);
             cutSize = data.Int("cutSize", 16);
-            string strmode = data.Attr("mode", "breakbeam");
+            string strmode = data.Attr("mode", "breakbeamlos");
+            breakbeamThickness = data.Int("breakBeamThickness", 32);
+            bool flag0 = (strmode.ToLower() == "breakbeamlos");
+            Logger.Log(LogLevel.Error, "LylyraHelper", direction);
+            Logger.Log(LogLevel.Error, "LylyraHelper", strmode);
+            Logger.Log(LogLevel.Error, "LylyraHelper", "" + flag0);
             firingLength = data.Float("firingLength", 1F);
-            if (strmode.ToLower() == "breakbeam")
+            if (strmode.ToLower() == "breakbeamlos")
             {
                 mode = FiringMode.Breakbeam;
+            }
+            else if (strmode.ToLower() == "breakbeam")
+            {
+                mode = FiringMode.bbnls;
             }
             else if (strmode.ToLower() == "flag")
             {
@@ -252,10 +295,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 flagName = data.Attr("flag", "laser_cutter_activate");
                 cooldown_time = data.Float("frequency", 2.0F);
             }
-            else
+            else if (strmode.ToLower() == "pulse")
             {
                 mode = FiringMode.Pulse;
                 cooldown_time = data.Float("frequency", 2.0F);
+            } 
+            else
+            {
+                throw new Exception("Invalid Laser Cutter Firing Mode: " + strmode);
             }
             Add(sprite = LylyraHelperModule.SpriteBank.Create("laserCutter"));
             sprite.Play("idle");
@@ -319,7 +366,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (mode == FiringMode.Breakbeam)
+            if (mode == FiringMode.bbnls)
             {
                 switch (direction.ToLower())
                 {
@@ -337,6 +384,29 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         break;
                 }
                 
+
+                scene.Add(breakbeam);
+
+            }
+
+            else if (mode == FiringMode.Breakbeam)
+            {
+                switch (direction.ToLower())
+                {
+                    case "up":
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(Width / 2, 4)); //TODO Change breakbeam sizing after finishing spriting
+                        break;
+                    case "down":
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(Width / 2, 4)); //TODO Change breakbeam sizing after finishing spriting
+                        break;
+                    case "left":
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, 4)); //TODO Change breakbeam sizing after finishing spriting
+                        break;
+                    case "right":
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, 4)); //TODO Change breakbeam sizing after finishing spriting
+                        break;
+                }
+
 
                 scene.Add(breakbeam);
 
@@ -366,9 +436,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 }
                 Scene.Add(laser);
             }
+            Logger.Log(LogLevel.Error, "LylyraHelper", mode.ToString());
         }
 
         private float lerp = 0;
+        private int breakbeamThickness;
+
         public override void Update()
         {
             base.Update();
