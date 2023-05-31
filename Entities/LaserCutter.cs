@@ -31,107 +31,31 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             private Slicer Slicer;
 
-            private class EnergyLine
-            {
-                public Vector2 Position;
-                public Vector2 Size;
-                public Vector2 Direction;
-                public Color Color;
-                public Vector2 BoundsX;
-                public Vector2 BoundsY;
-
-                public static EnergyLine GetEnergyLine(bool xOriented, Random rand, Vector2 beamSize, Vector2 Position, Vector2 boundsX, Vector2 boundsY)
-                {
-
-                    int siz = rand.Next((int)beamSize.Y / 5, (int)beamSize.Y * 4 / 5);
-                    int pos = rand.Next(0, (int)(beamSize.Y - siz - 1));
-                    return xOriented ? new EnergyLine //x
-                    {
-                        Position = Position + new Vector2(rand.Next(0, (int)(beamSize.X - 1)), rand.Next(0, (int)(beamSize.Y - siz))),
-                        Size = new Vector2(rand.Next((int)beamSize.Y / 5, (int)beamSize.Y), rand.Next(1, 3)),
-                        Direction = new Vector2(rand.Next(0, 2) * 2 - 1, 0),
-                        Color = Color.Lerp(Color.White, Calc.HexToColor("cdf38c"), rand.NextFloat()),
-                        BoundsX = boundsX,
-                        BoundsY = boundsY
-                    } : new EnergyLine //y
-                    {
-                        Position = Position + new Vector2(rand.Next(0, (int)(beamSize.X - 1)), pos),
-                        Size = new Vector2(rand.Next(1, 3), rand.Next((int)beamSize.Y / 5, siz)),
-                        Direction = (new Vector2(rand.Next(0, 2) * 2 - 1, rand.Next(0, 2) * 2 - 1)),
-                        Color = Color.Lerp(Color.White, Calc.HexToColor("cdf38c"), rand.NextFloat()),
-                        BoundsX = boundsX,
-                        BoundsY = boundsY
-                    };
-                }
-
-                internal void Update()
-                {
-                    if (Position.X < BoundsX.X ||
-                        Position.X > BoundsX.Y
-                        )
-                    {
-                        Direction.X *= -1;
-                    }
-                    if (Position.Y < BoundsY.X ||
-                        Position.Y > BoundsY.Y)
-                    {
-                        Direction.Y *= -1;
-                    }
-
-                    Position += Direction;
-                }
-
-                internal void Render()
-                {
-                    Draw.Rect(Position, Size.X, Size.Y, Color);
-                }
-            }
-
             private LaserCutter Parent;
             private Random rand;
-            private MTexture[,] beamTextures;
             private Vector2 Direction;
             private int counter;
             private float countdown = 0.7F;
             private float timestamp;
             private int cutSize;
+            private Sprite sprite;
+            private BreakbeamHitboxComponent bbhc;
 
-            public Laser(Vector2 Position, int width, int height, Vector2 direction, Level level, int cutSize, LaserCutter parent) : base(Position)
+            public Laser(Vector2 Position, Vector2 direction, Level level, int cutSize, LaserCutter parent, string strdirection) : base()
             {
-                Collider = new Hitbox(width, height);
+                Collider = new ColliderList();
+                Add(bbhc = new BreakbeamHitboxComponent(cutSize, strdirection, level, parent, (ColliderList)Collider, Vector2.Zero));
+                TopCenter = Position;
                 Direction = direction;
                 this.Position = Position;
                 this.Parent = parent;
                 rand = new Random();
-                beamTextures = new MTexture[2, 4];
                 Visible = false;
                 Collidable = false;
                 this.cutSize = cutSize;
-                string tex1 = direction.X == 0 ? "objects/LylyraHelper/laserCutter/laserFirstVertical" : "objects/LylyraHelper/laserCutter/laserFirstHorizontal";
-                string tex2 = direction.X == 0 ? "objects/LylyraHelper/laserCutter/laserSecondVertical" : "objects/LylyraHelper/laserCutter/laserSecondHorizontal";
-                if (direction.X == 0)
-                {
-                    beamTextures[0, 0] = GFX.Game[tex1].GetSubtexture(new Rectangle(0, 0, 16, 16));
-                    beamTextures[0, 1] = GFX.Game[tex1].GetSubtexture(new Rectangle(0, 16, 16, 16));
-                    beamTextures[0, 2] = GFX.Game[tex1].GetSubtexture(new Rectangle(0, 32, 16, 16));
-                    beamTextures[0, 3] = GFX.Game[tex1].GetSubtexture(new Rectangle(0, 48, 16, 16));
-                    beamTextures[1, 0] = GFX.Game[tex2].GetSubtexture(0, 0, 16, 16);
-                    beamTextures[1, 1] = GFX.Game[tex2].GetSubtexture(0, 16, 16, 16);
-                    beamTextures[1, 2] = GFX.Game[tex2].GetSubtexture(0, 32, 16, 16);
-                    beamTextures[1, 3] = GFX.Game[tex2].GetSubtexture(0, 48, 16, 16);
-                } 
-                else
-                {
-                    beamTextures[0, 0] = GFX.Game[tex1].GetSubtexture(new Rectangle(0,  0, 16, 16));
-                    beamTextures[0, 1] = GFX.Game[tex1].GetSubtexture(new Rectangle(16, 0, 16, 16));
-                    beamTextures[0, 2] = GFX.Game[tex1].GetSubtexture(new Rectangle(32, 0, 16, 16));
-                    beamTextures[0, 3] = GFX.Game[tex1].GetSubtexture(new Rectangle(48, 0, 16, 16));
-                    beamTextures[1, 0] = GFX.Game[tex2].GetSubtexture(0, 0, 16, 16);
-                    beamTextures[1, 1] = GFX.Game[tex2].GetSubtexture(16, 0, 16, 16);
-                    beamTextures[1, 2] = GFX.Game[tex2].GetSubtexture(32, 0, 16, 16);
-                    beamTextures[1, 3] = GFX.Game[tex2].GetSubtexture(48, 0, 16, 16);
-                }
-                
+                Add(sprite = LylyraHelperModule.SpriteBank.Create("laser"));
+                sprite.Play(strdirection);
+                sprite.Visible = false;
                 Add(new PlayerCollider(OnPlayer));
             }
 
@@ -166,44 +90,196 @@ namespace Celeste.Mod.LylyraHelper.Entities
             public override void Render()
             {
                 base.Render();
-
+                sprite.Visible = true;
                 if (countdown <= 0)
                 {
+                    int maxLength = Direction.Y != 0 ? (int)Height / 8 : (int)Width / 8;
+                    int maxLengthPrevious = Direction.Y != 0 ? (int)Height / 8 : (int)Width / 8;
+                    int maxLengthNext = Direction.Y != 0 ? (int)Height / 8 : (int)Width / 8;
+                    int maxRectangleLength = (int)(cutSize / 3.2F);
+                    if (maxRectangleLength > 16) maxRectangleLength = 16;
                     if (Direction.Y < 0)
                     {
-                        for (int i = 0; i < 40; i++)
+                        Draw.Rect(new Rectangle((int)Parent.TopCenter.X - maxRectangleLength / 2, (int) (Parent.TopCenter.Y - 4), maxRectangleLength, 12), Color.White);
+                        Draw.HollowRect(new Rectangle((int)Parent.TopCenter.X - maxRectangleLength / 2, (int)(Parent.TopCenter.Y - 4), maxRectangleLength, 12), Calc.HexToColor("d0e8f4"));
+                        for (int x = 0; x < cutSize / 8; x++)
                         {
-                            if (i == 0) beamTextures[counter / 20 % 2, 2].DrawCentered(Position + new Vector2(Width / 2, Height));
-                            else beamTextures[(counter / 20) % 2, (i + counter / 20) % 2 + 1].DrawCentered(Position + new Vector2(Width / 2, Height + Parent.Height / 2) - new Vector2(0, i * 16));
+                            maxLength = Math.Max((int) bbhc.hitboxes[x * 8 / BreakbeamHitboxComponent.scale].Height, (int)bbhc.hitboxes[x * 8 / BreakbeamHitboxComponent.scale].Height) / 8 + 2; ;
+                            if ((x > 0 && x < cutSize / 8 - 1))
+                                Draw.Rect(new Rectangle((int)Parent.TopCenter.X + x * 8 - cutSize / 2, (int)(Parent.TopCenter.Y) - maxLength * 8 - 8, 8, maxLength * 8), Color.White);
+                            for (int y = 0; y < maxLength; y++)
+                            {
+
+                                if (x > 0 && x < cutSize / 8 - 1 && y != 0) continue;
+                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, maxLength);
+                                sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2(x * 8 - cutSize / 2, -(y + 1) * 8), 
+                                    new Rectangle((int) coords.X * 8, (int)coords.Y * 8, 8, 8));
+                            }
                         }
                     }
                     else if(Direction.Y > 0)
                     {
-                        for (int i = 0; i < 40; i++)
-                        {   
-                            if (i == 0) beamTextures[counter / 20 % 2, 2].DrawCentered(Position + new Vector2(Width / 2, Height));
-                            else beamTextures[(counter / 20) % 2, (i + counter / 20) % 2 + 1].DrawCentered(Position + new Vector2(8, i * 16));
+                        Draw.Rect(new Rectangle((int)Parent.BottomCenter.X - maxRectangleLength / 2, (int)(Parent.BottomCenter.Y - 4), maxRectangleLength, 12), Color.White);
+                        Draw.HollowRect(new Rectangle((int)Parent.BottomCenter.X - maxRectangleLength / 2, (int)(Parent.BottomCenter.Y + 4), maxRectangleLength, 12), Calc.HexToColor("d0e8f4"));
+
+                        for (int x = 0; x < cutSize / 8; x++)
+                        {
+                            int num1 = x * 8 / BreakbeamHitboxComponent.scale;
+                            maxLength = (int)bbhc.hitboxes[num1].Height / 8 + 2;
+                            maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Height / 8 + 2 : 0;
+                            maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Height / 8 + 2 : 0;
+
+                            if (maxLength >= maxLengthPrevious && maxLength <= maxLengthNext)
+                            {
+                                Draw.Rect(new Rectangle((int)Parent.TopCenter.X + x * 8 - cutSize / 2, (int)(Parent.TopCenter.Y) + 8, 8, maxLength * 8), Color.White);
+                                continue;
+                            }
+                            for (int y = 0; y < maxLength; y++)
+                            {
+                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, maxLength);
+                                sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2(x * 8 - cutSize / 2, y * 8),
+                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                            }
                         }
                     }
                     else if (Direction.X > 0) //right
                     {
-                        for (int i = 0; i < 40; i++)
+                        Draw.Rect(new Rectangle((int)Parent.CenterRight.X - 8, (int)(Parent.CenterRight.Y - maxRectangleLength / 2), 16, maxRectangleLength), Color.White);
+                        Draw.HollowRect(new Rectangle((int)Parent.CenterRight.X - 8, (int)(Parent.CenterRight.Y - maxRectangleLength / 2), 16, maxRectangleLength), Calc.HexToColor("d0e8f4"));
+
+                        for (int y = 0; y < cutSize / 8; y++)
                         {
-                            if (i == 0) { }
-                            else beamTextures[(counter / 20) % 2, (i + counter / 20) % 2 + 1].DrawCentered(Parent.Center - new Vector2(Parent.Width / 2, 0) + new Vector2(i * 16, 0));
+
+                            
+                            maxLength = Math.Max((int)bbhc.hitboxes[y * 8 / BreakbeamHitboxComponent.scale].Width, (int)bbhc.hitboxes[y * 8 / BreakbeamHitboxComponent.scale].Width) / 8 + 2; 
+                            if ((y > 0 && y < cutSize / 8 - 1))
+                                Draw.Rect(new Rectangle((int)Parent.CenterRight.X + 8, (int)(Parent.CenterRight.Y) + y * 8 - cutSize / 2, maxLength * 8, 8), Color.White);
+                            for (int x = 0; x < maxLength; x++)
+                            {
+
+                                if (y > 0 && y < cutSize / 8 - 1 && x != 0) continue;
+                                Vector2 coords = GetTileCoords(x, y, maxLength, cutSize / 8);
+                                sprite.DrawSubrect(Parent.CenterRight - Position + new Vector2(x * 8, (y) * 8 - cutSize / 2),
+                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                            }
                         }
                     }
                     else //left
                     {
-                        for (int i = 0; i < 40; i++)
+                        Draw.Rect(new Rectangle((int)Parent.CenterLeft.X - 8, (int)(Parent.CenterLeft.Y - maxRectangleLength / 2), 16, maxRectangleLength), Color.White);
+                        Draw.HollowRect(new Rectangle((int)Parent.CenterLeft.X - 8, (int)(Parent.CenterLeft.Y - maxRectangleLength / 2), 16, maxRectangleLength), Calc.HexToColor("d0e8f4"));
+
+                        for (int y = 0; y < cutSize / 8; y++)
                         {
-                            if (i == 0) { }
-                            else beamTextures[(counter / 20) % 2, (i + counter / 20) % 2 + 1].DrawCentered(Parent.Center + new Vector2(Parent.Width / 2, 0) - new Vector2(i * 16, 0));
+
+                            maxLength = Math.Max((int)bbhc.hitboxes[y * 8 / BreakbeamHitboxComponent.scale].Width, (int)bbhc.hitboxes[y * 8 / BreakbeamHitboxComponent.scale].Width) / 8 + 2;
+                            if ((y > 0 && y < cutSize / 8 - 1))
+                                Draw.Rect(new Rectangle((int)Parent.CenterLeft.X - maxLength * 8 - 8, (int)(Parent.CenterLeft.Y) + y * 8 - cutSize / 2, maxLength * 8, 8), Color.White);
+                            for (int x = 0; x < maxLength; x++)
+                            {
+                                if (y > 0 && y < cutSize / 8 - 1 && x != 0) continue;
+                                Vector2 coords = GetTileCoords(x, y, maxLength, cutSize / 8);
+                                sprite.DrawSubrect(Parent.CenterLeft - Position + new Vector2(-(x + 1) * 8, (y) * 8 - cutSize / 2),
+                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                            }
                         }
                     }
                 }
+
+                sprite.Visible = false;
             }
 
+            private Vector2 GetTileCoords(int i, int j, int iMax, int jMax)
+            {
+                if (Direction.Y < 0)
+                {
+                    if (i == 0 && j == 0) return new Vector2(0, 2);
+                    else if (i == 0 && j == jMax - 1) return new Vector2(0, 0);
+                    else if (i == 0) return new Vector2(0, 1);
+
+                    else if (i == 1 && j == 0) return new Vector2(1, 2);
+                    else if (i == 1 && j == jMax - 1) return new Vector2(1, 0);
+                    else if (i == 1) return new Vector2(1, 1);
+
+                    else if (i == iMax - 2 && j == 0) return new Vector2(2, 2);
+                    else if (i == iMax - 2 && j == jMax - 1) return new Vector2(2, 0);
+                    else if (i == iMax - 2) return new Vector2(2, 1);
+
+                    else if (i == iMax - 1 && j == 0) return new Vector2(3, 2);
+                    else if (i == iMax - 1 && j == jMax - 1) return new Vector2(3, 0);
+                    else if (i == iMax - 1) return new Vector2(3, 1);
+
+                    else if (j == 0) return new Vector2(5, 2);
+
+
+                    return new Vector2(5, 1);
+                } else if (Direction.Y > 0)
+                {
+                    if (i == 0 && j == 0) return new Vector2(0, 0);
+                    else if (i == 0 && j == jMax - 1) return new Vector2(0, 2);
+                    else if (i == 0) return new Vector2(0, 1);
+
+                    else if (i == 1 && j == 0) return new Vector2(1, 0);
+                    else if (i == 1 && j == jMax - 1) return new Vector2(1, 2);
+                    else if (i == 1) return new Vector2(1, 1);
+
+                    else if (i == iMax - 2 && j == 0) return new Vector2(2, 0);
+                    else if (i == iMax - 2 && j == jMax - 1) return new Vector2(2, 2);
+                    else if (i == iMax - 2) return new Vector2(2, 1);
+
+                    else if (i == iMax - 1 && j == 0) return new Vector2(3, 0);
+                    else if (i == iMax - 1 && j == jMax - 1) return new Vector2(3, 2);
+                    else if (i == iMax - 1) return new Vector2(3, 1);
+
+                    else if (j == 0) return new Vector2(5, 0);
+
+
+                    return new Vector2(5, 1);
+                }
+                else if (Direction.X > 0) //right
+                {
+                    if (j == 0 && i == 0) return new Vector2(0, 0);
+                    else if (j == 0 && i == iMax - 1) return new Vector2(2, 0);
+                    else if (j == 0) return new Vector2(1, 0);
+
+                    else if (j == 1 && i == 0) return new Vector2(0, 1);
+                    else if (j == 1 && i == iMax - 1) return new Vector2(2, 1);
+                    else if (j == 1) return new Vector2(1, 1);
+
+                    else if (j == jMax - 2 && i == 0) return new Vector2(0, 2);
+                    else if (j == jMax - 2 && i == iMax - 1) return new Vector2(2, 2);
+                    else if (j == jMax - 2) return new Vector2(1, 2);
+
+                    else if (j == jMax - 1 && i == 0) return new Vector2(0, 3);
+                    else if (j == jMax - 1 && i == iMax - 1) return new Vector2(2, 3);
+                    else if (j == jMax - 1) return new Vector2(1, 3);
+
+                    else if (i == 0) return new Vector2(0, 5);
+                    return new Vector2(1, 5);
+                }
+                else if (Direction.X < 0) //left
+                {
+                    if (j == 0 && i == 0) return new Vector2(2, 0);
+                    else if (j == 0 && i == iMax - 1) return new Vector2(0, 0);
+                    else if (j == 0) return new Vector2(1, 0);
+
+                    else if (j == 1 && i == 0) return new Vector2(2, 1);
+                    else if (j == 1 && i == iMax - 1) return new Vector2(0, 1);
+                    else if (j == 1) return new Vector2(1, 1);
+
+                    else if (j == jMax - 2 && i == 0) return new Vector2(2, 2);
+                    else if (j == jMax - 2 && i == iMax - 1) return new Vector2(0, 2);
+                    else if (j == jMax - 2) return new Vector2(1, 2);
+
+                    else if (j == jMax - 1 && i == 0) return new Vector2(2, 3);
+                    else if (j == jMax - 1 && i == iMax - 1) return new Vector2(0, 3);
+                    else if (j == jMax - 1) return new Vector2(1, 3);
+
+                    else if (i == 0) return new Vector2(2, 5);
+                    return new Vector2(1, 5);
+                }
+                return Vector2.Zero;
+            }
         }
         public enum FiringMode
         {
@@ -255,7 +331,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             public void OnPlayer(Player player)
             {
-                Parent.Fire();
+                if (Parent.mode == FiringMode.Breakbeam || Parent.mode == FiringMode.bbnls) Parent.Fire();
             }
 
         }
@@ -286,9 +362,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base(data.Position + offset, 32, 32, false)
         {
             direction = data.Attr("direction", "Up").ToLower();
-            cutSize = data.Int("cutSize", 16);
+            cutSize = data.Int("cutSize", 64);
             breakbeamThickness = data.Int("breakBeamThickness", 32);
-            Logger.Log(LogLevel.Error, "LylyraHelper", direction);
             firingLength = data.Float("firingLength", 1F);
             mode = fm;
             Add(sprite = LylyraHelperModule.SpriteBank.Create("laserCutter"));
@@ -409,21 +484,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 switch (direction.ToLower())
                 {
                     case "up":
-                        laser = new Laser(BottomLeft + new Vector2(8, -648), 16, 640, -Vector2.UnitY, SceneAs<Level>(), cutSize, this);
+                        laser = new Laser(TopCenter ,  -Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction);
                         break;
                     case "down":
-                        laser = new Laser(TopLeft + new Vector2(8, 0), 16, 640, Vector2.UnitY, SceneAs<Level>(), cutSize, this);
+                        laser = new Laser(TopCenter, Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction);
                         break;
                     case "right":
-                        laser = new Laser(TopRight + new Vector2(0, 8), 640, 16, Vector2.UnitX, SceneAs<Level>(), cutSize, this);
+                        laser = new Laser(CenterLeft ,  Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction);
                         break;
                     case "left":
-                        laser = new Laser(TopRight + new Vector2(-648, 8), 640, 16, -Vector2.UnitX, SceneAs<Level>(), cutSize, this);
+                        laser = new Laser(CenterLeft , -Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction);
                         break;
                 }
                 Scene.Add(laser);
             }
-            Logger.Log(LogLevel.Error, "LylyraHelper", mode.ToString());
         }
 
         private float lerp = 0;

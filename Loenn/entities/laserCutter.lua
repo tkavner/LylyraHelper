@@ -69,6 +69,7 @@ for _, dir in ipairs(directions) do
 				frequency = 2.0,
 				firingLength = 1.0,
 				direction = dir,
+				cutSize = 32,
 				flag = "laser_cutter_activate"
 			}
 		})
@@ -77,6 +78,7 @@ for _, dir in ipairs(directions) do
 		data = {
 				frequency = 2.0,
 				firingLength = 1.0,
+				cutSize = 32,
 				direction = dir
 			}
 		})
@@ -85,6 +87,7 @@ for _, dir in ipairs(directions) do
 		data = {
 				frequency = 2.0,
 				firingLength = 1.0,
+				cutSize = 32,
 				direction = dir
 			}
 		})
@@ -94,6 +97,7 @@ for _, dir in ipairs(directions) do
 				frequency = 2.0,
 				firingLength = 1.0,
 				direction = dir,
+				cutSize = 32,
 				breakBeamThickness=32
 			}
 		})

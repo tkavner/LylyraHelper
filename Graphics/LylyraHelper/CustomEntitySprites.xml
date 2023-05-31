@@ -34,6 +34,13 @@
 		<Anim id="reset" path="reset" delay="0.1" frames="0-10" goto="idle"/>
 	</laserCutter>
 
+	<laser path="objects/LylyraHelper/laserCutter/" start="up">
+		<Loop id="up" path="laserUp" delay="0.1" frames="0-3"/>
+		<Loop id="down" path="laserDown" delay="0.1" frames="0-3"/>
+		<Loop id="left" path="laserLeft" delay="0.1" frames="0-3"/>
+		<Loop id="right" path="laserRight" delay="0.1" frames="0-3"/>jj
+	</laser>
+
     <bigcloud path="objects/LylyraHelper/scissors/" start="idle">
         <Anim id="spawn" path="scissors" delay="0.1" frames="6-10"/>
         <Loop id="idle" path="scissors" delay="0.1" frames="0"/>

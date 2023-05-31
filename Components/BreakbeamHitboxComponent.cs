@@ -21,10 +21,10 @@ namespace LylyraHelper.Other
         public int RawWidth { get; private set; }
         public string Orientation { get; private set; }
 
-        private Hitbox[] hitboxes;
+        public Hitbox[] hitboxes { get; }
 
         private ulong frame;
-        private int scale = 4;
+        public static int scale = 8;
         private Level Level;
         public BreakbeamHitboxComponent(int width, string orientation, Level level, Entity parent, ColliderList hitbox, Vector2 offset) : base(true, true)
         {
@@ -37,7 +37,6 @@ namespace LylyraHelper.Other
             this.Offset = offset;
             for (int i = 0; i < hitboxes.Length; i++)
             {
-                Logger.Log(LogLevel.Error, "Lylyra", string.Format("{0}", hitboxes.Length));
 
                 hitboxes[i] = GetOrientedHitbox(GetEdgeScreenLength(), scale, i * scale - width / 2);
                 clist.Add(hitboxes[i]);
@@ -97,13 +96,7 @@ namespace LylyraHelper.Other
 
         public ColliderList GetHitbox()
         {
-            //check if we have already calculated breakbeam this frame
-            if (Engine.FrameCounter == frame)
-            {
-                return clist;
-            }
-            frame = Engine.FrameCounter;
-            RecalcHitbox();
+            
             return clist;
         }
 
@@ -144,7 +137,7 @@ namespace LylyraHelper.Other
             {
                 //update each hitbox
                 Hitbox h = hitboxes[i];
-                ResizeHitbox(h, GetEdgeScreenLength(), i * scale - RawWidth / scale * 2);
+                ResizeHitbox(h, GetEdgeScreenLength(), i * scale - hitboxes.Length * scale / 2);
 
                 if (Level.CollideCheck<Solid>(new Rectangle((int) h.AbsoluteLeft, (int) h.AbsoluteTop, (int) h.Width, (int) h.Height)))
                 {

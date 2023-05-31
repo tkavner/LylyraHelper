@@ -95,7 +95,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     if (d.CollideCheck(Entity))
                     {
-                        Logger.Log(LogLevel.Error, "LylyraHelper", "added dashpaper");
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
                     }
@@ -127,7 +126,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
-                        Logger.Log(LogLevel.Error, "LylyraHelper", "added icuttable");
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
                         continue;
@@ -202,7 +200,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     if ((!d.CollideCheck(Entity)) || collisionOverride || sliceOnImpact)
                     {
-                        Logger.Log(LogLevel.Error, "LylyraHelper", "cut icuttable");
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
                         bool toReturn = icut.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
                         sliceStartPositions.Remove(d);
@@ -511,7 +508,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                         //if cb1Pos.X < parent.Position.X then the spikes are no longer attached and should be removed
                         if ((cb1Pos.Y + cb1Height < spike.Y + spike.Height && cb1Added) || (cb2Pos.Y > spike.Y && cb2Pos.Y < spike.Y + spike.Height && cb2Added)) //then the spikes intersect the hole. 
                         {
-                            Logger.Log(LogLevel.Error, "LylyraHelper", "blarg");
                             if (spikesOnCB1)
                             {
                                 float spikePosY = spike.Y;
@@ -573,7 +569,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                                         Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType);
                                         Scene.Add(newSpike1);
 
-                                        Logger.Log(LogLevel.Error, "LylyraHelper", "blarg3");
 
                                     }
                                 }
