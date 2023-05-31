@@ -153,7 +153,6 @@ namespace LylyraHelper.Other
                     int cycles = 10 + (int) Math.Log(GetEdgeScreenLength(), 2);
                     while (cycles-- > 0)
                     {
-
                         int pivot = (int)(low + (high - low) / 2f);
                         ResizeHitbox(h, pivot, i * scale - hitboxes.Length * scale / 2); 
 
