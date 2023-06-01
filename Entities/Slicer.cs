@@ -28,11 +28,34 @@ namespace Celeste.Mod.LylyraHelper.Components
         private int directionalOffset;
         private bool sliceOnImpact;
         private bool fragile;
+        private Vector2 ColliderOffset;
         private Action entityCallback;
 
         public int entitiesCut { get; private set; }
 
-        public Slicer(Vector2 Direction, int cutSize, Level level, int directionalOffset, Collider slicingCollider = null, bool active = true, bool sliceOnImpact = false, bool fragile = false) : base(active, false)
+        public Slicer(
+            Vector2 Direction,
+            int cutSize,
+            Level level,
+            int directionalOffset,
+            Collider slicingCollider = null,
+            bool active = true,
+            bool sliceOnImpact = false,
+            bool fragile = false) : this(Direction, cutSize, level, directionalOffset, Vector2.Zero, slicingCollider, active, sliceOnImpact, fragile)
+        {
+
+        }
+
+        public Slicer(
+            Vector2 Direction, 
+            int cutSize, 
+            Level level, 
+            int directionalOffset, 
+            Vector2 colliderOffset,
+            Collider slicingCollider = null, 
+            bool active = true, 
+            bool sliceOnImpact = false, 
+            bool fragile = false) : base(active, false)
         {
             this.slicingCollider = slicingCollider;
             this.Direction = Direction;
@@ -41,7 +64,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             this.directionalOffset = directionalOffset;
             this.sliceOnImpact = sliceOnImpact;
             this.fragile = fragile;
-
+            ColliderOffset = colliderOffset;
             if (Cuttable.paperScraps == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
@@ -72,12 +95,14 @@ namespace Celeste.Mod.LylyraHelper.Components
         public override void Update()
         {
             base.Update();
-
+            Vector2 positionHold = Entity.Position;
+            Entity.Position = Entity.Position + ColliderOffset;
             Collider tempHold = Entity.Collider;
             if (slicingCollider != null) Entity.Collider = slicingCollider;
             if(this.Entity.Collidable) CheckCollisions();
             
             Slice();
+            Entity.Position = positionHold;
             Entity.Collider = tempHold;
         }
 
@@ -1040,6 +1065,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             level.ParticlesFG.Emit(Cuttable.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
         }
 
+        //directional position is used with instant slicing because normally slicers depend on movement to slice
         private Vector2 GetDirectionalPosition()
         {
             if (Direction.X > 0)

@@ -27,12 +27,36 @@
         <Anim id="break" path="breakleft" delay="0.1" frames="0-7"/>
     </scissorsleft>
 
-	<laserCutter path="objects/LylyraHelper/laserCutter/" start="idle">
-		<Loop id="idle" path="idle" delay="0.1" frames="0"/>
-		<Anim id="fire" path="fire" delay="0.1" frames="0-10" goto="firecont" />
-		<Loop id="firecont" path="firecont" delay="0.1" frames="0-1"/>
-		<Anim id="reset" path="reset" delay="0.1" frames="0-10" goto="idle"/>
-	</laserCutter>
+	<laserCutterUp path="objects/LylyraHelper/laserCutter/" start="idle">
+		<Loop id="idle" path="idleUp" delay="0.1" frames="0"/>
+		<Anim id="fire" path="fireUp" delay="0.1" frames="0-10" goto="firecont" />
+		<Loop id="firecont" path="firecontUp" delay="0.1" frames="0-1"/>
+		<Anim id="reset" path="resetUp" delay="0.1" frames="0-10" goto="idle"/>
+	</laserCutterUp>
+
+
+	<laserCutterDown path="objects/LylyraHelper/laserCutter/" start="idle">
+		<Loop id="idle" path="idleDown" delay="0.1" frames="0"/>
+		<Anim id="fire" path="fireDown" delay="0.1" frames="0-10" goto="firecont" />
+		<Loop id="firecont" path="firecontDown" delay="0.1" frames="0-1"/>
+		<Anim id="reset" path="resetDown" delay="0.1" frames="0-10" goto="idle"/>
+	</laserCutterDown>
+
+
+	<laserCutterLeft path="objects/LylyraHelper/laserCutter/" start="idle">
+		<Loop id="idle" path="idleLeft" delay="0.1" frames="0"/>
+		<Anim id="fire" path="fireLeft" delay="0.1" frames="0-10" goto="firecont" />
+		<Loop id="firecont" path="firecontLeft" delay="0.1" frames="0-1"/>
+		<Anim id="reset" path="resetLeft" delay="0.1" frames="0-10" goto="idle"/>
+	</laserCutterLeft>
+
+
+	<laserCutterRight path="objects/LylyraHelper/laserCutter/" start="idle">
+		<Loop id="idle" path="idleRight" delay="0.1" frames="0"/>
+		<Anim id="fire" path="fireRight" delay="0.1" frames="0-10" goto="firecont" />
+		<Loop id="firecont" path="firecontRight" delay="0.1" frames="0-1"/>
+		<Anim id="reset" path="resetRight" delay="0.1" frames="0-10" goto="idle"/>
+	</laserCutterRight>
 
 	<laser path="objects/LylyraHelper/laserCutter/" start="up">
 		<Loop id="up" path="laserUp" delay="0.1" frames="0-3"/>

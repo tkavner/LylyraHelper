@@ -50,6 +50,11 @@ namespace Celeste.Mod.LylyraHelper.Components
             Vector2 Position = Parent.Position;
             float Width = Parent.Width;
             float Height = Parent.Height;
+            if (direction.Y != 0)
+            {
+            } else
+            {
+            }
             Vector2[] arrayResults = Slicer.CalcCuts(Position, new Vector2(Width, Height), cutPosition, direction, gapWidth); //cuts gives where the new block should exist, we want where it should not
             Vector2 p1, p2; //these points represent the cut area
             if (direction.X != 0) //horizontal cut, vertical gap
