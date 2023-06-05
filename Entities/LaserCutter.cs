@@ -105,7 +105,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         for (int x = 0; x < cutSize / 8; x++)
                         {
 
-                            int num1 = x * 8 / BreakbeamHitboxComponent.scale;
+                            int num1 = x * 8 / bbhc.scale;
                             maxLength = (int)bbhc.hitboxes[num1].Height / 8 + 2;
                             maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Height / 8 + 2 : 0;
                             maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Height / 8 + 2 : 0;
@@ -147,7 +147,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                         for (int x = 0; x < cutSize / 8; x++)
                         {
-                            int num1 = x * 8 / BreakbeamHitboxComponent.scale;
+                            int num1 = x * 8 / bbhc.scale;
                             maxLength = (int)bbhc.hitboxes[num1].Height / 8 + 2;
                             maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Height / 8 + 2 : 0;
                             maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Height / 8 + 2 : 0;
@@ -190,7 +190,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                         for (int y = 0; y < cutSize / 8; y++)
                         {
-                            int num1 = y * 8 / BreakbeamHitboxComponent.scale;
+                            int num1 = y * 8 / bbhc.scale;
                             maxLength = (int)bbhc.hitboxes[num1].Width / 8 + 1;
                             maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Width / 8 + 1 : 0;
                             maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Width / 8 + 1 : 0;
@@ -231,7 +231,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         for (int y = 0; y < cutSize / 8; y++)
                         {
 
-                            int num1 = y * 8 / BreakbeamHitboxComponent.scale;
+                            int num1 = y * 8 / bbhc.scale;
                             maxLength = (int)bbhc.hitboxes[num1].Width / 8 + 2;
                             maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Width / 8 + 2 : 0;
                             maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Width / 8 + 2 : 0;

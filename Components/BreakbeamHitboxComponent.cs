@@ -24,9 +24,9 @@ namespace LylyraHelper.Other
         public Hitbox[] hitboxes { get; }
 
         private ulong frame;
-        public static int scale = 8;
+        public int scale = 8;
         private Level Level;
-        public BreakbeamHitboxComponent(int width, string orientation, Level level, Entity parent, ColliderList hitbox, Vector2 offset) : base(true, true)
+        public BreakbeamHitboxComponent(int width, string orientation, Level level, Entity parent, ColliderList hitbox, Vector2 offset, int scale = 8) : base(true, true)
         {
             RawWidth = width;
             Orientation = orientation;
