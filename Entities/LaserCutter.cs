@@ -86,18 +86,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Collidable = true;
                     Parent.Collider = Parent.shortHitbox;
                     int min = int.MaxValue;
-                    if (Direction.Y < 0)
-                    {
-                        for (int x = 0; x < cutSize / 8; x++)
-                        {
-                            int num1 = x * 8 / bbhc.scale;
-                            min = min > (int)bbhc.hitboxes[num1].Height / 8 ? (int)bbhc.hitboxes[num1].Height / 8: min;
-
-                        }
-                        Slicer.directionalOffset = (min) * 8;
-                        LaserLength = min + 1;
-                    }
-                    else if(Direction.Y > 0)
+                    if (Direction.Y != 0)
                     {
                         for (int x = 0; x < cutSize / 8; x++)
                         {
@@ -105,30 +94,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             min = min > (int)bbhc.hitboxes[num1].Height / 8 ? (int)bbhc.hitboxes[num1].Height / 8 : min;
 
                         }
-                        Slicer.directionalOffset = (min) * 8;
-                        LaserLength = min + 1;
                     }
-                    else if (Direction.X > 0)
-                    {
-                        for (int y = 0; y < cutSize / 8; y++)
-                        {
-                            int num1 = y * 8 / bbhc.scale;
-                            min = min > (int)bbhc.hitboxes[num1].Width / 8  ? (int)bbhc.hitboxes[num1].Width / 8: min;
-                        }
-                        Slicer.directionalOffset = (min) * 8;
-                        LaserLength = min + 1;
-                    }
-                    else
+                    else if (Direction.X != 0)
                     {
                         for (int y = 0; y < cutSize / 8; y++)
                         {
                             int num1 = y * 8 / bbhc.scale;
                             min = min > (int)bbhc.hitboxes[num1].Width / 8 ? (int)bbhc.hitboxes[num1].Width / 8 : min;
                         }
-                        Slicer.directionalOffset = (min) * 8;
-                        LaserLength = min + 1;
                     }
+
+                    Slicer.directionalOffset = (min) * 8;
+                    LaserLength = min + 1;
                 }
+                
             }
 
             public override void Render()
