@@ -50,10 +50,13 @@ namespace Celeste.Mod.LylyraHelper.Components
             Vector2 Position = Parent.Position;
             float Width = Parent.Width;
             float Height = Parent.Height;
-            if (direction.Y != 0)
+            if (direction.Y < 0)
             {
-            } else
+
+            }
+            if (direction.X < 0)
             {
+
             }
             Vector2[] arrayResults = Slicer.CalcCuts(Position, new Vector2(Width, Height), cutPosition, direction, gapWidth); //cuts gives where the new block should exist, we want where it should not
             Vector2 p1, p2; //these points represent the cut area
@@ -68,45 +71,35 @@ namespace Celeste.Mod.LylyraHelper.Components
                 p2 = arrayResults[1] + new Vector2(0, (arrayResults[3].Y < Height ? arrayResults[3].Y : Height));
             }
 
+            Logger.Log("LylyraHelper", "" + p1 + " " + p2 + " " + (p2 - p1));
             if (direction.X > 0)
             {
+                if (cutStartPosition.X > p1.X) p1.X = (int)cutStartPosition.X;
                 if (cutPosition.X < p2.X) p2.X = (int)cutPosition.X;
             }
             else if (direction.X < 0)
             {
                 if (cutPosition.X > p1.X) p1.X = (int)cutPosition.X;
+                if (cutStartPosition.X < p2.X) p2.X = (int)cutStartPosition.X;
             }
-            if (direction.Y > 0)
+            else if (direction.Y > 0)
             {
+                if (cutStartPosition.Y > p1.Y) p1.Y = (int)cutStartPosition.Y;
                 if (cutPosition.Y < p2.Y) p2.Y = (int)cutPosition.Y;
             }
             else if (direction.Y < 0)
             {
                 if (cutPosition.Y > p1.Y) p1.Y = (int)cutPosition.Y;
-            }
-
-            if (direction.X < 0)
-            {
-                if (cutStartPosition.X < p2.X) p2.X = (int)cutStartPosition.X;
-            }
-            else if (direction.X > 0)
-            {
-                if (cutStartPosition.X > p1.X) p1.X = (int)cutStartPosition.X;
-            }
-
-            if (direction.Y < 0)
-            {
                 if (cutStartPosition.Y < p2.Y) p2.Y = (int)cutStartPosition.Y;
             }
-            else if (direction.Y > 0)
-            {
-                if (cutStartPosition.Y > p1.Y) p1.Y = (int)cutStartPosition.Y;
-            }
+
+            Logger.Log("LylyraHelper", "" + p1 + " " + p2 + " " + (p2 - p1));
 
             p1 -= Position;
             p2 -= Position;
             p1 /= 8;
             p2 /= 8;
+            Logger.Log("LylyraHelper", "" + p1 + " " + p2 + " " + (p2 - p1));
 
             int furthestTop = Int32.MaxValue;
             int furthestDown = -1;

@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\Cuttable.cs" />
+    <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\KnifeSpikes.cs" />
     <Compile Include="Components\PaperComponent.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
@@ -79,6 +80,14 @@
     <None Include="Ahorn\entities\deathNote.jl" />
     <None Include="Ahorn\entities\dashPaper.jl" />
     <None Include="Ahorn\entities\bigCloud.jl" />
+    <None Include="Loenn\entities\bigCloud.lua" />
+    <None Include="Loenn\entities\bubbledScissors.lua" />
+    <None Include="Loenn\entities\dashPaper.lua" />
+    <None Include="Loenn\entities\deathnote.lua" />
+    <None Include="Loenn\entities\KnifeSpikes.lua" />
+    <None Include="Loenn\entities\laserCutter.lua" />
+    <None Include="Loenn\lang\en_gb.lang" />
+    <None Include="Loenn\triggers\AddSlicerOnStartTrigger.lua" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

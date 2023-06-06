@@ -25,7 +25,8 @@ namespace Celeste.Mod.LylyraHelper.Components
         private int cutSize;
         private Dictionary<Entity, Vector2> sliceStartPositions = new Dictionary<Entity, Vector2>();
         private Level level;
-        private int directionalOffset;
+        public int directionalOffset { get; set; }
+
         private bool sliceOnImpact;
         private bool fragile;
         private Vector2 ColliderOffset;
@@ -226,6 +227,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                     if ((!d.CollideCheck(Entity)) || collisionOverride || sliceOnImpact)
                     {
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
+                        Logger.Log("LylyraHelper", "" + startPosition + " " + GetDirectionalPosition() + " " + directionalOffset);
                         bool toReturn = icut.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
                         sliceStartPositions.Remove(d);
                         return toReturn;
@@ -382,6 +384,8 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             return new Vector2((int)Math.Round(vector2.X), (int)Math.Round(vector2.Y));
         }
+
+        
 
         private void SliceFallingBlock(FallingBlock original)
         {
@@ -1070,19 +1074,19 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             if (Direction.X > 0)
             {
-                return Entity.Center + new Vector2(directionalOffset, 0);
+                return Entity.CenterLeft + new Vector2(directionalOffset, 0);
             }
             else if (Direction.X < 0)
             {
-                return Entity.Center + new Vector2(-directionalOffset, 0);
+                return Entity.CenterRight + new Vector2(-directionalOffset, 0);
             }
             else if (Direction.Y > 0)
             {
-                return Entity.Center + new Vector2(0, directionalOffset);
+                return Entity.TopCenter + new Vector2(0, directionalOffset);
             }
             else
             {
-                return Entity.Center + new Vector2(0, -directionalOffset);
+                return Entity.BottomCenter + new Vector2(0, -directionalOffset);
             }
         }
 

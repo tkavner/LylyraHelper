@@ -40,11 +40,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
             private int cutSize;
             private Sprite sprite;
             private BreakbeamHitboxComponent bbhc;
+            private int LaserLength;
 
-            public Laser(Vector2 Position, Vector2 direction, Level level, int cutSize, LaserCutter parent, string strdirection) : base()
+            public Laser(Vector2 Position, Vector2 direction, Level level, int cutSize, LaserCutter parent, string strdirection, Vector2 offset) : base()
             {
                 Collider = new ColliderList();
-                Add(bbhc = new BreakbeamHitboxComponent(cutSize, strdirection, level, parent, (ColliderList)Collider, Vector2.Zero));
+                Add(bbhc = new BreakbeamHitboxComponent(cutSize, strdirection, level, parent, (ColliderList) Collider, offset));
                 TopCenter = Position;
                 Direction = direction;
                 this.Position = Position;
@@ -62,7 +63,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             public override void Added(Scene scene)
             {
                 base.Added(scene);
-                Add(Slicer = new Slicer(new Vector2(Direction.X, Direction.Y), cutSize, SceneAs<Level>(), 320, Direction * 2, sliceOnImpact: true, slicingCollider: Collider));
+                Add(Slicer = new Slicer(Direction, cutSize, SceneAs<Level>(), 320, Direction, sliceOnImpact: true, slicingCollider: Collider));
             }
 
             private void OnPlayer(Player obj)
@@ -84,6 +85,49 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Visible = true;
                     Collidable = true;
                     Parent.Collider = Parent.shortHitbox;
+                    int min = int.MaxValue;
+                    if (Direction.Y < 0)
+                    {
+                        for (int x = 0; x < cutSize / 8; x++)
+                        {
+                            int num1 = x * 8 / bbhc.scale;
+                            min = min > (int)bbhc.hitboxes[num1].Height / 8 ? (int)bbhc.hitboxes[num1].Height / 8: min;
+
+                        }
+                        Slicer.directionalOffset = (min) * 8;
+                        LaserLength = min + 1;
+                    }
+                    else if(Direction.Y > 0)
+                    {
+                        for (int x = 0; x < cutSize / 8; x++)
+                        {
+                            int num1 = x * 8 / bbhc.scale;
+                            min = min > (int)bbhc.hitboxes[num1].Height / 8 ? (int)bbhc.hitboxes[num1].Height / 8 : min;
+
+                        }
+                        Slicer.directionalOffset = (min) * 8;
+                        LaserLength = min + 1;
+                    }
+                    else if (Direction.X > 0)
+                    {
+                        for (int y = 0; y < cutSize / 8; y++)
+                        {
+                            int num1 = y * 8 / bbhc.scale;
+                            min = min > (int)bbhc.hitboxes[num1].Width / 8  ? (int)bbhc.hitboxes[num1].Width / 8: min;
+                        }
+                        Slicer.directionalOffset = (min) * 8;
+                        LaserLength = min + 1;
+                    }
+                    else
+                    {
+                        for (int y = 0; y < cutSize / 8; y++)
+                        {
+                            int num1 = y * 8 / bbhc.scale;
+                            min = min > (int)bbhc.hitboxes[num1].Width / 8 ? (int)bbhc.hitboxes[num1].Width / 8 : min;
+                        }
+                        Slicer.directionalOffset = (min) * 8;
+                        LaserLength = min + 1;
+                    }
                 }
             }
 
@@ -93,32 +137,27 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 sprite.Visible = true;
                 if (countdown <= 0)
                 {
-                    int maxLength = Direction.Y != 0 ? (int)Height / 8 : (int)Width / 8;
-                    int maxLengthPrevious = Direction.Y != 0 ? (int)Height / 8 : (int)Width / 8;
-                    int maxLengthNext = Direction.Y != 0 ? (int)Height / 8 : (int)Width / 8;
                     int maxRectangleLength = (int)(cutSize / 3.2F);
-                    if (maxRectangleLength > 16) maxRectangleLength = 16;
+                    if (maxRectangleLength > 16) maxRectangleLength = 16; 
+                    int min = LaserLength;
                     if (Direction.Y < 0)
                     {
                         Draw.Rect(new Rectangle((int)Parent.TopCenter.X - maxRectangleLength / 2, (int)(Parent.TopCenter.Y - 4), maxRectangleLength, 12), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.TopCenter.X - maxRectangleLength / 2, (int)(Parent.TopCenter.Y - 4), maxRectangleLength, 12), Calc.HexToColor("d0e8f4"));
+                        
+                        
                         for (int x = 0; x < cutSize / 8; x++)
                         {
 
-                            int num1 = x * 8 / bbhc.scale;
-                            maxLength = (int)bbhc.hitboxes[num1].Height / 8 + 2;
-                            maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Height / 8 + 2 : 0;
-                            maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Height / 8 + 2 : 0;
-                            int max = Math.Max(Math.Max(maxLengthPrevious, maxLengthNext), maxLength);
                             if ((x > 0 && x < cutSize / 8 - 1))
                             {
-                                Draw.Rect(new Rectangle((int)Parent.TopCenter.X + x * 8 - cutSize / 2, (int)(Parent.TopCenter.Y) - maxLength * 8 - 8, 8, maxLength * 8), Color.White);
+                                Draw.Rect(new Rectangle((int)Parent.TopCenter.X + x * 8 - cutSize / 2, (int)(Parent.TopCenter.Y) - min * 8, 8, min * 8 - 8), Color.White);
                             }
-                            for (int y = 0; y < max; y++)
+                            for (int y = 0; y < min; y++)
                             {
 
                                 if (x > 0 && x < cutSize / 8 - 1 && y != 0) continue;
-                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, maxLength, maxLength, maxLengthPrevious, maxLengthNext);
+                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, min);
                                 sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2(x * 8 - cutSize / 2, -(y + 1) * 8),
                                     new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
                                 if (coords.Y != 4)
@@ -144,42 +183,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     {
                         Draw.Rect(new Rectangle((int)Parent.BottomCenter.X - maxRectangleLength / 2, (int)(Parent.BottomCenter.Y - 8), maxRectangleLength, 12), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.BottomCenter.X - maxRectangleLength / 2, (int)(Parent.BottomCenter.Y - 8), maxRectangleLength, 12), Calc.HexToColor("d0e8f4"));
-
+                        
                         for (int x = 0; x < cutSize / 8; x++)
                         {
-                            int num1 = x * 8 / bbhc.scale;
-                            maxLength = (int)bbhc.hitboxes[num1].Height / 8 + 2;
-                            maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Height / 8 + 2 : 0;
-                            maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Height / 8 + 2 : 0;
-
-                            int max = Math.Max(Math.Max(maxLengthPrevious, maxLengthNext), maxLength);
-
                             if ((x > 0 && x < cutSize / 8 - 1))
                             {
-                                Draw.Rect(new Rectangle((int)Parent.BottomCenter.X + x * 8 - cutSize / 2, (int)(Parent.BottomCenter.Y) + 8, 8, maxLength * 8), Color.White);
+                                Draw.Rect(new Rectangle((int)Parent.BottomCenter.X + x * 8 - cutSize / 2, (int)(Parent.BottomCenter.Y) + 8, 8, min * 8 - 8), Color.White);
                             }
-                            for (int y = 0; y < max; y++)
+                            for (int y = 0; y < LaserLength;  y++)
                             {
-
-                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, maxLength, maxLength, maxLengthPrevious, maxLengthNext);
-
+                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, LaserLength);
                                 if (coords == new Vector2(-1)) continue;
-
-                                if (coords.Y != 4)
-                                {
-                                    sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2(x * 8 - cutSize / 2, y * 8),
-                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
-                                else if (coords.X == 1)
-                                {
-                                    sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2((x + 1) * 8 - cutSize / 2, (y) * 8),
-                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
-                                else
-                                {
-                                    sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2((x - 1) * 8 - cutSize / 2, (y) * 8),
-                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
+                                sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2(x * 8 - cutSize / 2, y * 8),
+                                new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                                
                             }
                         }
                     }
@@ -187,22 +204,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     {
                         Draw.Rect(new Rectangle((int)Parent.CenterRight.X - 8, (int)(Parent.CenterRight.Y - maxRectangleLength / 2), 16, maxRectangleLength), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.CenterRight.X - 8, (int)(Parent.CenterRight.Y - maxRectangleLength / 2), 16, maxRectangleLength), Calc.HexToColor("d0e8f4"));
-
+                        
                         for (int y = 0; y < cutSize / 8; y++)
                         {
-                            int num1 = y * 8 / bbhc.scale;
-                            maxLength = (int)bbhc.hitboxes[num1].Width / 8 + 1;
-                            maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Width / 8 + 1 : 0;
-                            maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Width / 8 + 1 : 0;
-                            int max = Math.Max(Math.Max(maxLengthPrevious, maxLengthNext), maxLength);
+                            
                             if ((y > 0 && y < cutSize / 8 - 1))
                             {
-                                Draw.Rect(new Rectangle((int)Parent.CenterRight.X + 8, (int)(Parent.CenterRight.Y) + y * 8 - cutSize / 2, max * 8, 8), Color.White);
+                                Draw.Rect(new Rectangle((int)Parent.CenterRight.X + 8, (int)(Parent.CenterRight.Y) + y * 8 - cutSize / 2, min * 8 - 8, 8), Color.White);
                             }
-                            for (int x = 0; x < max; x++)
+                            for (int x = 0; x < min; x++)
                             {
 
-                                Vector2 coords = GetTileCoords(x, y, maxLength, cutSize / 8, maxLengthPrevious, maxLength, maxLengthNext);
+                                Vector2 coords = GetTileCoords(x, y, min, cutSize / 8);
 
                                 if (coords == new Vector2(-1)) continue;
                                 if (coords.Y != 4)
@@ -227,21 +240,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     {
                         Draw.Rect(new Rectangle((int)Parent.CenterLeft.X - 8, (int)(Parent.CenterLeft.Y - maxRectangleLength / 2), 16, maxRectangleLength), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.CenterLeft.X - 8, (int)(Parent.CenterLeft.Y - maxRectangleLength / 2), 16, maxRectangleLength), Calc.HexToColor("d0e8f4"));
-
+                        
                         for (int y = 0; y < cutSize / 8; y++)
                         {
 
-                            int num1 = y * 8 / bbhc.scale;
-                            maxLength = (int)bbhc.hitboxes[num1].Width / 8 + 2;
-                            maxLengthPrevious = (num1 > 0) ? (int)bbhc.hitboxes[num1 - 1].Width / 8 + 2 : 0;
-                            maxLengthNext = (num1 < cutSize / 8 - 1) ? (int)bbhc.hitboxes[num1 + 1].Width / 8 + 2 : 0;
-                            int max = Math.Max(Math.Max(maxLengthPrevious, maxLengthNext), maxLength);
                             if ((y > 0 && y < cutSize / 8 - 1))
-                                Draw.Rect(new Rectangle((int)Parent.CenterLeft.X - maxLength * 8 - 8, (int)(Parent.CenterLeft.Y) + y * 8 - cutSize / 2, maxLength * 8, 8), Color.White);
-                            for (int x = 0; x < max; x++)
+                            {
+                                Draw.Rect(new Rectangle((int)Parent.CenterLeft.X + 8 - min * 8 - 8, (int)(Parent.CenterLeft.Y) + y * 8 - cutSize / 2, min * 8 - 8, 8), Color.White);
+                            }
+                            for (int x = 0; x < min; x++)
                             {
                                 if (y > 0 && y < cutSize / 8 - 1 && x != 0) continue;
-                                Vector2 coords = GetTileCoords(x, y, maxLength, cutSize / 8, maxLengthPrevious, maxLength, maxLengthNext);
+                                Vector2 coords = GetTileCoords(x, y, min, cutSize / 8);
                                 if (coords.Y != 4)
                                 {
                                     sprite.DrawSubrect(Parent.CenterLeft - Position + new Vector2(-(x + 1) * 8, (y) * 8 - cutSize / 2),
@@ -266,7 +276,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
 
-            private Vector2 GetTileCoords(int i, int j, int iMax, int jMax, int previous, int current, int next)
+            private Vector2 GetTileCoords(int i, int j, int iMax, int jMax)
             {
                 if (Direction.Y < 0)
                 {
@@ -298,7 +308,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (i == 0) return new Vector2(0, 1);
 
 
-                    else if (i > current && current < previous) return new Vector2(4, 1);
 
                     else if (i == 1 && j == 0) return new Vector2(1, 0);
                     else if (i == 1 && j == jMax - 1) return new Vector2(1, 2);
@@ -313,7 +322,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (i == iMax - 1) return new Vector2(3, 1);
 
 
-                    else if (i > current && current < previous) return new Vector2(4, 0);
 
                     else if (j == 0) return new Vector2(5, 0);
 
@@ -325,7 +333,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (j == 0 && i == iMax - 1) return new Vector2(2, 0);
                     else if (j == 0) return new Vector2(1, 0);
 
-                    else if (i > current && current < previous) return new Vector2(1, 4);
 
                     else if (j == 1 && i == 0) return new Vector2(0, 1);
                     else if (j == 1 && i == iMax - 1) return new Vector2(2, 1);
@@ -336,7 +343,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (j == jMax - 2) return new Vector2(1, 2);
 
 
-                    else if (i > current && current < previous) return new Vector2(0, 4);
 
                     else if (j == jMax - 1 && i == 0) return new Vector2(0, 3);
                     else if (j == jMax - 1 && i == iMax - 1) return new Vector2(2, 3);
@@ -531,10 +537,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         breakbeam = new Breakbeam(Position - new Vector2(0, -4), this, new Vector2(640, 32)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                 }
-
-
                 scene.Add(breakbeam);
-
             }
 
             else if (mode == FiringMode.Breakbeam)
@@ -542,16 +545,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 switch (direction.ToLower())
                 {
                     case "up":
-                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(Width / 2, 4)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(Width / 2, 0)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                     case "down":
-                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(Width / 2, 4)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(Width / 2, 0)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                     case "left":
-                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, Height / 2 + 4)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, Height / 2)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                     case "right":
-                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, Height / 2 + 4)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position, this, breakbeamThickness, direction, new Vector2(0, Height / 2)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                 }
 
@@ -570,16 +573,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 switch (direction.ToLower())
                 {
                     case "up":
-                        laser = new Laser(TopCenter, -Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction);
+                        laser = new Laser(Position, -Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction, new Vector2(Width / 2, 0));
                         break;
                     case "down":
-                        laser = new Laser(TopCenter, Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction);
+                        laser = new Laser(Position, Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction, new Vector2(Width / 2, 0));
                         break;
                     case "right":
-                        laser = new Laser(CenterLeft, Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction);
+                        laser = new Laser(Position, Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction, new Vector2(0, Height / 2));
                         break;
                     case "left":
-                        laser = new Laser(CenterLeft, -Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction);
+                        laser = new Laser(Position, -Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction, new Vector2(0, Height / 2));
                         break;
                 }
                 Scene.Add(laser);
