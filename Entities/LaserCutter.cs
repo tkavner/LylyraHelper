@@ -137,23 +137,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                                 if (x > 0 && x < cutSize / 8 - 1 && y != 0) continue;
                                 Vector2 coords = GetTileCoords(x, y, cutSize / 8, min);
+                                if (coords == new Vector2(-1)) continue;
                                 sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2(x * 8 - cutSize / 2, -(y + 1) * 8),
                                     new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                if (coords.Y != 4)
-                                {
-                                    sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2(x * 8 - cutSize / 2, -(y + 1) * 8),
-                                        new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
-                                else if (coords.X == 1)
-                                {
-                                    sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2((x + 1) * 8 - cutSize / 2, -(y + 1) * 8),
-                                        new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
-                                else
-                                {
-                                    sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2((x - 1) * 8 - cutSize / 2, -(y + 1) * 8),
-                                        new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
                             }
                         }
 
@@ -193,25 +179,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             }
                             for (int x = 0; x < min; x++)
                             {
-
+                                if (y > 0 && y < cutSize / 8 - 1 && x != 0) continue;
                                 Vector2 coords = GetTileCoords(x, y, min, cutSize / 8);
-
                                 if (coords == new Vector2(-1)) continue;
-                                if (coords.Y != 4)
-                                {
                                     sprite.DrawSubrect(Parent.CenterRight - Position + new Vector2(x * 8, (y) * 8 - cutSize / 2),
                                     new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
-                                else if (coords.X == 1)
-                                {
-                                    sprite.DrawSubrect(Parent.CenterRight - Position + new Vector2(x * 8, (y + 1) * 8 - cutSize / 2),
-                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
-                                else
-                                {
-                                    sprite.DrawSubrect(Parent.CenterRight - Position + new Vector2(x * 8, (y - 1) * 8 - cutSize / 2),
-                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
                             }
                         }
                     }
@@ -231,21 +203,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             {
                                 if (y > 0 && y < cutSize / 8 - 1 && x != 0) continue;
                                 Vector2 coords = GetTileCoords(x, y, min, cutSize / 8);
-                                if (coords.Y != 4)
-                                {
                                     sprite.DrawSubrect(Parent.CenterLeft - Position + new Vector2(-(x + 1) * 8, (y) * 8 - cutSize / 2),
                                         new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
-                                else if (coords.X == 1)
-                                {
-                                    sprite.DrawSubrect(Parent.CenterLeft - Position + new Vector2(-(x + 1) * 8, (y + 1) * 8 - cutSize / 2),
-                                        new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
-                                else
-                                {
-                                    sprite.DrawSubrect(Parent.CenterLeft - Position + new Vector2(-(x + 1) * 8, (y - 1) * 8 - cutSize / 2),
-                                        new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                }
                             }
                         }
                     }
