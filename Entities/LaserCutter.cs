@@ -91,7 +91,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         for (int x = 0; x < cutSize / 8; x++)
                         {
                             int num1 = x * 8 / bbhc.scale;
-                            min = min > (int)bbhc.hitboxes[num1].Height / 8 ? (int)bbhc.hitboxes[num1].Height / 8 : min;
+                            min = min > (int)bbhc.hitboxes[num1].Height ? (int)bbhc.hitboxes[num1].Height : min;
 
                         }
                     }
@@ -100,12 +100,129 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         for (int y = 0; y < cutSize / 8; y++)
                         {
                             int num1 = y * 8 / bbhc.scale;
-                            min = min > (int)bbhc.hitboxes[num1].Width / 8 ? (int)bbhc.hitboxes[num1].Width / 8 : min;
+                            min = min > (int)bbhc.hitboxes[num1].Width ? (int)bbhc.hitboxes[num1].Width : min;
                         }
                     }
 
-                    Slicer.directionalOffset = (min) * 8;
-                    LaserLength = min + 1;
+                    Slicer.directionalOffset = (min);
+                    LaserLength = min + 8;
+                }
+                
+            }
+
+            private void DrawMiddle()
+            {
+                int darkBlueLength = 4;
+                int darkBlueOffset = 2;
+                int whiteLength = 1;
+                int whiteOffset = 6;
+                int lightBlueLength = 1;
+                int lightBlueOffset = 7;
+                if (Direction.Y != 0)
+                {
+                    int num1, num2, num4;
+                    if (Direction.Y < 0)
+                    {
+                        num1 = (int)Parent.TopCenter.X - cutSize / 2;
+                        num2 = (int)(Parent.TopCenter.Y) - LaserLength + ((int)LaserLength) / 2;
+                        num4 = 8;
+                    } else
+                    {
+                        num1 = (int)Parent.BottomCenter.X - cutSize / 2;
+                        num2 = (int)(Parent.BottomCenter.Y) + ((int)LaserLength) / 2 - 8;
+                        num4 = 20;
+                    }
+                    int num5 = num1 + cutSize;
+
+                    Draw.Rect(new Rectangle(
+                                num1 + darkBlueOffset,
+                                num2,
+                                darkBlueLength,
+                                num4)
+                            , Calc.HexToColor("afdbff"));
+                    Draw.Rect(new Rectangle(
+                            num1 + whiteOffset,
+                            num2,
+                            whiteLength,
+                            num4)
+                        , Color.White);
+                    Draw.Rect(new Rectangle(
+                            num1 + lightBlueOffset,
+                            num2,
+                            lightBlueLength,
+                            num4)
+                        , Calc.HexToColor("d0e8f4"));
+                    Draw.Rect(new Rectangle(
+                            num5 - darkBlueOffset - darkBlueLength,
+                            num2,
+                            darkBlueLength,
+                            num4)
+                        , Calc.HexToColor("afdbff"));
+                    Draw.Rect(new Rectangle(
+                            num5 - whiteOffset - whiteLength,
+                            num2,
+                            whiteLength,
+                            num4)
+                        , Color.White);
+                    Draw.Rect(new Rectangle(
+                            num5 - lightBlueOffset - lightBlueLength,
+                            num2,
+                            lightBlueLength,
+                            num4)
+                        , Calc.HexToColor("d0e8f4"));
+                } else
+                {
+                    int num1, num2, num4;
+                    if (Direction.X < 0)
+                    {
+                        num1 = (int)Parent.CenterLeft.X - LaserLength + ((int)LaserLength) / 2;
+                        num2 = (int)(Parent.CenterLeft.Y) - cutSize / 2;
+                        num4 = 8;
+                    }
+                    else
+                    {
+                        num1 = (int)Parent.CenterRight.X + ((int)LaserLength) / 2 - 8;
+                        num2 = (int)(Parent.CenterRight.Y) - cutSize / 2;
+                        num4 = 20;
+                    }
+                    int num5 = num2 + cutSize;
+
+                    Draw.Rect(new Rectangle(
+                            num1,
+                            num2 + darkBlueOffset,
+                            num4,
+                            darkBlueLength),
+                            Calc.HexToColor("afdbff"));
+                    Draw.Rect(new Rectangle(
+                            num1,
+                            num2 + whiteOffset,
+                            num4,
+                            whiteLength),
+                            Color.White);
+                    Draw.Rect(new Rectangle(
+                            num1,
+                            num2 + lightBlueOffset,
+                            num4,
+                            lightBlueLength),
+                            Calc.HexToColor("d0e8f4"));
+                    Draw.Rect(new Rectangle(
+                            num1,
+                            num5 - darkBlueOffset - darkBlueLength,
+                            num4,
+                            darkBlueLength),
+                            Calc.HexToColor("afdbff"));
+                    Draw.Rect(new Rectangle(
+                            num1,
+                            num5 - whiteOffset - whiteLength,
+                            num4,
+                            whiteLength),
+                            Color.White);
+                    Draw.Rect(new Rectangle(
+                            num1,
+                            num5 - lightBlueOffset - lightBlueLength,
+                            num4,
+                            lightBlueLength),
+                            Calc.HexToColor("d0e8f4"));
                 }
                 
             }
@@ -117,51 +234,61 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 if (countdown <= 0)
                 {
                     int maxRectangleLength = (int)(cutSize / 3.2F);
-                    if (maxRectangleLength > 16) maxRectangleLength = 16; 
-                    int min = LaserLength;
-                    if (Direction.Y < 0)
+                    if (maxRectangleLength > 16) maxRectangleLength = 16;
+                    if (Direction.Y < 0) //up
                     {
                         Draw.Rect(new Rectangle((int)Parent.TopCenter.X - maxRectangleLength / 2, (int)(Parent.TopCenter.Y - 4), maxRectangleLength, 12), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.TopCenter.X - maxRectangleLength / 2, (int)(Parent.TopCenter.Y - 4), maxRectangleLength, 12), Calc.HexToColor("d0e8f4"));
-                        
-                        
+                        DrawMiddle();
                         for (int x = 0; x < cutSize / 8; x++)
                         {
-
                             if ((x > 0 && x < cutSize / 8 - 1))
-                            {
-                                Draw.Rect(new Rectangle((int)Parent.TopCenter.X + x * 8 - cutSize / 2, (int)(Parent.TopCenter.Y) - min * 8, 8, min * 8 - 8), Color.White);
-                            }
-                            for (int y = 0; y < min; y++)
+                                Draw.Rect(
+                                    new Rectangle(
+                                        (int)Parent.TopCenter.X + x * 8 - cutSize / 2, 
+                                        (int)(Parent.TopCenter.Y) - LaserLength, 
+                                        8, 
+                                        LaserLength - 8), 
+                                    Color.White);
+                            for (int y = 0; y < ((int)LaserLength / 8); y++)
                             {
 
                                 if (x > 0 && x < cutSize / 8 - 1 && y != 0) continue;
-                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, min);
+                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, ((int)LaserLength) / 8);
                                 if (coords == new Vector2(-1)) continue;
-                                sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2(x * 8 - cutSize / 2, -(y + 1) * 8),
+                                if (y < ((int)LaserLength / 8)/2)
+                                    sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2(x * 8 - cutSize / 2, -(y + 1) * 8),
                                     new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                                else
+                                {
+                                    sprite.DrawSubrect(Parent.TopCenter - Position + new Vector2(x * 8 - cutSize / 2, -(y + 1) * 8 - (LaserLength - (8 * ((int)LaserLength / 8)))),
+                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                                }
                             }
                         }
 
                     }
-                    else if (Direction.Y > 0)
+                    else if (Direction.Y > 0) //down
                     {
                         Draw.Rect(new Rectangle((int)Parent.BottomCenter.X - maxRectangleLength / 2, (int)(Parent.BottomCenter.Y - 8), maxRectangleLength, 12), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.BottomCenter.X - maxRectangleLength / 2, (int)(Parent.BottomCenter.Y - 8), maxRectangleLength, 12), Calc.HexToColor("d0e8f4"));
-                        
+
+                        DrawMiddle();
                         for (int x = 0; x < cutSize / 8; x++)
                         {
                             if ((x > 0 && x < cutSize / 8 - 1))
+                                Draw.Rect(new Rectangle((int)Parent.BottomCenter.X + x * 8 - cutSize / 2, (int)(Parent.BottomCenter.Y) + 8, 8, LaserLength - 8), Color.White);
+                            for (int y = 0; y < ((int)LaserLength / 8);  y++)
                             {
-                                Draw.Rect(new Rectangle((int)Parent.BottomCenter.X + x * 8 - cutSize / 2, (int)(Parent.BottomCenter.Y) + 8, 8, min * 8 - 8), Color.White);
-                            }
-                            for (int y = 0; y < LaserLength;  y++)
-                            {
-                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, LaserLength);
+                                Vector2 coords = GetTileCoords(x, y, cutSize / 8, ((int)LaserLength / 8));
                                 if (coords == new Vector2(-1)) continue;
-                                sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2(x * 8 - cutSize / 2, y * 8),
-                                new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-                                
+                                if (y < ((int)LaserLength / 8) / 2)
+                                    sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2(x * 8 - cutSize / 2, y * 8),
+                                        new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                                else
+                                    sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2(x * 8 - cutSize / 2, y * 8 + (LaserLength - (8 * ((int)LaserLength / 8)))),
+                                        new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+
                             }
                         }
                     }
@@ -169,20 +296,22 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     {
                         Draw.Rect(new Rectangle((int)Parent.CenterRight.X - 8, (int)(Parent.CenterRight.Y - maxRectangleLength / 2), 16, maxRectangleLength), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.CenterRight.X - 8, (int)(Parent.CenterRight.Y - maxRectangleLength / 2), 16, maxRectangleLength), Calc.HexToColor("d0e8f4"));
-                        
+
+                        DrawMiddle();
                         for (int y = 0; y < cutSize / 8; y++)
                         {
-                            
                             if ((y > 0 && y < cutSize / 8 - 1))
-                            {
-                                Draw.Rect(new Rectangle((int)Parent.CenterRight.X + 8, (int)(Parent.CenterRight.Y) + y * 8 - cutSize / 2, min * 8 - 8, 8), Color.White);
-                            }
-                            for (int x = 0; x < min; x++)
+                                Draw.Rect(new Rectangle((int)Parent.CenterRight.X + 8, (int)(Parent.CenterRight.Y) + y * 8 - cutSize / 2, LaserLength - 8, 8), Color.White);
+                            for (int x = 0; x < ((int)LaserLength / 8); x++)
                             {
                                 if (y > 0 && y < cutSize / 8 - 1 && x != 0) continue;
-                                Vector2 coords = GetTileCoords(x, y, min, cutSize / 8);
+                                Vector2 coords = GetTileCoords(x, y, ((int)LaserLength / 8), cutSize / 8);
                                 if (coords == new Vector2(-1)) continue;
+                                if (x < ((int)LaserLength / 8) / 2)
                                     sprite.DrawSubrect(Parent.CenterRight - Position + new Vector2(x * 8, (y) * 8 - cutSize / 2),
+                                    new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                                else
+                                    sprite.DrawSubrect(Parent.CenterRight - Position + new Vector2(x * 8 + (LaserLength - (8 * ((int)LaserLength / 8))), (y) * 8 - cutSize / 2),
                                     new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
                             }
                         }
@@ -191,19 +320,22 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     {
                         Draw.Rect(new Rectangle((int)Parent.CenterLeft.X - 8, (int)(Parent.CenterLeft.Y - maxRectangleLength / 2), 16, maxRectangleLength), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.CenterLeft.X - 8, (int)(Parent.CenterLeft.Y - maxRectangleLength / 2), 16, maxRectangleLength), Calc.HexToColor("d0e8f4"));
-                        
+                        DrawMiddle();
                         for (int y = 0; y < cutSize / 8; y++)
                         {
-
                             if ((y > 0 && y < cutSize / 8 - 1))
-                            {
-                                Draw.Rect(new Rectangle((int)Parent.CenterLeft.X + 8 - min * 8 - 8, (int)(Parent.CenterLeft.Y) + y * 8 - cutSize / 2, min * 8 - 8, 8), Color.White);
-                            }
-                            for (int x = 0; x < min; x++)
+                                Draw.Rect(new Rectangle((int)Parent.CenterLeft.X + 8 - LaserLength - 8, (int)(Parent.CenterLeft.Y) + y * 8 - cutSize / 2, LaserLength - 8, 8), Color.White);
+                            for (int x = 0; x < ((int)LaserLength / 8); x++)
                             {
                                 if (y > 0 && y < cutSize / 8 - 1 && x != 0) continue;
-                                Vector2 coords = GetTileCoords(x, y, min, cutSize / 8);
+                                Vector2 coords = GetTileCoords(x, y, ((int)LaserLength / 8), cutSize / 8);
+                                if (coords == new Vector2(-1)) continue;
+                                
+                                if (x < ((int)LaserLength / 8) / 2)
                                     sprite.DrawSubrect(Parent.CenterLeft - Position + new Vector2(-(x + 1) * 8, (y) * 8 - cutSize / 2),
+                                        new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
+                                else
+                                    sprite.DrawSubrect(Parent.CenterLeft - Position + new Vector2(-(x + 1) * 8 - (LaserLength - (8 * ((int)LaserLength / 8))), (y) * 8 - cutSize / 2),
                                         new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
                             }
                         }
@@ -222,6 +354,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (i == 0 && j == jMax - 1) return new Vector2(0, 0);
                     else if (i == 0) return new Vector2(0, 1);
 
+
+                    else if (i == iMax - 1 && j == 0) return new Vector2(3, 2);
+                    else if (i == iMax - 1 && j == jMax - 1) return new Vector2(3, 0);
+                    else if (i == iMax - 1) return new Vector2(3, 1);
+
                     else if (i == 1 && j == 0) return new Vector2(1, 2);
                     else if (i == 1 && j == jMax - 1) return new Vector2(1, 0);
                     else if (i == 1) return new Vector2(1, 1);
@@ -230,9 +367,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (i == iMax - 2 && j == jMax - 1) return new Vector2(2, 0);
                     else if (i == iMax - 2) return new Vector2(2, 1);
 
-                    else if (i == iMax - 1 && j == 0) return new Vector2(3, 2);
-                    else if (i == iMax - 1 && j == jMax - 1) return new Vector2(3, 0);
-                    else if (i == iMax - 1) return new Vector2(3, 1);
 
                     else if (j == 0) return new Vector2(5, 2);
 
@@ -246,6 +380,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (i == 0) return new Vector2(0, 1);
 
 
+                    else if (i == iMax - 1 && j == 0) return new Vector2(3, 0);
+                    else if (i == iMax - 1 && j == jMax - 1) return new Vector2(3, 2);
+                    else if (i == iMax - 1) return new Vector2(3, 1);
 
                     else if (i == 1 && j == 0) return new Vector2(1, 0);
                     else if (i == 1 && j == jMax - 1) return new Vector2(1, 2);
@@ -255,9 +392,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (i == iMax - 2 && j == jMax - 1) return new Vector2(2, 2);
                     else if (i == iMax - 2) return new Vector2(2, 1);
 
-                    else if (i == iMax - 1 && j == 0) return new Vector2(3, 0);
-                    else if (i == iMax - 1 && j == jMax - 1) return new Vector2(3, 2);
-                    else if (i == iMax - 1) return new Vector2(3, 1);
 
 
 
@@ -271,6 +405,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (j == 0 && i == iMax - 1) return new Vector2(2, 0);
                     else if (j == 0) return new Vector2(1, 0);
 
+                    else if (j == jMax - 1 && i == 0) return new Vector2(0, 3);
+                    else if (j == jMax - 1 && i == iMax - 1) return new Vector2(2, 3);
+                    else if (j == jMax - 1) return new Vector2(1, 3);
 
                     else if (j == 1 && i == 0) return new Vector2(0, 1);
                     else if (j == 1 && i == iMax - 1) return new Vector2(2, 1);
@@ -282,9 +419,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
 
 
-                    else if (j == jMax - 1 && i == 0) return new Vector2(0, 3);
-                    else if (j == jMax - 1 && i == iMax - 1) return new Vector2(2, 3);
-                    else if (j == jMax - 1) return new Vector2(1, 3);
 
 
                     else if (i == 0) return new Vector2(0, 5);
@@ -296,6 +430,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (j == 0 && i == iMax - 1) return new Vector2(0, 0);
                     else if (j == 0) return new Vector2(1, 0);
 
+                    else if (j == jMax - 1 && i == 0) return new Vector2(2, 3);
+                    else if (j == jMax - 1 && i == iMax - 1) return new Vector2(0, 3);
+                    else if (j == jMax - 1) return new Vector2(1, 3);
+
                     else if (j == 1 && i == 0) return new Vector2(2, 1);
                     else if (j == 1 && i == iMax - 1) return new Vector2(0, 1);
                     else if (j == 1) return new Vector2(1, 1);
@@ -304,9 +442,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     else if (j == jMax - 2 && i == iMax - 1) return new Vector2(0, 2);
                     else if (j == jMax - 2) return new Vector2(1, 2);
 
-                    else if (j == jMax - 1 && i == 0) return new Vector2(2, 3);
-                    else if (j == jMax - 1 && i == iMax - 1) return new Vector2(0, 3);
-                    else if (j == jMax - 1) return new Vector2(1, 3);
 
                     else if (i == 0) return new Vector2(2, 5);
                     return new Vector2(1, 5);
