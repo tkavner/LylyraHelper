@@ -501,8 +501,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                 string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spike);
                 bool useYCoordinates = (spike.Direction == Spikes.Directions.Left || spike.Direction == Spikes.Directions.Right) || Direction.X != 0;
                 
-                bool spikesOnCB1 = cb1Added && (spike.Y < cb1Pos.Y + cb1Height && useYCoordinates) || (spike.X < cb1Pos.X + cb1Width && !useYCoordinates); //check if spikes start before the hole to see if part of them should be on cb1
-                bool spikesOnCB2 = cb2Added && (spike.Y + spike.Height > cb2Pos.Y && useYCoordinates) || (spike.X + spike.Width > cb2Pos.X && !useYCoordinates); //check if the spikes extend past the hole to see if part of them should be on cb2
+                bool spikesOnCB1 = cb1Added && (spike.Y <= cb1Pos.Y + cb1Height && useYCoordinates) || (spike.X < cb1Pos.X + cb1Width && !useYCoordinates); //check if spikes start before the hole to see if part of them should be on cb1
+                bool spikesOnCB2 = cb2Added && (spike.Y >= cb2Pos.Y && useYCoordinates) || (spike.X + spike.Width > cb2Pos.X && !useYCoordinates); //check if the spikes extend past the hole to see if part of them should be on cb2
                 int grace = 5;
                 if (Spikes.Directions.Left == spike.Direction && furthestLeft > spike.Position.X + grace)
                 {
@@ -646,17 +646,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                     case Spikes.Directions.Down:
                         //compare to right side edge (cb1Pos.X + cb1Width), then check for a hole on right side (cb1Pos.Y + cb1Height)
 
-                        if (cb1Pos.Y > parent.Position.Y && spike.Direction == Spikes.Directions.Up)
-                        {
-                            Scene.Remove(spike);
-                            break;
-                        }
-                        else if ((cb2Pos.Y + cb2Height < parent.Position.Y + Entity.Height) && spike.Direction == Spikes.Directions.Down)
-                        {
-                            Scene.Remove(spike);
-                            break;
-                        }
-                        else if (cb1Pos.X + cb1Width < spike.X + spike.Width) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
+                        
+                        if ((cb1Pos.X + cb1Width < spike.X + spike.Width && cb1Added) || (cb2Pos.X > spike.X && cb2Pos.X < spike.X + spike.Width && cb2Added)) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
                         {
                             Scene.Remove(spike);
 
@@ -673,7 +664,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                                         spikePosX = cb1Pos.X;
                                         break;
                                     case Spikes.Directions.Down:
-                                        spikePosY = cb1Pos.Y + cb2Height;
+                                        spikePosY = cb1Pos.Y + cb1Height;
                                         spikePosX = cb1Pos.X;
                                         break;
                                 }
@@ -846,221 +837,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                 }
             }
-            /*else if (mover.Entity is TriggerSpikes) //trigger spikes, incredibly enough, do not inheret from spikes, and contain a private array of a private struct type. this is what we call "awful"
-            {
-                //destroy all parts of spikes that aren't connected anymore.
-                //switch depending on direction
-                TriggerSpikes spike = mover.Entity as TriggerSpikes;
-                Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.TriggerSpikes", true, true);
-
-                TriggerSpikes.Directions spikeDirection = (TriggerSpikes.Directions)spikesType.GetField("direction", BindingFlags.NonPublic | BindingFlags.Instance).
-                                GetValue(spike);
-                bool horizontal = spikeDirection == TriggerSpikes.Directions.Left || spikeDirection == TriggerSpikes.Directions.Right;
-
-                bool spikesOnCB1 = cb1Added && (spike.Y < cb1Pos.Y + cb1Height && horizontal) || (spike.X < cb1Pos.X + cb1Width && !horizontal); //check if spikes start before the hole to see if part of them should be on cb1
-                bool spikesOnCB2 = cb2Added && (spike.Y + spike.Height > cb2Pos.Y && horizontal) || (spike.X + spike.Width > cb2Pos.Y && !horizontal); //check if the spikes extend past the hole to see if part of them should be on cb2
-
-
-                switch (spikeDirection)
-                {
-                    case TriggerSpikes.Directions.Left:
-                    case TriggerSpikes.Directions.Right:
-                        //clipping logic: in the case of left spikes, compare to left side edge (cb1Pos.X), then check for a hole on left side (cb1Pos.Y + cb1Height) to the top of the spikes. 
-                        //if cb1Pos.X < parent.Position.X then the spikes are no longer attached and should be removed
-                        if ((cb1Pos.Y + cb1Height < spike.Y + spike.Height && cb1Added) || (cb2Pos.Y < spike.Y + spike.Height && cb2Added)) //then the spikes intersect the hole. 
-                        {
-                            Logger.Log(LogLevel.Error, "LylyraHelper", "blarg");
-                            if (spikesOnCB1)
-                            {
-                                float spikePosY = spike.Y;
-                                float spikePosX = spike.X;
-                                switch (spikeDirection)
-                                {
-                                    case TriggerSpikes.Directions.Left:
-                                        spikePosY = spike.Y;
-                                        spikePosX = cb1Pos.X;
-                                        break;
-                                    case TriggerSpikes.Directions.Right:
-                                        spikePosY = spike.Y;
-                                        spikePosX = cb1Pos.X + cb1Width;
-                                        break;
-                                }
-                                int spikeHeight = (int)(cb1Pos.Y + cb1Height - spike.Y);
-                                if (spikeHeight >= minLength)
-                                {
-                                    TriggerSpikes newSpike1 = new TriggerSpikes(new Vector2(spikePosX, spikePosY), spikeHeight, spikeDirection);
-                                    Scene.Add(newSpike1);
-                                    Logger.Log(LogLevel.Error, "LylyraHelper", "blarg2");
-                                }
-                            }
-                            if (spikesOnCB2)
-                            {
-                                float spikePosY = cb2Pos.Y;
-                                int spikeHeight = (int)(spike.Y + spike.Height - cb2Pos.Y);
-                                float spikePosX = spike.X;
-                                switch (spikeDirection)
-                                {
-                                    case TriggerSpikes.Directions.Left:
-                                        spikePosY = cb2Pos.Y;
-                                        spikePosX = cb2Pos.X;
-                                        break;
-                                    case TriggerSpikes.Directions.Right:
-                                        spikePosY = cb2Pos.Y;
-                                        spikePosX = cb2Pos.X + cb2Width;
-
-                                        break;
-                                }
-                                if (spikeHeight >= minLength)
-                                {
-                                    TriggerSpikes newSpike1 = new TriggerSpikes(new Vector2(spikePosX, spikePosY), spikeHeight, spikeDirection);
-                                    Scene.Add(newSpike1);
-
-                                    Logger.Log(LogLevel.Error, "LylyraHelper", "blarg3");
-
-                                }
-                            }
-
-                            Scene.Remove(spike);
-                        }
-                        else //this means spikes do not intersect the hole but are attached to a block still. Update Spike positions so they do not desync from their object as it respawns
-                        {
-                            if (spikesOnCB1)
-                            {
-                                mover.Platform = cb1;
-                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
-                                staticMovers.Add(mover);
-                                switch (spikeDirection)
-                                {
-                                    case TriggerSpikes.Directions.Left:
-                                        spike.Position = new Vector2(cb1Pos.X, spike.Y);
-
-                                        break;
-                                    case TriggerSpikes.Directions.Right:
-                                        spike.Position = new Vector2(cb1Pos.X + cb1Width, spike.Y);
-                                        break;
-                                }
-                            }
-                            if (spikesOnCB2)
-                            {
-                                mover.Platform = cb2;
-                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb2);
-
-                                staticMovers.Add(mover);
-                                switch (spikeDirection)
-                                {
-                                    case TriggerSpikes.Directions.Left:
-                                        spike.Position = new Vector2(cb2Pos.X, spike.Y);
-                                        break;
-                                    case TriggerSpikes.Directions.Right:
-                                        spike.Position = new Vector2(cb2Pos.X + cb2Width, spike.Y);
-                                        break;
-                                }
-                            }
-                        }
-                        break;
-
-                    case TriggerSpikes.Directions.Up:
-                    case TriggerSpikes.Directions.Down:
-                        //compare to right side edge (cb1Pos.X + cb1Width), then check for a hole on right side (cb1Pos.Y + cb1Height)
-
-                        if (cb1Pos.Y > parent.Position.Y && spikeDirection == TriggerSpikes.Directions.Up)
-                        {
-                            Scene.Remove(spike);
-                            break;
-                        }
-                        else if ((cb2Pos.Y + cb2Height < parent.Position.Y + Entity.Height) && spikeDirection == TriggerSpikes.Directions.Down)
-                        {
-                            Scene.Remove(spike);
-                            break;
-                        }
-                        else if (cb1Pos.X + cb1Width < spike.X + spike.Width) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
-                        {
-                            Scene.Remove(spike);
-
-                            if (spikesOnCB1)
-                            {
-                                float spikePosX = spike.X;
-                                int spikeWidth = (int)(cb1Pos.X + cb1Width - spike.X);
-                                float spikePosY = cb1Pos.Y;
-                                int spikeHeight = (int)(spike.Y + spike.Height - cb1Pos.Y);
-                                switch (spikeDirection)
-                                {
-                                    case TriggerSpikes.Directions.Up:
-                                        spikePosY = cb1Pos.Y;
-                                        spikePosX = cb1Pos.X;
-                                        break;
-                                    case TriggerSpikes.Directions.Down:
-                                        spikePosY = cb1Pos.Y + cb2Height;
-                                        spikePosX = cb1Pos.X;
-                                        break;
-                                }
-                                if (spikeWidth >= minLength)
-                                {
-                                        TriggerSpikes newSpike1 = new TriggerSpikes(new Vector2(spikePosX, spikePosY), spikeWidth, spikeDirection);
-                                        Scene.Add(newSpike1);
-                                }
-                            }
-                            if (spikesOnCB2)
-                            {
-                                float spikePosX = cb2Pos.X;
-                                int spikeWidth = (int)(spike.X + spike.Width - cb2Pos.X);
-                                float spikePosY = cb2Pos.Y;
-                                int spikeHeight = (int)(spike.Y + spike.Height - cb2Pos.Y);
-                                switch (spikeDirection)
-                                {
-                                    case TriggerSpikes.Directions.Up:
-                                        spikePosY = cb2Pos.Y;
-                                        spikePosX = cb2Pos.X;
-                                        break;
-                                    case TriggerSpikes.Directions.Down:
-                                        spikePosY = cb2Pos.Y + cb2Height;
-                                        spikePosX = cb2Pos.X;
-                                        break;
-                                }
-                                if (spikeWidth >= minLength)
-                                {
-
-                                    TriggerSpikes newSpike1 = new TriggerSpikes(new Vector2(spikePosX, spikePosY), spikeWidth, spikeDirection);
-                                    Scene.Add(newSpike1);
-                                }
-                            }
-                        }
-                        else //this means spikes do not intersect the hole but are attached to a block still. Update Spike positions so they do not desync from their object as it respawns
-                        {
-                            if (spikesOnCB1)
-                            {
-                                mover.Platform = cb1;
-                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
-                                staticMovers.Add(mover);
-                                switch (spikeDirection)
-                                {
-                                    case TriggerSpikes.Directions.Up:
-                                        spike.Position = new Vector2(spike.X, cb1Pos.Y);
-                                        break;
-                                    case TriggerSpikes.Directions.Down:
-                                        spike.Position = new Vector2(spike.X, cb1Pos.Y + cb1Height);
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                mover.Platform = cb2;
-                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb2);
-                                staticMovers.Add(mover);
-                                switch (spikeDirection)
-                                {
-                                    case TriggerSpikes.Directions.Up:
-                                        spike.Position = new Vector2(spike.X, cb2Pos.Y);
-                                        break;
-                                    case TriggerSpikes.Directions.Down:
-                                        spike.Position = new Vector2(spike.X, cb2Pos.Y + cb2Height);
-                                        break;
-                                }
-                            }
-                        }
-                        break;
-                }
-            }*/
         }
 
         private void AddParticles(Vector2 position, Vector2 range, Color color)

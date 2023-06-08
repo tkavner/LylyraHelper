@@ -26,7 +26,9 @@ namespace LylyraHelper.Other
         private ulong frame;
         public int scale = 8;
         private Level Level;
-        public BreakbeamHitboxComponent(int width, string orientation, Level level, Entity parent, ColliderList hitbox, Vector2 offset, int scale = 8) : base(true, true)
+        private bool simpleHitbox;
+
+        public BreakbeamHitboxComponent(int width, string orientation, Level level, Entity parent, ColliderList hitbox, Vector2 offset, int scale = 8, bool simple = false) : base(true, true)
         {
             RawWidth = width;
             Orientation = orientation;
@@ -41,6 +43,7 @@ namespace LylyraHelper.Other
                 hitboxes[i] = GetOrientedHitbox(GetEdgeScreenLength(), scale, i * scale - width / 2);
                 clist.Add(hitboxes[i]);
             }
+            this.simpleHitbox = simple;
         }
 
         private int GetEdgeScreenLength()
@@ -91,14 +94,35 @@ namespace LylyraHelper.Other
         public override void Update()
         {
             base.Update();
+            var temp = Entity.Collider;
+            Entity.Collider = clist;
             RecalcHitbox();
+            Entity.Collider = temp;
+            if (simpleHitbox)
+            {
+                float absoluteMin = int.MaxValue;
+                foreach (Hitbox h in hitboxes)
+                {
+                    if (Orientation == "up" || Orientation == "down")
+                    {
+                        if (h.Height < absoluteMin) absoluteMin = h.Height;
+                    }
+                    else
+                    {
+
+                        if (h.Width < absoluteMin) absoluteMin = h.Width;
+                    }
+                }
+
+                ResizeHitbox((Hitbox)Entity.Collider, absoluteMin, -hitboxes.Length * scale + RawWidth / 2);
+            }
+            else
+            {
+                Entity.Collider = clist;
+            }
+
         }
 
-        public ColliderList GetHitbox()
-        {
-            
-            return clist;
-        }
 
         private void ResizeHitbox(Hitbox hitbox, float size, float offset)
         {
@@ -132,13 +156,12 @@ namespace LylyraHelper.Other
 
         private void RecalcHitbox()
         {
-
             for (int i = 0; i < RawWidth / scale; i++)
             {
                 //update each hitbox
                 Hitbox h = hitboxes[i];
                 ResizeHitbox(h, GetEdgeScreenLength(), i * scale - hitboxes.Length * scale / 2);
-
+                
                 if (Level.CollideCheck<Solid>(new Rectangle((int) h.AbsoluteLeft, (int) h.AbsoluteTop, (int) h.Width, (int) h.Height)))
                 {
                     int low = 0;
@@ -150,7 +173,10 @@ namespace LylyraHelper.Other
                         ResizeHitbox(h, pivot, i * scale - hitboxes.Length * scale / 2); 
 
                         if (pivot == low)
+                        {
                             break;
+                        }
+
                         if (Level.CollideCheck<Solid>(new Rectangle((int)h.AbsoluteLeft, (int)h.AbsoluteTop, (int)h.Width, (int)h.Height)))
                         {
                             high = pivot;
@@ -160,10 +186,11 @@ namespace LylyraHelper.Other
                             low = pivot;
                         }
                     }
-
                 }
 
             }
+
+            
         }
 
 

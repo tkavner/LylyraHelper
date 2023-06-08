@@ -44,8 +44,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             public Laser(Vector2 Position, Vector2 direction, Level level, int cutSize, LaserCutter parent, string strdirection, Vector2 offset) : base()
             {
-                Collider = new ColliderList();
-                Add(bbhc = new BreakbeamHitboxComponent(cutSize, strdirection, level, parent, (ColliderList) Collider, offset));
+                Collider = GetOrientedHitbox(2, strdirection, cutSize, 0);
+                Add(bbhc = new BreakbeamHitboxComponent(cutSize, strdirection, level, parent, new ColliderList(), offset, simple:true));
                 TopCenter = Position;
                 Direction = direction;
                 this.Position = Position;
@@ -73,6 +73,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             public override void Update()
             {
+
                 base.Update();
                 float newTimestamp = timestamp + Engine.DeltaTime;
                 if (timestamp != newTimestamp)
@@ -85,29 +86,30 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Visible = true;
                     Collidable = true;
                     Parent.Collider = Parent.shortHitbox;
-                    int min = int.MaxValue;
-                    if (Direction.Y != 0)
-                    {
-                        for (int x = 0; x < cutSize / 8; x++)
-                        {
-                            int num1 = x * 8 / bbhc.scale;
-                            min = min > (int)bbhc.hitboxes[num1].Height ? (int)bbhc.hitboxes[num1].Height : min;
-
-                        }
-                    }
-                    else if (Direction.X != 0)
-                    {
-                        for (int y = 0; y < cutSize / 8; y++)
-                        {
-                            int num1 = y * 8 / bbhc.scale;
-                            min = min > (int)bbhc.hitboxes[num1].Width ? (int)bbhc.hitboxes[num1].Width : min;
-                        }
-                    }
-
-                    Slicer.directionalOffset = (min);
-                    LaserLength = min + 8;
+                    
                 }
-                
+                int min = int.MaxValue;
+                if (Direction.Y != 0)
+                {
+                    for (int x = 0; x < cutSize / 8; x++)
+                    {
+                        int num1 = x * 8 / bbhc.scale;
+                        min = min > (int)bbhc.hitboxes[num1].Height ? (int)bbhc.hitboxes[num1].Height : min;
+
+                    }
+                }
+                else if (Direction.X != 0)
+                {
+                    for (int y = 0; y < cutSize / 8; y++)
+                    {
+                        int num1 = y * 8 / bbhc.scale;
+                        min = min > (int)bbhc.hitboxes[num1].Width ? (int)bbhc.hitboxes[num1].Width : min;
+                    }
+                }
+
+                Slicer.directionalOffset = (min);
+                LaserLength = min + 8;
+                if (Direction.Y > 0) LaserLength = min;
             }
 
             private void DrawMiddle()
@@ -118,19 +120,21 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 int whiteOffset = 6;
                 int lightBlueLength = 1;
                 int lightBlueOffset = 7;
+                int num4 = Math.Abs((4 * ((int)LaserLength / 8)) - ((4 * ((int)LaserLength / 8)) + (LaserLength - (8 * ((int)LaserLength / 8)))));
+                int laserRenderEndPoint = ((int)(8 * (((int)LaserLength / 2) / 8)));
+
                 if (Direction.Y != 0)
                 {
-                    int num1, num2, num4;
+                    int num1, num2;
                     if (Direction.Y < 0)
                     {
                         num1 = (int)Parent.TopCenter.X - cutSize / 2;
-                        num2 = (int)(Parent.TopCenter.Y) - LaserLength + ((int)LaserLength) / 2;
-                        num4 = 8;
+                        num2 = (int)(Parent.TopCenter.Y) - laserRenderEndPoint - num4;
+                        
                     } else
                     {
                         num1 = (int)Parent.BottomCenter.X - cutSize / 2;
-                        num2 = (int)(Parent.BottomCenter.Y) + ((int)LaserLength) / 2 - 8;
-                        num4 = 20;
+                        num2 = (int)(Parent.BottomCenter.Y) + laserRenderEndPoint;
                     }
                     int num5 = num1 + cutSize;
 
@@ -145,7 +149,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             num2,
                             whiteLength,
                             num4)
-                        , Color.White);
+                        , Color.Red);
                     Draw.Rect(new Rectangle(
                             num1 + lightBlueOffset,
                             num2,
@@ -163,7 +167,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             num2,
                             whiteLength,
                             num4)
-                        , Color.White);
+                        , Color.Red);
                     Draw.Rect(new Rectangle(
                             num5 - lightBlueOffset - lightBlueLength,
                             num2,
@@ -172,18 +176,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         , Calc.HexToColor("d0e8f4"));
                 } else
                 {
-                    int num1, num2, num4;
+                    int num1, num2;
                     if (Direction.X < 0)
                     {
-                        num1 = (int)Parent.CenterLeft.X - LaserLength + ((int)LaserLength) / 2;
+                        num1 = (int)Parent.CenterLeft.X   - laserRenderEndPoint - num4;
                         num2 = (int)(Parent.CenterLeft.Y) - cutSize / 2;
-                        num4 = 8;
                     }
                     else
                     {
-                        num1 = (int)Parent.CenterRight.X + ((int)LaserLength) / 2 - 8;
+                        laserRenderEndPoint = ((int)(8 * (((int)LaserLength / 2) / 8)));
+                        num1 = (int)Parent.CenterRight.X + laserRenderEndPoint;
                         num2 = (int)(Parent.CenterRight.Y) - cutSize / 2;
-                        num4 = 20;
                     }
                     int num5 = num2 + cutSize;
 
@@ -198,7 +201,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             num2 + whiteOffset,
                             num4,
                             whiteLength),
-                            Color.White);
+                            Color.Red);
                     Draw.Rect(new Rectangle(
                             num1,
                             num2 + lightBlueOffset,
@@ -216,7 +219,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             num5 - whiteOffset - whiteLength,
                             num4,
                             whiteLength),
-                            Color.White);
+                            Color.Red);
                     Draw.Rect(new Rectangle(
                             num1,
                             num5 - lightBlueOffset - lightBlueLength,
@@ -277,7 +280,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         for (int x = 0; x < cutSize / 8; x++)
                         {
                             if ((x > 0 && x < cutSize / 8 - 1))
-                                Draw.Rect(new Rectangle((int)Parent.BottomCenter.X + x * 8 - cutSize / 2, (int)(Parent.BottomCenter.Y) + 8, 8, LaserLength - 8), Color.White);
+                                Draw.Rect(new Rectangle((int)Parent.BottomCenter.X + x * 8 - cutSize / 2, (int)(Parent.BottomCenter.Y), 8, LaserLength), Color.White);
                             for (int y = 0; y < ((int)LaserLength / 8);  y++)
                             {
                                 Vector2 coords = GetTileCoords(x, y, cutSize / 8, ((int)LaserLength / 8));
@@ -288,7 +291,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                                 else
                                     sprite.DrawSubrect(Parent.BottomCenter - Position + new Vector2(x * 8 - cutSize / 2, y * 8 + (LaserLength - (8 * ((int)LaserLength / 8)))),
                                         new Rectangle((int)coords.X * 8, (int)coords.Y * 8, 8, 8));
-
                             }
                         }
                     }
@@ -316,7 +318,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             }
                         }
                     }
-                    else //left
+                    else if (Direction.X < 0)//left
                     {
                         Draw.Rect(new Rectangle((int)Parent.CenterLeft.X - 8, (int)(Parent.CenterLeft.Y - maxRectangleLength / 2), 16, maxRectangleLength), Color.White);
                         Draw.HollowRect(new Rectangle((int)Parent.CenterLeft.X - 8, (int)(Parent.CenterLeft.Y - maxRectangleLength / 2), 16, maxRectangleLength), Calc.HexToColor("d0e8f4"));
@@ -324,7 +326,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         for (int y = 0; y < cutSize / 8; y++)
                         {
                             if ((y > 0 && y < cutSize / 8 - 1))
-                                Draw.Rect(new Rectangle((int)Parent.CenterLeft.X + 8 - LaserLength - 8, (int)(Parent.CenterLeft.Y) + y * 8 - cutSize / 2, LaserLength - 8, 8), Color.White);
+                                Draw.Rect(new Rectangle((int)Parent.CenterLeft.X - LaserLength, (int)(Parent.CenterLeft.Y) + y * 8 - cutSize / 2, LaserLength - 8, 8), Color.White);
                             for (int x = 0; x < ((int)LaserLength / 8); x++)
                             {
                                 if (y > 0 && y < cutSize / 8 - 1 && x != 0) continue;
@@ -342,9 +344,33 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
 
+                DrawMiddle();
                 sprite.Visible = false;
             }
 
+            private Hitbox GetOrientedHitbox(int length, string Orientation, int width = 0, int offset = 0)
+            {
+                if (Orientation == "up")
+                {
+                    return new Hitbox(width, length, offset, -length);
+                }
+                else if (Orientation == "down")
+                {
+                    return new Hitbox(width, length, offset, 0);
+                }
+                else if (Orientation == "right")
+                {
+                    return new Hitbox(length, width, -length, offset);
+                }
+                else if (Orientation == "left")
+                {
+                    return new Hitbox(length, width, 0, offset);
+                }
+                else
+                {
+                    throw new Exception("Invalid Breakbeam Orientation: " + Orientation);
+                }
+            }
 
             private Vector2 GetTileCoords(int i, int j, int iMax, int jMax)
             {
@@ -473,29 +499,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Parent = parent;
             }
 
-            private Hitbox GetOrientedHitbox(int length, string Orientation, int width = 0, int offset = 0)
-            {
-                if (Orientation == "up")
-                {
-                    return new Hitbox(width, length, offset, -length);
-                }
-                else if (Orientation == "down")
-                {
-                    return new Hitbox(width, length, offset, 0);
-                }
-                else if (Orientation == "right")
-                {
-                    return new Hitbox(length, width, -length, offset);
-                }
-                else if (Orientation == "left")
-                {
-                    return new Hitbox(length, width, 0, offset);
-                }
-                else
-                {
-                    throw new Exception("Invalid Breakbeam Orientation: " + Orientation);
-                }
-            }
 
             public void OnPlayer(Player player)
             {

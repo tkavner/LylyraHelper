@@ -19,7 +19,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public BigCloud(EntityData data, Vector2 offset) : base(data.Position + offset, true)
         {
-            this.Collider.Width = data.Width;
+            this.Collider.Width = 64;
             base.Collider.Position.X = -32f;
             base.Collider.Position.Y = -data.Int("offsetY", 5);
         }
