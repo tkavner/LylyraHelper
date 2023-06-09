@@ -118,7 +118,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                 Slicer.directionalOffset = (min);
                 LaserLength = min + 8;
-                if (Direction.Y > 0) LaserLength = min;
+                if (Direction.Y > 0 || Direction.X > 0) LaserLength = min;
             }
 
             public override void Removed(Scene scene)

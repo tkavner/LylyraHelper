@@ -143,7 +143,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
             }
 
-            foreach (Solid d in SceneAs<Level>().Tracker.GetEntities<Solid>())
+            foreach (Entity d in Scene.Entities)
             {
                 if (d == Entity) continue;
 
@@ -168,7 +168,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                 }
                 //vanilla entity handling
-                /*else if (d is Booster)
+                else if (d is Booster)
                 {
                     Booster booster = d as Booster;
                     if (!slicingEntities.Contains(d) && d.CollideCheck(Entity))
@@ -177,8 +177,13 @@ namespace Celeste.Mod.LylyraHelper.Components
                         bool respawning = ((float)boosterType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d) > 0);
                         if (!respawning) booster.PlayerReleased();
                     }
-                }*/
-                else if (d.GetType() == typeof(CrushBlock) || d.GetType() == typeof(FallingBlock) || d.GetType() == typeof(DreamBlock) || d.GetType() == typeof(MoveBlock) || d.GetType() == typeof(DashBlock))
+                }
+                else if (
+                    d.GetType() == typeof(CrushBlock) || 
+                    d.GetType() == typeof(FallingBlock) || 
+                    d.GetType() == typeof(DreamBlock) || 
+                    d.GetType() == typeof(MoveBlock) || 
+                    d.GetType() == typeof(DashBlock))
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
@@ -244,7 +249,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     if ((!d.CollideCheck(Entity)) || collisionOverride || sliceOnImpact)
                     {
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
-                        Logger.Log("LylyraHelper", "" + startPosition + " " + GetDirectionalPosition() + " " + directionalOffset);
                         bool toReturn = icut.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
                         sliceStartPositions.Remove(d);
                         return toReturn;
@@ -435,7 +439,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             Type stateType = bType.GetNestedType("MovementState", BindingFlags.NonPublic);
             string[] names = stateType.GetEnumNames();
             string stateName = bType.GetField("state", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original).ToString();
-            Logger.Log("LylyraHelper", stateName);
             if (stateName == "Breaking")
             {
                 sliceStartPositions.Remove(original);

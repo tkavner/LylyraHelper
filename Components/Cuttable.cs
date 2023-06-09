@@ -71,7 +71,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 p2 = arrayResults[1] + new Vector2(0, (arrayResults[3].Y < Height ? arrayResults[3].Y : Height));
             }
 
-            Logger.Log("LylyraHelper", "" + p1 + " " + p2 + " " + (p2 - p1));
             if (direction.X > 0)
             {
                 if (cutStartPosition.X > p1.X) p1.X = (int)cutStartPosition.X;
@@ -93,13 +92,11 @@ namespace Celeste.Mod.LylyraHelper.Components
                 if (cutStartPosition.Y < p2.Y) p2.Y = (int)cutStartPosition.Y;
             }
 
-            Logger.Log("LylyraHelper", "" + p1 + " " + p2 + " " + (p2 - p1));
 
             p1 -= Position;
             p2 -= Position;
             p1 /= 8;
             p2 /= 8;
-            Logger.Log("LylyraHelper", "" + p1 + " " + p2 + " " + (p2 - p1));
 
             int furthestTop = Int32.MaxValue;
             int furthestDown = -1;
