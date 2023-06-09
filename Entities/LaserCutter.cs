@@ -1,5 +1,6 @@
 ﻿using Celeste.Mod.Entities;
 using Celeste.Mod.LylyraHelper.Components;
+using FMOD.Studio;
 using LylyraHelper.Other;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -41,6 +42,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             private Sprite sprite;
             private BreakbeamHitboxComponent bbhc;
             private int LaserLength;
+            private EventInstance beamAudioToken;
+            private bool firePlayed;
 
             public Laser(Vector2 Position, Vector2 direction, Level level, int cutSize, LaserCutter parent, string strdirection, Vector2 offset) : base()
             {
@@ -81,12 +84,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     countdown -= newTimestamp - timestamp;
                     counter++;
                 }
+                if (countdown <= 0.2 && !firePlayed)
+                {
+                    firePlayed = true;
+                    Audio.Play("event:/LylyraHelper/laser_fire", Position, "fade", 0.8F);
+                }
                 if (countdown <= 0 && !Visible)
                 {
                     Visible = true;
                     Collidable = true;
                     Parent.Collider = Parent.shortHitbox;
-                    
+                    beamAudioToken = Audio.Play("event:/LylyraHelper/laser_beam");
+
                 }
                 int min = int.MaxValue;
                 if (Direction.Y != 0)
@@ -110,6 +119,25 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Slicer.directionalOffset = (min);
                 LaserLength = min + 8;
                 if (Direction.Y > 0) LaserLength = min;
+            }
+
+            public override void Removed(Scene scene)
+            {
+                base.Removed(scene);
+                if (beamAudioToken != null)
+                {
+                    Audio.Stop(beamAudioToken);
+                }
+            }
+
+            public override void SceneEnd(Scene scene)
+            {
+                base.SceneEnd(scene);
+                if (beamAudioToken != null)
+                {
+                    Audio.Stop(beamAudioToken);
+                }
+
             }
 
             private void DrawMiddle()
@@ -149,7 +177,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             num2,
                             whiteLength,
                             num4)
-                        , Color.Red);
+                        , Color.White);
                     Draw.Rect(new Rectangle(
                             num1 + lightBlueOffset,
                             num2,
@@ -167,7 +195,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             num2,
                             whiteLength,
                             num4)
-                        , Color.Red);
+                        , Color.White);
                     Draw.Rect(new Rectangle(
                             num5 - lightBlueOffset - lightBlueLength,
                             num2,
@@ -201,7 +229,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             num2 + whiteOffset,
                             num4,
                             whiteLength),
-                            Color.Red);
+                            Color.White);
                     Draw.Rect(new Rectangle(
                             num1,
                             num2 + lightBlueOffset,
@@ -219,7 +247,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             num5 - whiteOffset - whiteLength,
                             num4,
                             whiteLength),
-                            Color.Red);
+                            Color.White);
                     Draw.Rect(new Rectangle(
                             num1,
                             num5 - lightBlueOffset - lightBlueLength,
@@ -344,7 +372,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
 
-                DrawMiddle();
                 sprite.Visible = false;
             }
 
@@ -679,6 +706,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 if (firingTimer <= 0 && (sprite.CurrentAnimationID == "fire" || sprite.CurrentAnimationID == "firecont"))
                 {
                     sprite.Play("reset");
+                    Audio.Play("event:/LylyraHelper/laser_power_down");
                     Scene.Remove(laser);
                     laser = null;
                     lerp = 0;
