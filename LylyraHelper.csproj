@@ -41,6 +41,7 @@
     <Reference Include="MMHOOK_Celeste">
       <HintPath>..\..\MMHOOK_Celeste.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Cecil, Version=0.11.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e" />
     <Reference Include="MonoMod.Utils, Version=21.8.19.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\MonoMod.Utils.dll</HintPath>

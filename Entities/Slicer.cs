@@ -3,6 +3,7 @@ using Celeste.Mod.LylyraHelper.Entities;
 using Celeste.Mod.LylyraHelper.Intefaces;
 using Microsoft.Xna.Framework;
 using Monocle;
+using MonoMod.Cil;
 using MonoMod.ModInterop;
 using MonoMod.Utils;
 using System;
@@ -142,13 +143,13 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
             }
 
-            foreach (Entity d in base.Scene.Entities)
+            foreach (Solid d in SceneAs<Level>().Tracker.GetEntities<Solid>())
             {
                 if (d == Entity) continue;
 
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
                 //custom entities from other mods
-                if (d is ICuttable icut)
+                if (CustomSlicingActions.ContainsKey(d.GetType()))
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
@@ -157,7 +158,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                         continue;
                     }
                 }
-                else if (CustomSlicingActions.ContainsKey(d.GetType()))
+                else if (d is ICuttable icut)
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
@@ -167,7 +168,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                 }
                 //vanilla entity handling
-                else if (d is Booster)
+                /*else if (d is Booster)
                 {
                     Booster booster = d as Booster;
                     if (!slicingEntities.Contains(d) && d.CollideCheck(Entity))
@@ -176,14 +177,22 @@ namespace Celeste.Mod.LylyraHelper.Components
                         bool respawning = ((float)boosterType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d) > 0);
                         if (!respawning) booster.PlayerReleased();
                     }
-                }
-                else if (d.GetType() == typeof(CrushBlock) || d.GetType() == typeof(FallingBlock) || d.GetType() == typeof(DreamBlock) || d is CrystalStaticSpinner)
+                }*/
+                else if (d.GetType() == typeof(CrushBlock) || d.GetType() == typeof(FallingBlock) || d.GetType() == typeof(DreamBlock) || d.GetType() == typeof(MoveBlock) || d.GetType() == typeof(DashBlock))
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
                     }
+                }
+            }
+            foreach (CrystalStaticSpinner d in SceneAs<Level>().Tracker.GetEntities<CrystalStaticSpinner>())
+            {
+                if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
+                {
+                    slicingEntities.Add(d);
+                    sliceStartPositions.Add(d, Position);
                 }
             }
         }
@@ -207,11 +216,19 @@ namespace Celeste.Mod.LylyraHelper.Components
             secondFrameActivation.RemoveAll(d =>
             {
                 d.Awake(Scene);
-                Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
-                cbType.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, -Direction);
-                cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, level);
-                cbType.GetMethod("Attack", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(d, new object[] { -Direction });
+                if (d is CrushBlock)
+                {
+                    Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
+                    cbType.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, -Direction);
+                    cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, level);
+                    cbType.GetMethod("Attack", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(d, new object[] { -Direction });
 
+                } 
+                else if (d is MoveBlock)
+                {
+                    Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.MoveBlock", true, true);
+                    cbType.GetField("triggered", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, true);
+                }
                 return true;
             });
 
@@ -258,6 +275,16 @@ namespace Celeste.Mod.LylyraHelper.Components
                             SliceFallingBlock(d as FallingBlock);
                             return true;
                         }
+                        else if (d is MoveBlock)
+                        {
+                            SliceMoveBlock(d as MoveBlock);
+                            return true;
+                        }
+                        else if (d is DashBlock)
+                        {
+                            SliceDashBlock(d as DashBlock);
+                            return true;
+                        }
                     }
                     else if (d is CrystalStaticSpinner)
                     {
@@ -271,6 +298,11 @@ namespace Celeste.Mod.LylyraHelper.Components
 
                 return false;
             });
+        }
+
+        private void SliceDashBlock(DashBlock dashBlock)
+        {
+            dashBlock.Break(Entity.Position, Direction, true);
         }
 
         private void SliceDreamBlock(DreamBlock original)
@@ -385,7 +417,54 @@ namespace Celeste.Mod.LylyraHelper.Components
             return new Vector2((int)Math.Round(vector2.X), (int)Math.Round(vector2.Y));
         }
 
-        
+
+        private void SliceMoveBlock(MoveBlock original)
+        {
+            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
+            Vector2 b1Pos = resultArray[0];
+            Vector2 b2Pos = resultArray[1];
+            int b1Width = (int)resultArray[2].X;
+            int b1Height = (int)resultArray[2].Y;
+
+            int b2Width = (int)resultArray[3].X;
+            int b2Height = (int)resultArray[3].Y;
+
+            MoveBlock mb1;
+            MoveBlock mb2;
+            Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.MoveBlock", true, true);
+            Type stateType = bType.GetNestedType("MovementState", BindingFlags.NonPublic);
+            string[] names = stateType.GetEnumNames();
+            string stateName = bType.GetField("state", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original).ToString();
+            Logger.Log("LylyraHelper", stateName);
+            if (stateName == "Breaking")
+            {
+                sliceStartPositions.Remove(original);
+                return;
+            }
+            List<StaticMover> staticMovers = (List<StaticMover>)bType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            AddParticles(
+            original.Position,
+                new Vector2(original.Width, original.Height),
+                Calc.HexToColor("111111")); 
+            Audio.Play("event:/game/general/wall_break_stone", original.Position);
+            sliceStartPositions.Remove(original);
+            Scene.Remove(original);
+            var direction = (MoveBlock.Directions) bType.GetField("direction", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            var canSteer = (bool) bType.GetField("canSteer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            var fast = (bool) bType.GetField("fast", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            if (b1Width >= 16 && b1Height >= 16)
+            {
+                mb1 = new MoveBlock(b1Pos, b1Width, b1Height, direction, canSteer, fast);
+                Scene.Add(mb1);
+                secondFrameActivation.Add(mb1);
+            }
+            if (b2Width >= 16 && b2Height >= 16)
+            {
+                mb2 = new MoveBlock(b2Pos, b2Width, b2Height, direction, canSteer, fast);
+                Scene.Add(mb2);
+                secondFrameActivation.Add(mb2);
+            }
+        }
 
         private void SliceFallingBlock(FallingBlock original)
         {
@@ -945,6 +1024,36 @@ namespace Celeste.Mod.LylyraHelper.Components
             Vector2 Direction = (Vector2)dynData.Get("Direction");
             Entity Entity = dynData.Get("Entity") as Entity;
             HandleStaticMover(Scene, Direction, Entity, original, cb1, cb2, mover, minLength);
+        }
+
+        public static void Load()
+        {
+
+        }
+
+        public static void Unload()
+        {
+
+        }
+
+        public static void MoveBlockControllerIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            ILLabel target = null; //required because out target is not always responsive.
+            int mbIndex = -1; //MoveBlock Index
+            int dIndex = -1; //DecalData Index
+            if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<MoveBlock>("MoveNext"), i2 => i2.MatchStloc(out mbIndex)))
+            {
+                if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<MoveBlock>("triggered")) && cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(out int _), instr => instr.MatchBr(out target)))
+                {
+
+                }
+            }
+        }
+
+
+        private void AddToSlicingList(Entity e)
+        {
         }
     }
 }
