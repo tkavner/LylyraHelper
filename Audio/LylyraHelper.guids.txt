@@ -815,6 +815,7 @@
 {be721364-ec75-44a6-9063-768cb2be6f11} event:/LylyraHelper/laser_beam
 {cbc3f196-5202-48e5-9eb8-738a1c34a929} event:/LylyraHelper/laser_fire
 {a82cd911-dea1-45ac-a91e-37e0add1d73c} event:/LylyraHelper/laser_power_down
+{54acca3e-76ac-43ea-a37a-ceeb79cba68d} event:/LylyraHelper/scissor_cut
 {ea595d6d-cb07-4897-81cb-4830bf5823cb} event:/!!!_README_FIRST
 {c7aad72f-9796-42d3-980b-d093fd765716} bus:/
 {aac396d1-a63f-418a-810a-5d5a59fb2c43} bus:/gameplay_sfx

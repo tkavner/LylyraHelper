@@ -49,6 +49,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public static ParticleType scissorShards;
         private Slicer slicer;
         private float explosionCooldown;
+        private bool audioFlag;
+        private bool firstFrame = true;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -169,20 +171,19 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.Update();
             float oldElapsed = timeElapsed;
             timeElapsed += Engine.DeltaTime;
-
+            if (firstFrame)
+            {
+                level.Displacement.AddBurst(Position, 0.4f, 12f, 36f, 0.5f);
+                level.Displacement.AddBurst(Position, 0.4f, 24f, 48f, 0.5f);
+                level.Displacement.AddBurst(Position, 0.4f, 36f, 60f, 0.5f);
+                firstFrame = false;
+            }
             if (timeElapsed != oldElapsed) //check for frame advacement
             {
                 explosionCooldown -= timeElapsed - oldElapsed;
                 if (Moving)
                 {
-                    if (oldElapsed == 0)
-                    {
-                        Level level = SceneAs<Level>();
-                        level.Displacement.AddBurst(Position, 0.4f, 12f, 36f, 0.5f);
-                        level.Displacement.AddBurst(Position, 0.4f, 24f, 48f, 0.5f);
-                        level.Displacement.AddBurst(Position, 0.4f, 36f, 60f, 0.5f);
-                        Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
-                    }
+                    
                     if (timeElapsed > spawnGrace)
                     {
                         this.Position += (CutDirection).SafeNormalize() * 3;
@@ -209,6 +210,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scene.Remove();
                 }
 
+                if (sprite.CurrentAnimationFrame == 3 && audioFlag)
+                {
+                    Audio.Play("event:/LylyraHelper/scissor_cut", Position, "fade", 0.7F);
+                    audioFlag = false;
+                }
+                audioFlag = sprite.CurrentAnimationFrame != 3;
+
             }
             var tempHold = Collider;
             Collider = directionalColliderHalf1;
@@ -220,7 +228,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Collider = tempHold;
 
             breaking = (flag1 && flag2) || breaking;
-
+            
         }
 
         private Vector2 GetDirectionalPosition()
@@ -248,6 +256,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
             level.ParticlesFG.Emit(Cuttable.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
+
             
         }
 
