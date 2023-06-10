@@ -202,13 +202,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
                 Rectangle bounds = SceneAs<Level>().Bounds;
-                if (Top < bounds.Bottom ||
-                    Bottom > bounds.Top ||
-                    Right < bounds.Left ||
-                    Left > bounds.Right)
+                if (Top >= bounds.Bottom + 32 ||
+                    Bottom < bounds.Top - 32 ||
+                    Right < bounds.Left - 32 ||
+                    Left > bounds.Right + 32)
                 {
-                    Scene.Remove();
+                    RemoveSelf();
                 }
+                
 
                 if (sprite.CurrentAnimationFrame == 3 && audioFlag)
                 {
@@ -251,15 +252,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 return Position + new Vector2(0, -6);
             }
         }
-
-        private void AddParticles(Vector2 position, Vector2 range, Color color)
-        {
-            int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            level.ParticlesFG.Emit(Cuttable.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
-
-            
-        }
-
 
         public static void Load()
         {
