@@ -663,7 +663,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 bool useYCoordinates = (spike.Direction == Spikes.Directions.Left || spike.Direction == Spikes.Directions.Right) || Direction.X != 0;
                 
                 bool spikesOnCB1 = cb1Added && (spike.Y <= cb1Pos.Y + cb1Height && useYCoordinates) || (spike.X < cb1Pos.X + cb1Width && !useYCoordinates); //check if spikes start before the hole to see if part of them should be on cb1
-                bool spikesOnCB2 = cb2Added && (spike.Y >= cb2Pos.Y && useYCoordinates) || (spike.X + spike.Width > cb2Pos.X && !useYCoordinates); //check if the spikes extend past the hole to see if part of them should be on cb2
+                bool spikesOnCB2 = cb2Added && (spike.Y + spike.Height >= cb2Pos.Y && useYCoordinates) || (spike.X + spike.Width > cb2Pos.X && !useYCoordinates); //check if the spikes extend past the hole to see if part of them should be on cb2
                 int grace = 5;
                 if (Spikes.Directions.Left == spike.Direction && furthestLeft > spike.Position.X + grace)
                 {
@@ -1075,8 +1075,6 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             return (x % m + m) % m;
         }
-
-        
 
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomSlicingActions = new Dictionary<Type, Action<Entity, DynamicData>>();
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomStaticHandlerActions = new Dictionary<Type, Action<Entity, DynamicData>>();
