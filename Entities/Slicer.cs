@@ -1108,34 +1108,5 @@ namespace Celeste.Mod.LylyraHelper.Components
             HandleStaticMover(Scene, Direction, Entity, original, cb1, cb2, mover, minLength);
         }
 
-        public static void Load()
-        {
-
-        }
-
-        public static void Unload()
-        {
-
-        }
-
-        public static void MoveBlockControllerIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-            ILLabel target = null; //required because out target is not always responsive.
-            int mbIndex = -1; //MoveBlock Index
-            int dIndex = -1; //DecalData Index
-            if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<MoveBlock>("MoveNext"), i2 => i2.MatchStloc(out mbIndex)))
-            {
-                if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<MoveBlock>("triggered")) && cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(out int _), instr => instr.MatchBr(out target)))
-                {
-
-                }
-            }
-        }
-
-
-        private void AddToSlicingList(Entity e)
-        {
-        }
     }
 }
