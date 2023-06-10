@@ -183,7 +183,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                     d.GetType() == typeof(FallingBlock) || 
                     d.GetType() == typeof(DreamBlock) || 
                     d.GetType() == typeof(MoveBlock) || 
-                    d.GetType() == typeof(DashBlock))
+                    d.GetType() == typeof(DashBlock) ||
+                    d.GetType() == typeof(StarJumpBlock) ||
+                    d.GetType() == typeof(BounceBlock))
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
@@ -289,6 +291,16 @@ namespace Celeste.Mod.LylyraHelper.Components
                             SliceDashBlock(d as DashBlock);
                             return true;
                         }
+                        else if (d is StarJumpBlock)
+                        {
+                            SliceStarJumpBlock(d as StarJumpBlock);
+                            return true;
+                        }
+                        else if (d is BounceBlock)
+                        {
+                            SliceBounceBlock(d as BounceBlock);
+                            return true;
+                        }
                     }
                     else if (d is CrystalStaticSpinner)
                     {
@@ -304,9 +316,66 @@ namespace Celeste.Mod.LylyraHelper.Components
             });
         }
 
+        private void SliceBounceBlock(BounceBlock original)
+        {
+            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
+
+            Vector2 b1Pos = resultArray[0];
+            Vector2 b2Pos = resultArray[1];
+            int b1Width = (int)resultArray[2].X;
+            int b1Height = (int)resultArray[2].Y;
+
+            int b2Width = (int)resultArray[3].X;
+            int b2Height = (int)resultArray[3].Y;
+
+            BounceBlock sjb1 = null;
+            BounceBlock sjb2 = null;
+
+            Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.BounceBlock", true, true);
+
+            float respawnTimer = (float)bType.GetField("respawnTimer", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(original);
+            string state = (string)bType.GetField("state", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(original).ToString();
+
+            Scene.Remove(original);
+            sliceStartPositions.Remove(original);
+            if (respawnTimer > 0 || state == "Broken")
+            {
+                return;
+            }
+
+            if (b1Width >= 16 && b1Height >= 16 && original.CollideRect(new Rectangle((int)b1Pos.X, (int)b1Pos.Y, b1Width, b1Height))) Scene.Add(sjb1 = new BounceBlock(b1Pos, b1Width, b1Height));
+            if (b2Width >= 16 && b2Height >= 16 && original.CollideRect(new Rectangle((int)b2Pos.X, (int)b2Pos.Y, b2Width, b2Height))) Scene.Add(sjb2 = new BounceBlock(b2Pos, b2Width, b2Height));
+        }
+
         private void SliceDashBlock(DashBlock dashBlock)
         {
             dashBlock.Break(Entity.Position, Direction, true);
+            sliceStartPositions.Remove(dashBlock);
+        }
+
+        private void SliceStarJumpBlock(StarJumpBlock original)
+        {
+            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
+
+            Vector2 b1Pos = resultArray[0];
+            Vector2 b2Pos = resultArray[1];
+            int b1Width = (int)resultArray[2].X;
+            int b1Height = (int)resultArray[2].Y;
+
+            int b2Width = (int)resultArray[3].X;
+            int b2Height = (int)resultArray[3].Y;
+
+            StarJumpBlock sjb1 = null;
+            StarJumpBlock sjb2 = null;
+
+            Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.StarJumpBlock", true, true);
+            bool sinks = (bool) bType.GetField("sinks", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(original);
+
+            Scene.Remove(original);
+            sliceStartPositions.Remove(original);
+
+            if (b1Width >= 8 && b1Height >= 8 && original.CollideRect(new Rectangle((int)b1Pos.X, (int)b1Pos.Y, b1Width, b1Height))) Scene.Add(sjb1 = new StarJumpBlock(b1Pos, b1Width, b1Height, sinks));
+            if (b2Width >= 8 && b2Height >= 8 && original.CollideRect(new Rectangle((int)b2Pos.X, (int)b2Pos.Y, b2Width, b2Height))) Scene.Add(sjb2 = new StarJumpBlock(b2Pos, b2Width, b2Height, sinks));
         }
 
         private void SliceDreamBlock(DreamBlock original)
@@ -340,7 +409,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             sliceStartPositions.Remove(original);
             Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("000000"));
-
         }
 
         private void SliceKevin(CrushBlock original)
@@ -420,7 +488,6 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             return new Vector2((int)Math.Round(vector2.X), (int)Math.Round(vector2.Y));
         }
-
 
         private void SliceMoveBlock(MoveBlock original)
         {
