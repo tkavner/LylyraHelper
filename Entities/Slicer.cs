@@ -222,9 +222,9 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             secondFrameActivation.RemoveAll(d =>
             {
-                d.Awake(Scene);
                 if (d is CrushBlock)
                 {
+                    d.Awake(Scene);
                     Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
                     cbType.GetField("crushDir", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, -Direction);
                     cbType.GetField("level", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, level);
@@ -233,8 +233,12 @@ namespace Celeste.Mod.LylyraHelper.Components
                 } 
                 else if (d is MoveBlock)
                 {
-                    Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.MoveBlock", true, true);
-                    cbType.GetField("triggered", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, true);
+                    Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.MoveBlock", true, true);
+                    bType.GetField("triggered", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, true);
+                    d.Visible = true;
+                    Entity border = (Entity) bType.GetField("border", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
+                    Type borderType = border.GetType();
+                    border.Visible = false;
                 }
                 return true;
             });
@@ -503,6 +507,17 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private void SliceMoveBlock(MoveBlock original)
         {
+
+            Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.MoveBlock", true, true);
+            Type stateType = bType.GetNestedType("MovementState", BindingFlags.NonPublic);
+            string[] names = stateType.GetEnumNames();
+            string stateName = bType.GetField("state", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original).ToString();
+            if (stateName == "Breaking")
+            {
+                sliceStartPositions.Remove(original);
+                return;
+            }
+
             Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
             Vector2 b1Pos = resultArray[0];
             Vector2 b2Pos = resultArray[1];
@@ -514,37 +529,36 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             MoveBlock mb1;
             MoveBlock mb2;
-            Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.MoveBlock", true, true);
-            Type stateType = bType.GetNestedType("MovementState", BindingFlags.NonPublic);
-            string[] names = stateType.GetEnumNames();
-            string stateName = bType.GetField("state", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original).ToString();
-            if (stateName == "Breaking")
-            {
-                sliceStartPositions.Remove(original);
-                return;
-            }
             List<StaticMover> staticMovers = (List<StaticMover>)bType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
             AddParticles(
             original.Position,
                 new Vector2(original.Width, original.Height),
                 Calc.HexToColor("111111")); 
             Audio.Play("event:/game/general/wall_break_stone", original.Position);
+            bool triggered = (bool)bType.GetField("triggered", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            MoveBlock.Directions direction = (MoveBlock.Directions) bType.GetField("direction", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            bool canSteer = (bool) bType.GetField("canSteer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            bool fast = (bool) bType.GetField("fast", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            Vector2 startPosition = (Vector2)bType.GetField("startPosition", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+
+            bool vertical = direction == MoveBlock.Directions.Up || direction == MoveBlock.Directions.Down;
+
             sliceStartPositions.Remove(original);
             Scene.Remove(original);
-            var direction = (MoveBlock.Directions) bType.GetField("direction", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-            var canSteer = (bool) bType.GetField("canSteer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
-            var fast = (bool) bType.GetField("fast", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+
             if (b1Width >= 16 && b1Height >= 16)
             {
                 mb1 = new MoveBlock(b1Pos, b1Width, b1Height, direction, canSteer, fast);
                 Scene.Add(mb1);
                 secondFrameActivation.Add(mb1);
+                bType.GetField("startPosition", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(mb1, vertical ? new Vector2(b1Pos.X, startPosition.Y) : new Vector2(startPosition.X, b1Pos.Y));
             }
             if (b2Width >= 16 && b2Height >= 16)
             {
                 mb2 = new MoveBlock(b2Pos, b2Width, b2Height, direction, canSteer, fast);
                 Scene.Add(mb2);
                 secondFrameActivation.Add(mb2);
+                bType.GetField("startPosition", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(mb2, vertical ? new Vector2(b2Pos.X, startPosition.Y) : new Vector2(startPosition.X, b2Pos.Y));
             }
         }
 
