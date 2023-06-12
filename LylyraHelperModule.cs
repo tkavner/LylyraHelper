@@ -65,18 +65,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Slicer.RegisterSecondFrameSlicerAction(type, action);
             }
 
-            public static void UnregisterSecondSlicerAction(Type type, Action<Entity, DynamicData> action)
+            public static void UnregisterSecondSlicerAction(Type type)
             {
-                Slicer.UnregisterSecondFrameSlicerAction(type, action);
+                Slicer.UnregisterSecondFrameSlicerAction(type);
             }
-            public static void RegisterSlicerAction(Type type, Action<Entity, DynamicData> action)
+            public static void RegisterSlicerAction(Type type, Func<Entity, DynamicData, bool> action)
             {
                 Slicer.RegisterSlicerAction(type, action);
             }
 
-            public static void UnregisterSlicerAction(Type type, Action<Entity, DynamicData> action)
+            public static void UnregisterSlicerAction(Type type)
             {
-                Slicer.UnregisterSlicerAction(type, action);
+                Slicer.UnregisterSlicerAction(type);
             }
 
             public static void RegisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
@@ -84,9 +84,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Slicer.RegisterSlicerStaticHandler(type, action);
             }
 
-            public static void UnregisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
+            public static void UnregisterSlicerStaticHandler(Type type)
             {
-                Slicer.UnregisterSlicerStaticHandler(type, action);
+                Slicer.UnregisterSlicerStaticHandler(type);
             }
 
             //this method handles attached static movers (like spikes) for Solids. Convenience Method.

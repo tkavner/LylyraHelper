@@ -19,7 +19,7 @@ namespace Celeste.Mod.LylyraHelper.Components
     {
 
         private List<Entity> slicingEntities = new List<Entity>();
-        //some entities take a frame advancement to activate properly (Such as Kevins). This list is for those entities.
+        //some entities take a frame advancement to activate properly (Such as Kevins and MoveBlocks). This list is for those entities.
         private List<Entity> secondFrameActivation = new List<Entity>();
         public Collider slicingCollider { get; set; }
         private Vector2 Direction;
@@ -272,7 +272,11 @@ namespace Celeste.Mod.LylyraHelper.Components
                     {
                         if (CustomSlicingActions.ContainsKey(d.GetType()))
                         {
-                            CustomSlicingActions[d.GetType()].Invoke(d, new DynamicData(this));
+                            if (CustomSlicingActions[d.GetType()].Invoke(d, new DynamicData(this)))
+                            {
+                                secondFrameActivation.Add(d);
+                            }
+                            sliceStartPositions.Remove(d);
                             return true;
                         }
                         else if (d is DreamBlock)
@@ -1095,20 +1099,20 @@ namespace Celeste.Mod.LylyraHelper.Components
             return (x % m + m) % m;
         }
 
-        private static Dictionary<Type, Action<Entity, DynamicData>> CustomSlicingActions = new Dictionary<Type, Action<Entity, DynamicData>>();
+        private static Dictionary<Type, Func<Entity, DynamicData, bool>> CustomSlicingActions = new Dictionary<Type, Func<Entity, DynamicData, bool>>();
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomStaticHandlerActions = new Dictionary<Type, Action<Entity, DynamicData>>();
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomSecondFrameActions = new Dictionary<Type, Action<Entity, DynamicData>>();
-        public static void UnregisterSlicerAction(Type type, Action<Entity, DynamicData> action)
+        public static void UnregisterSlicerAction(Type type)
+        {
+            CustomSlicingActions.Remove(type);
+        }
+
+        public static void RegisterSlicerAction(Type type, Func<Entity, DynamicData, bool> action)
         {
             CustomSlicingActions.Add(type, action);
         }
 
-        public static void RegisterSlicerAction(Type type, Action<Entity, DynamicData> action)
-        {
-            CustomSlicingActions.Add(type, action);
-        }
-
-        public static void UnregisterSecondFrameSlicerAction(Type type, Action<Entity, DynamicData> action)
+        public static void UnregisterSecondFrameSlicerAction(Type type)
         {
             CustomSecondFrameActions.Remove(type);
         }
@@ -1119,7 +1123,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             CustomSecondFrameActions.Add(type, action);
         }
 
-        public static void UnregisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
+        public static void UnregisterSlicerStaticHandler(Type type)
         {
             CustomStaticHandlerActions.Remove(type);
         }
