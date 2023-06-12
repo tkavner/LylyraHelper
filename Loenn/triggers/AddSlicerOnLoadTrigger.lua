@@ -4,6 +4,14 @@ addSlicerOnLoadTrigger.placements = {}
 
 local directions = {"Up", "Down", "Right", "Left", "All"}
 
+
+addSlicerOnLoadTrigger.fieldInformation = {
+    direction = {
+        options = directions,
+        editable = false
+    }
+}
+
 for _, dir in ipairs(directions) do
 	local placement = {
 		name = "AddSlicerOnLoadTrigger ("..dir..")",
@@ -12,7 +20,9 @@ for _, dir in ipairs(directions) do
 			singleUse = false,
 			entityTypes = "",
 			direction = dir,
-			roomwide = false
+			roomwide = false,
+			cutSize = 16,
+			knifeLength = 8
 		}
 	}
 	table.insert(addSlicerOnLoadTrigger.placements, placement)

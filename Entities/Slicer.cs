@@ -107,6 +107,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             Slice();
             Entity.Position = positionHold;
             Entity.Collider = tempHold;
+            Visible = true;
         }
 
         private void CheckCollisions()
@@ -243,7 +244,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     bType.GetField("triggered", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, true);
                     Entity border = (Entity) bType.GetField("border", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
                     border.Visible = false;
-                    
                 }
                 return true;
             });
@@ -542,8 +542,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             int b2Width = (int)resultArray[3].X;
             int b2Height = (int)resultArray[3].Y;
 
-            MoveBlock mb1;
-            MoveBlock mb2;
+            MoveBlock mb1 = null;
+            MoveBlock mb2 = null;
             List<StaticMover> staticMovers = (List<StaticMover>)bType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
             AddParticles(
             original.Position,
@@ -574,6 +574,11 @@ namespace Celeste.Mod.LylyraHelper.Components
                 Scene.Add(mb2);
                 intermediateFrameActivation.Add(mb2);
                 bType.GetField("startPosition", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(mb2, vertical ? new Vector2(b2Pos.X, startPosition.Y) : new Vector2(startPosition.X, b2Pos.Y));
+            }
+
+            foreach (StaticMover mover in staticMovers)
+            {
+                HandleStaticMover(Scene, Direction, Entity, original, mb1, mb2, mover, 8);
             }
         }
 
@@ -1145,6 +1150,11 @@ namespace Celeste.Mod.LylyraHelper.Components
             Vector2 Direction = (Vector2)dynData.Get("Direction");
             Entity Entity = dynData.Get("Entity") as Entity;
             HandleStaticMover(Scene, Direction, Entity, original, cb1, cb2, mover, minLength);
+        }
+        public override void DebugRender(Camera camera)
+        {
+            base.DebugRender(camera);
+            slicingCollider?.Render(camera, Color.Yellow);
         }
 
     }

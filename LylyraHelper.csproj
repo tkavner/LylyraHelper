@@ -89,7 +89,7 @@
     <None Include="Loenn\entities\KnifeSpikes.lua" />
     <None Include="Loenn\entities\laserCutter.lua" />
     <None Include="Loenn\lang\en_gb.lang" />
-    <None Include="Loenn\triggers\AddSlicerOnStartTrigger.lua" />
+    <None Include="Loenn\triggers\AddSlicerOnLoadTrigger.lua" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

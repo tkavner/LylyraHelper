@@ -7,8 +7,8 @@ bigCloud.name = "LylyraHelper/BigCloud"
 table.insert(bigCloud.placements, {
 		name = "Big Cloud",
 		data = {
-				width = 64
-				xOffset = 32
+				width = 64,
+				xOffset = 32,
 				yOffset = 5
 			}
 		})
@@ -21,3 +21,5 @@ function bigCloud.sprite(room, entity)
 	return sprite
 
 end
+
+return bigCloud
