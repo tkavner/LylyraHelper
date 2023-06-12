@@ -438,7 +438,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             Scene.Remove(original);
             sliceStartPositions.Remove(original);
-            Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("000000"));
         }
 
@@ -458,6 +457,8 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             var returnStack = cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
             List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            SoundSource soundSource = (SoundSource) cbType.GetField("currentMoveLoopSfx", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            soundSource?.Stop();
             var newReturnStack1 = Activator.CreateInstance(returnStack.GetType(), returnStack);
             var newReturnStack2 = Activator.CreateInstance(returnStack.GetType(), returnStack);
 
@@ -477,7 +478,6 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             //create cloned crushblocks + set data
 
-            Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Entity.Center);
             CrushBlock cb1 = null;
             bool cb1Added;
             if (cb1Added = (cb1Width >= 24 && cb1Height >= 24 && original.CollideRect(new Rectangle((int)cb1Pos.X, (int)cb1Pos.Y, cb1Width, cb1Height))))
@@ -641,7 +641,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             sliceStartPositions.Remove(original);
         }
 
-        //currently handles vanilla static movers (basically just spikes and springs)
+        //currently handles vanilla static movers (basically just spikes and springs). Welcome to hell.
         private static void HandleStaticMover(Scene Scene, Vector2 Direction, Entity Entity, Entity parent, Solid cb1, Solid cb2, StaticMover mover, int minLength, DynamicData dynData = null)
         {
             bool cb1Added = cb1 != null;
