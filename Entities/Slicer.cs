@@ -21,6 +21,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         private List<Entity> slicingEntities = new List<Entity>();
         //some entities take a frame advancement to activate properly (Such as Kevins and MoveBlocks). This list is for those entities.
         private List<Entity> secondFrameActivation = new List<Entity>();
+        private List<Entity> intermediateFrameActivation = new List<Entity>();
         public Collider slicingCollider { get; set; }
         private Vector2 Direction;
         private int cutSize;
@@ -240,10 +241,16 @@ namespace Celeste.Mod.LylyraHelper.Components
                 {
                     Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.MoveBlock", true, true);
                     bType.GetField("triggered", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, true);
-                    d.Visible = true;
                     Entity border = (Entity) bType.GetField("border", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                    if (border != null) border.Visible = false;
+                    border.Visible = false;
+                    
                 }
+                return true;
+            });
+
+            intermediateFrameActivation.RemoveAll(d =>
+            {
+                secondFrameActivation.Add(d);
                 return true;
             });
 
@@ -273,7 +280,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                         {
                             if (CustomSlicingActions[d.GetType()].Invoke(d, new DynamicData(this)))
                             {
-                                secondFrameActivation.Add(d);
+                                intermediateFrameActivation.Add(d);
                             }
                             sliceStartPositions.Remove(d);
                             return true;
@@ -478,7 +485,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut);
                 cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb1, newReturnStack1);
                 Scene.Add(cb1);
-                secondFrameActivation.Add(cb1);
+                intermediateFrameActivation.Add(cb1);
             }
 
             CrushBlock cb2 = null;
@@ -488,7 +495,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut);
                 cbType.GetField("returnStack", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(cb2, newReturnStack2);
                 Scene.Add(cb2);
-                secondFrameActivation.Add(cb2);
+                intermediateFrameActivation.Add(cb2);
             }
 
             foreach (StaticMover mover in staticMovers)
@@ -558,14 +565,14 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 mb1 = new MoveBlock(b1Pos, b1Width, b1Height, direction, canSteer, fast);
                 Scene.Add(mb1);
-                secondFrameActivation.Add(mb1);
+                intermediateFrameActivation.Add(mb1);
                 bType.GetField("startPosition", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(mb1, vertical ? new Vector2(b1Pos.X, startPosition.Y) : new Vector2(startPosition.X, b1Pos.Y));
             }
             if (b2Width >= 16 && b2Height >= 16)
             {
                 mb2 = new MoveBlock(b2Pos, b2Width, b2Height, direction, canSteer, fast);
                 Scene.Add(mb2);
-                secondFrameActivation.Add(mb2);
+                intermediateFrameActivation.Add(mb2);
                 bType.GetField("startPosition", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(mb2, vertical ? new Vector2(b2Pos.X, startPosition.Y) : new Vector2(startPosition.X, b2Pos.Y));
             }
         }

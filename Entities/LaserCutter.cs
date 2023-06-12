@@ -37,7 +37,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             private Random rand;
             private Vector2 Direction;
             private int counter;
-            private float countdown = 0.7F;
+            private float countdown = 0.8F;
             private float timestamp;
             private int cutSize;
             private Sprite sprite;
