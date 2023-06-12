@@ -31,7 +31,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
             Scissors.Load();
             PaperHitbox.Load();
-            AddSlicerOnLoadTrigger.Load();
+            AddSlicerTrigger.Load();
             typeof(ModExports).ModInterop();
         }
 
@@ -39,7 +39,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             Scissors.Unload();
             PaperHitbox.Unload();
-            AddSlicerOnLoadTrigger.Unload();
+            AddSlicerTrigger.Unload();
         }
 
         public override void LoadContent(bool firstLoad)

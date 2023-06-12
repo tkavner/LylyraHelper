@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 namespace Celeste.Mod.LylyraHelper.Triggers
 {
     [Tracked(false)]
-    [CustomEntity("LylyraHelper/AddSlicerOnLoadTrigger")]
-    public class AddSlicerOnLoadTrigger : Trigger
+    [CustomEntity("LylyraHelper/AddSlicerTrigger")]
+    public class AddSlicerTrigger : Trigger
     {
         private string direction;
         private bool sliceOnImpact;
@@ -26,7 +26,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private bool onLoad;
         private bool used;
 
-        public AddSlicerOnLoadTrigger(EntityData data, Vector2 offset) : base(data, offset)
+        public AddSlicerTrigger(EntityData data, Vector2 offset) : base(data, offset)
         {
             direction = data.Attr("direction", "All");
             sliceOnImpact = data.Bool("sliceOnImpact", false);
@@ -64,7 +64,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private static void SlicerTriggerCheck(On.Monocle.Scene.orig_Add_Entity orig, Scene self, Entity entity)
         {
             orig.Invoke(self, entity);
-            foreach (AddSlicerOnLoadTrigger trigger in self.Tracker.GetEntities<AddSlicerOnLoadTrigger>())
+            foreach (AddSlicerTrigger trigger in self.Tracker.GetEntities<AddSlicerTrigger>())
             {
                 if (entity.Collider == null && !trigger.oneUse)
                     trigger.TryAddSlicer(entity);

@@ -65,7 +65,7 @@
     <Compile Include="Entities\LaserCutter.cs" />
     <Compile Include="Components\BreakbeamHitboxComponent.cs" />
     <Compile Include="Other\PaperHitbox.cs" />
-    <Compile Include="Trigger\AddSlicerOnLoadTrigger.cs" />
+    <Compile Include="Trigger\AddSlicerTrigger.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />
     <Compile Include="Entities\Slicer.cs" />
     <Compile Include="Interfaces\ICuttable.cs" />
@@ -75,7 +75,6 @@
     <Compile Include="Entities\Paper.cs" />
     <Compile Include="LylyraHelperModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Trigger\AddSlicerTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Ahorn\entities\bubbledScsissors.jl" />
@@ -89,7 +88,7 @@
     <None Include="Loenn\entities\KnifeSpikes.lua" />
     <None Include="Loenn\entities\laserCutter.lua" />
     <None Include="Loenn\lang\en_gb.lang" />
-    <None Include="Loenn\triggers\AddSlicerOnLoadTrigger.lua" />
+    <None Include="Loenn\triggers\AddSlicerTrigger.lua" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
