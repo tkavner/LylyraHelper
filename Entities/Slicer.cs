@@ -242,8 +242,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                     bType.GetField("triggered", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(d, true);
                     d.Visible = true;
                     Entity border = (Entity) bType.GetField("border", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d);
-                    Type borderType = border.GetType();
-                    border.Visible = false;
+                    if (border != null) border.Visible = false;
                 }
                 return true;
             });

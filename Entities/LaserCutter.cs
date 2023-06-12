@@ -1,5 +1,6 @@
 ﻿using Celeste.Mod.Entities;
 using Celeste.Mod.LylyraHelper.Components;
+using FMOD;
 using FMOD.Studio;
 using LylyraHelper.Other;
 using Microsoft.Xna.Framework;
@@ -119,6 +120,48 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Slicer.directionalOffset = (min);
                 LaserLength = min + 8;
                 if (Direction.Y > 0 || Direction.X > 0) LaserLength = min;
+                if (Visible) AddParticles();
+            }
+
+            private void AddParticles()
+            {
+
+                int num4 = Math.Abs((4 * ((int)LaserLength / 8)) - ((4 * ((int)LaserLength / 8)) + (LaserLength - (8 * ((int)LaserLength / 8)))));
+                int laserRenderEndPoint = ((int)(8 * (((int)LaserLength / 2) / 8)));
+                if (Direction.Y != 0)
+                {
+                    if (Direction.Y > 0)
+                    {
+                        //Parent.SceneAs<Level>().ParticlesFG.Emit(Bumper.P_Launch, cutSize / 32 > 1 ? cutSize / 32 : 1, 
+                            //new Vector2((int)Parent.BottomCenter.X , (int)(Parent.BottomCenter.Y + LaserLength)), new Vector2(cutSize / 2, 0), (float)Math.PI / 2);
+                        Parent.SceneAs<Level>().ParticlesFG.Emit(Cuttable.paperScraps, cutSize / 32 > 1 ? cutSize / 32 : 1,
+                            new Vector2((int)Parent.BottomCenter.X, (int)(Parent.BottomCenter.Y + LaserLength)), new Vector2(cutSize / 2, 0), Calc.HexToColor("afdbff"));
+                    }
+                    else if (Direction.Y < 0)
+                    {
+                        //Parent.SceneAs<Level>().ParticlesFG.Emit(Bumper.P_Launch, cutSize / 32 > 1 ? cutSize / 32 : 1, 
+                            //new Vector2((int)Parent.TopCenter.X, (int)(Parent.TopCenter.Y) - LaserLength), new Vector2(cutSize / 2, 0), (float)Math.PI * 3 / 2);
+                        Parent.SceneAs<Level>().ParticlesFG.Emit(Cuttable.paperScraps, cutSize / 32 > 1 ? cutSize / 32 : 1,
+                            new Vector2((int)Parent.TopCenter.X, (int)(Parent.TopCenter.Y - LaserLength)), new Vector2(cutSize / 2, 0), Calc.HexToColor("afdbff"));
+                    }
+                }
+                else
+                {
+                    if (Direction.X > 0)
+                    {
+                        //Parent.SceneAs<Level>().ParticlesFG.Emit(Bumper.P_Launch, cutSize / 32 > 1 ? cutSize / 32 : 1,
+                            //new Vector2((int)Parent.CenterRight.X + LaserLength, (int)(Parent.CenterLeft.Y)), new Vector2(0, cutSize / 2));
+                        Parent.SceneAs<Level>().ParticlesFG.Emit(Cuttable.paperScraps, cutSize / 32 > 1 ? cutSize / 32 : 1, 
+                            new Vector2((int)Parent.CenterRight.X + LaserLength, (int)(Parent.CenterLeft.Y)), new Vector2(0, cutSize / 2), Calc.HexToColor("afdbff"), 0);
+                    }
+                    else if (Direction.X < 0)
+                    {
+                        //Parent.SceneAs<Level>().ParticlesFG.Emit(Bumper.P_Launch, cutSize / 32 > 1 ? cutSize / 32 : 1, 
+                            //new Vector2((int)Parent.CenterLeft.X - LaserLength, (int)(Parent.CenterLeft.Y)), new Vector2(0, cutSize / 2), (float)Math.PI);
+                        Parent.SceneAs<Level>().ParticlesFG.Emit(Cuttable.paperScraps, cutSize / 32 > 1 ? cutSize / 32 : 1, 
+                            new Vector2((int)Parent.CenterLeft.X - LaserLength, (int)(Parent.CenterLeft.Y)), new Vector2(0, cutSize / 2), Calc.HexToColor("afdbff"), (float) Math.PI);
+                    }
+                }
             }
 
             public override void Removed(Scene scene)
@@ -159,7 +202,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         num1 = (int)Parent.TopCenter.X - cutSize / 2;
                         num2 = (int)(Parent.TopCenter.Y) - laserRenderEndPoint - num4;
                         
-                    } else
+                    } 
+                    else
                     {
                         num1 = (int)Parent.BottomCenter.X - cutSize / 2;
                         num2 = (int)(Parent.BottomCenter.Y) + laserRenderEndPoint;
@@ -202,7 +246,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             lightBlueLength,
                             num4)
                         , Calc.HexToColor("d0e8f4"));
-                } else
+                } 
+                else
                 {
                     int num1, num2;
                     if (Direction.X < 0)
