@@ -222,7 +222,12 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             secondFrameActivation.RemoveAll(d =>
             {
-                if (d is CrushBlock)
+                if (CustomSecondFrameActions.TryGetValue(d.GetType(), out Action<Entity, DynamicData> customAction))
+                {
+                    customAction.Invoke(d, new DynamicData(this));
+                    return true;
+                }
+                else if (d is CrushBlock)
                 {
                     d.Awake(Scene);
                     Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.CrushBlock", true, true);
@@ -1092,6 +1097,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomSlicingActions = new Dictionary<Type, Action<Entity, DynamicData>>();
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomStaticHandlerActions = new Dictionary<Type, Action<Entity, DynamicData>>();
+        private static Dictionary<Type, Action<Entity, DynamicData>> CustomSecondFrameActions = new Dictionary<Type, Action<Entity, DynamicData>>();
         public static void UnregisterSlicerAction(Type type, Action<Entity, DynamicData> action)
         {
             CustomSlicingActions.Add(type, action);
@@ -1100,6 +1106,17 @@ namespace Celeste.Mod.LylyraHelper.Components
         public static void RegisterSlicerAction(Type type, Action<Entity, DynamicData> action)
         {
             CustomSlicingActions.Add(type, action);
+        }
+
+        public static void UnregisterSecondFrameSlicerAction(Type type, Action<Entity, DynamicData> action)
+        {
+            CustomSecondFrameActions.Remove(type);
+        }
+
+
+        public static void RegisterSecondFrameSlicerAction(Type type, Action<Entity, DynamicData> action)
+        {
+            CustomSecondFrameActions.Add(type, action);
         }
 
         public static void UnregisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)

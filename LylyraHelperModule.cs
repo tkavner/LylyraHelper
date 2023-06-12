@@ -59,6 +59,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
         [ModExportName("LylyraHelper.Slicer")]
         private static class ModExports
         {
+
+            public static void RegisterSecondSlicerAction(Type type, Action<Entity, DynamicData> action)
+            {
+                Slicer.RegisterSecondFrameSlicerAction(type, action);
+            }
+
+            public static void UnregisterSecondSlicerAction(Type type, Action<Entity, DynamicData> action)
+            {
+                Slicer.UnregisterSecondFrameSlicerAction(type, action);
+            }
             public static void RegisterSlicerAction(Type type, Action<Entity, DynamicData> action)
             {
                 Slicer.RegisterSlicerAction(type, action);
