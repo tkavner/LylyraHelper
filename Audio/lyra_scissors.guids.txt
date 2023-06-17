@@ -1,0 +1,6 @@
+{4839aa09-9295-4bf1-900b-4e69396fa87d} event:/Kataiser/lyra_scissors_break
+{566c6f54-63e5-446a-a163-5e6e2de0af05} event:/Kataiser/lyra_scissors_cut_close
+{0b4efc1f-93d3-4c3f-a173-04b78a286ac3} event:/Kataiser/lyra_scissors_cut_open
+{8f86857e-779a-4137-8658-92837a76eae3} event:/Kataiser/lyra_scissors_cut_loop
+{45341b3a-ef68-4a27-95fb-a423a7ef060d} event:/Kataiser/lyra_scissors_hit
+{2583df5e-dcf9-479e-9d16-951593eb893e} bank:/lyra_scissors

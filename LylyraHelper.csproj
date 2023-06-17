@@ -90,5 +90,8 @@
     <None Include="Loenn\lang\en_gb.lang" />
     <None Include="Loenn\triggers\AddSlicerTrigger.lua" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="credits.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Celeste.Mod.Helpers;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Intefaces;
+using FMOD.Studio;
 using global::Celeste;
 using global::Celeste.Mod;
 using global::Celeste.Mod.Entities;
@@ -51,6 +52,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private float explosionCooldown;
         private bool audioFlag;
         private bool firstFrame = true;
+        private bool audioFlag2;
+        private EventInstance audioToken;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -137,16 +140,42 @@ namespace Celeste.Mod.LylyraHelper.Entities
             while (!breaking) yield return null;
             Moving = false;
             sprite.Play("break");
-
+            if (audioToken != null)
+            {
+                Audio.Stop(audioToken);
+                audioToken = null;
+            }
+            Audio.Play("event:/Kataiser/lyra_scissors_hit", Position);
             //Partial cut non solid entities
             if (timeElapsed > spawnGrace)
             {
                 slicer.Slice(true);
             }
             Collidable = false;
-            yield return 0.75F;
+            yield return 0.2F;
+            Audio.Play("event:/Kataiser/lyra_scissors_break", Position);
+            yield return 0.55F;
             Scene.Remove(this);
             yield return null;
+        }
+
+        public override void Removed(Scene scene)
+        {
+            base.Removed(scene);
+            if (audioToken != null)
+            {
+                Audio.Stop(audioToken);
+            }
+        }
+
+        public override void SceneEnd(Scene scene)
+        {
+            base.SceneEnd(scene);
+
+            if (audioToken != null)
+            {
+                Audio.Stop(audioToken);
+            }
         }
 
         public override void Added(Scene scene)
@@ -163,6 +192,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 player.Die((player.Position - Position).SafeNormalize());
                 Moving = false;
                 sprite.Stop();
+                if (audioToken != null)
+                {
+                    Audio.Stop(audioToken);
+                    audioToken = null;
+                }
             }
         }
 
@@ -193,6 +227,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         if (!playedAudio)
                         {
                             playedAudio = true;
+                            if (audioToken == null) audioToken = Audio.Play("event:/Kataiser/lyra_scissors_cut_loop", Position);
                         }
                     }
 
@@ -207,16 +242,27 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Right < bounds.Left - 32 ||
                     Left > bounds.Right + 32)
                 {
+                    if (audioToken != null)
+                    {
+                        Audio.Stop(audioToken);
+                    }
                     RemoveSelf();
                 }
                 
 
-                if (sprite.CurrentAnimationFrame == 3 && audioFlag)
+                if (sprite.CurrentAnimationFrame == 2 && audioFlag)
                 {
-                    Audio.Play("event:/LylyraHelper/scissor_cut", Position, "fade", 0.7F);
                     audioFlag = false;
+                    Audio.Play("event:/Kataiser/lyra_scissors_cut_close", Position);
                 }
-                audioFlag = sprite.CurrentAnimationFrame != 3;
+                audioFlag = sprite.CurrentAnimationFrame != 2;
+
+                if (sprite.CurrentAnimationFrame == 5 && audioFlag2)
+                {
+                    audioFlag2 = false;
+                    Audio.Play("event:/Kataiser/lyra_scissors_cut_open", Position);
+                }
+                audioFlag2 = sprite.CurrentAnimationFrame != 5;
 
             }
             var tempHold = Collider;
@@ -350,7 +396,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Render()
         {
             Vector2 placeholder = sprite.Position;
-            if (!Moving && !breaking) sprite.Position += shaker.Value;
+            if ((!Moving && !breaking) || breaking) sprite.Position += shaker.Value;
             base.Render();
             sprite.Position = placeholder;
         }
