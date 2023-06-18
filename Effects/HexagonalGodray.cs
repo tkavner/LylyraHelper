@@ -62,11 +62,11 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
         public float speedX;
         public float speedY;
-        private bool hexLerp;
+        private bool hsvLerp;
         private float minRotation;
         private float maxRotation;
 
-        public HexagonalGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, bool hexLerp)
+        public HexagonalGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, bool hsvLerp)
         {
             vertices = new VertexPositionColor[12 * numRays];
             rays = new HexRay[numRays];
@@ -81,7 +81,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
             UseSpritebatch = false;
             speedX = speedx;
             speedY = speedy;
-            this.hexLerp = hexLerp;
+            this.hsvLerp = hsvLerp;
 
             this.minRotation = minRotation;
             this.maxRotation = Math.Max(0, maxRotation);
@@ -126,7 +126,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
                 Vector2 vector3 = new Vector2((int)num2, (int)num3);
 
                 Color color = Color.White;
-                if (hexLerp)
+                if (hsvLerp)
                 {
                     color = HSVLerp(rayColor, fadeColor, percent) * Ease.CubeInOut(Calc.Clamp(((percent < 0.5f) ? percent : (1f - percent)) * 2f, 0f, 1f)) * fade;
                 } else
@@ -180,17 +180,27 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
         private static Color HSVLerp(Color c1, Color c2, float amount)
         {
+            amount = MathHelper.Clamp(amount, 0f, 1f);
             Vector3 hsv1 = ColortoHSV(c1);
             Vector3 hsv2 = ColortoHSV(c2);
-            
+            if (Math.Abs(hsv2.X - hsv1.X) > 3) {
+                if (hsv2.X > hsv1.X)
+                {
+                    hsv1.X += 6;
+                }
+                else
+                {
+                    hsv2.X += 6;
+                }
+            }
             Vector3 lerped = new Vector3(
                 hsv1.X * amount + (1 - amount) * hsv2.X,
                 hsv1.Y * amount + (1 - amount) * hsv2.Y,
                 hsv1.Z * amount + (1 - amount) * hsv2.Z);
-            Vector3 vector3 = HSVToRGB(lerped) * 2;
-            Logger.Log("LylyraHelper", "" + vector3);
-            return new Color(vector3) * 0.5F;
-        }
+            Vector3 vector3 = HSVToRGB(lerped);
+            vector3.X = Mod(vector3.X, 6);
+            return new Color(vector3.X, vector3.Y, vector3.Z, 0.5F);
+        } 
 
         private static Vector3 HSVToRGB(Vector3 vector)
         {
@@ -203,8 +213,8 @@ namespace Celeste.Mod.LylyraHelper.Effects
             if (h > 6) h -= 6; if (s > 1) s = 1; if (v > 1) v = 1;
             if (h < 0) h += 6;
             float alpha = v * (1 - s);
-            float beta = v * (1 - (h - (float) Math.Floor((float) h) * s));
-            float gamma = v * (1 - (1 - (h - (float)Math.Floor((float)h))) * s);
+            float beta = v * (1 - (Mod(h, 1) * s));
+            float gamma = v * (1 - (1 - Mod(h, 1)) * s);
             if (0 <= h && h < 1) return new Vector3(v, gamma, alpha);
             else if (1 <= h && h < 2) return new Vector3(beta, v, alpha);
             else if (2 <= h && h < 3) return new Vector3(alpha, v, gamma);
@@ -215,7 +225,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
         }
         private static Vector3 ColortoHSV(Color color)
         {
-            return RGBToHSV(color.R, color.G, color.B, 255);
+            return RGBToHSV(color.R, color.G, color.B, 256);
         }
 
         //returns h: value between 0 and 6, s (value between 0 and 1, and v 
@@ -234,27 +244,23 @@ namespace Celeste.Mod.LylyraHelper.Effects
             } 
             else if (r == max)
             {
-                h = (int)Mod((g - b) / delta, 6F);
+                h = Mod((g - b) / delta, 6F);
             }
             else if (g == max) 
             {
-                h = (int)Mod((b - r) / delta + 2, 6F);
+                h = Mod((b - r) / delta + 2, 6F);
             }
             else if (b == max)
             {
-                h = (int)Mod((r - g) / delta + 4, 6F);
+                h = Mod((r - g) / delta + 4, 6F);
             }
-            int hPrime = (int) (60 * h);
             float v = max;
-            int vPrime = (int) (100 * v);
             float s = 0;
             if (v != 0)
             {
                 s = delta / v;
             }
-            int sPrime = (int)(s * 100);
 
-            Logger.Log("LylyraHelper", "h: " + h + "\ts: " + s + "\tv: " + v);
             return new Vector3(h, s, v);
         }
 
