@@ -588,9 +588,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Breakbeam breakbeam;
         private float laserCooldown;
         private float timestamp;
-        private float cooldown_time = 2.0F;
+        private float cooldownTime;
         private FiringMode mode;
-        private float pulseFrequency;
         private string flagName;
         private float firingLength;
         private float firingTimer;
@@ -600,14 +599,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Hitbox shortHitboxMain;
         private Hitbox shortHitboxSecondary;
         internal Collider bigHitbox;
+        private bool invert;
 
         public LaserCutter(EntityData data, Vector2 offset, FiringMode fm) :
             base(data.Position + offset, 32, 32, false)
         {
             direction = data.Attr("direction", "Up");
             cutSize = data.Int("cutSize", 64);
-            breakbeamThickness = data.Int("breakBeamThickness", 32);
+            breakbeamThickness = data.Int("breakbeamThickness", 32);
             firingLength = data.Float("firingLength", 1F);
+            cooldownTime = data.Float("cooldown", 2F);
+            invert = data.Bool("invert", false);
             mode = fm;
             Add(sprite = LylyraHelperModule.SpriteBank.Create("laserCutter" + direction));
             direction = direction.ToLower();
@@ -717,7 +719,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 sprite.Play("fire", false);
                 firingTimer = firingLength;
-                laserCooldown = cooldown_time;
+                laserCooldown = cooldownTime;
                 switch (direction.ToLower())
                 {
                     case "up":
@@ -798,7 +800,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     Fire();
                 }
-                if (laserCooldown <= 0 && sprite.CurrentAnimationID == "idle" && mode == FiringMode.Flag && SceneAs<Level>().Session.GetFlag(flagName))
+                if (laserCooldown <= 0 && sprite.CurrentAnimationID == "idle" && mode == FiringMode.Flag && (SceneAs<Level>().Session.GetFlag(flagName) ^ invert))
                 {
                     Fire();
                 }

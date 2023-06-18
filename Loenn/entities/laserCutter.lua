@@ -37,28 +37,43 @@ laserCutterInFront.fieldInformation = {
     direction = {
         options = directions,
         editable = false
-    }
+    },
+	cutSize = {
+		fieldType = "integer"
+	}
 }
 
 laserCutterPulse.fieldInformation = {
     direction = {
         options = directions,
         editable = false
-    }
+    },
+	cutSize = {
+		fieldType = "integer"
+	}
 }
 
 laserCutterFlag.fieldInformation = {
     direction = {
         options = directions,
         editable = false
-    }
+    },
+	cutSize = {
+		fieldType = "integer"
+	}
 }
 
 laserCutterBreakbeam.fieldInformation = {
     direction = {
         options = directions,
         editable = false
-    }
+    },
+	cutSize = {
+		fieldType = "integer"
+	},
+	breakBeamThickness=32 = {
+		fieldType = "integer"
+	}
 }
 
 
@@ -66,17 +81,18 @@ for _, dir in ipairs(directions) do
 	table.insert(laserCutterFlag.placements, {
 		name = "Laser Cutter (Flag, "..dir..")",
 		data = {
-				frequency = 2.0,
+				cooldown = 2.0,
 				firingLength = 1.0,
 				direction = dir,
 				cutSize = 32,
-				flag = "laser_cutter_activate"
+				flag = "laser_cutter_activate",
+				invert = true
 			}
 		})
 	table.insert(laserCutterPulse.placements, {
 		name = "Laser Cutter (Pulse, "..dir..")",
 		data = {
-				frequency = 2.0,
+				cooldown = 2.0,
 				firingLength = 1.0,
 				cutSize = 32,
 				direction = dir
@@ -85,7 +101,7 @@ for _, dir in ipairs(directions) do
 	table.insert(laserCutterInFront.placements, {
 		name = "Laser Cutter (In Front, "..dir..")",
 		data = {
-				frequency = 2.0,
+				cooldown = 2.0,
 				firingLength = 1.0,
 				cutSize = 32,
 				direction = dir
@@ -94,11 +110,11 @@ for _, dir in ipairs(directions) do
 	table.insert(laserCutterBreakbeam.placements, {
 		name = "Laser Cutter (Breakbeam, "..dir..")",
 		data = {
-				frequency = 2.0,
+				cooldown = 2.0,
 				firingLength = 1.0,
 				direction = dir,
 				cutSize = 32,
-				breakBeamThickness=32
+				breakbeamThickness=32
 			}
 		})
 end
