@@ -9,7 +9,15 @@ addSlicerOnLoadTrigger.fieldInformation = {
     direction = {
         options = directions,
         editable = false
-    }
+    },
+	cutSize = {
+		fieldType = "integer",
+		minimumValue=8
+	},
+	knifeLength = {
+		fieldType = "integer",
+		minimumValue=1
+	}
 }
 
 for _, dir in ipairs(directions) do
@@ -22,7 +30,8 @@ for _, dir in ipairs(directions) do
 			direction = dir,
 			roomwide = false,
 			cutSize = 16,
-			knifeLength = 8
+			knifeLength = 8,
+			onLoadOnly=false
 		}
 	}
 	table.insert(addSlicerOnLoadTrigger.placements, placement)
