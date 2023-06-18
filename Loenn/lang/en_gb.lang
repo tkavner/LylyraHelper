@@ -1,4 +1,5 @@
 #Knife Spikes
+
 entities.LylyraHelper/KnifeSpikesUp.placements.name.up_default=Knife Spikes (Up, Default)
 entities.LylyraHelper/KnifeSpikesUp.placements.name.up_outline=Knife Spikes (Up, Outline)
 entities.LylyraHelper/KnifeSpikesUp.placements.name.up_cliffside=Knife Spikes (Up, Cliffside)
@@ -16,11 +17,54 @@ entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_outline=Knife Spikes 
 entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_cliffside=Knife Spikes (Left, Cliffside)
 entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_reflection=Knife Spikes (Left, Reflection)
 
+#Laser Cutter
+
+entities.LylyraHelper/LaserCutterFlag.attributes.description.direction=The direction the laser cutter fires.
+entities.LylyraHelper/LaserCutterFlag.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
+entities.LylyraHelper/LaserCutterFlag.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Minimum: 8
+entities.LylyraHelper/LaserCutterFlag.attributes.description.cooldown=The amount of time, in seconds, the laser cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the laser will activate as soon as possible.
+entities.LylyraHelper/LaserCutterFlag.attributes.description.flag=The session flag that needs to be active for the laser to fire. Laser will continously fire while the flag is active.
+entities.LylyraHelper/LaserCutterFlag.attributes.description.invert=If checked, the laser cutter will be off when the flag is set to true, and on when the flag is set to false.
+
+entities.LylyraHelper/LaserCutterPulse.attributes.description.direction=The direction the laser cutter fires.
+entities.LylyraHelper/LaserCutterPulse.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
+entities.LylyraHelper/LaserCutterPulse.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Minimum: 8
+entities.LylyraHelper/LaserCutterFlag.attributes.description.cooldown=The amount of time, in seconds, the Laser Cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the Laser Cutter will reactivate as soon as possible.
+
+entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.direction=The direction the laser cutter fires.
+entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
+entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Should be a multiple of 8. Minimum: 8
+entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.cooldown=The amount of time, in seconds, the Laser Cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the Laser Cutter will activate as soon as possible.
+entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.breakbeamThickness=The size breakbeam, in pixels. Minimum: 1.
+
+entities.LylyraHelper/LaserCutterInFront.attributes.description.direction=The direction the laser cutter fires.
+entities.LylyraHelper/LaserCutterInFront.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
+entities.LylyraHelper/LaserCutterInFront.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Minimum: 8
+entities.LylyraHelper/LaserCutterInFront.attributes.description.cooldown=The amount of time, in seconds, the Laser Cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the Laser Cutter will activate as soon as possible.
+
 #Dash Paper
 
-entities.LylyraHelper/DashPaper.attributes.description.SpawnScissors=If checked, spawn Scissors on dash. Scissors spawn behind the player and move in the cardinal direction(s) dashed (Diagonal dashes spawn)
+entities.LylyraHelper/DashPaper.attributes.description.spawnScissors=If checked, spawn Scissors when dashing on the Paper. Scissors spawn behind the player at the edge of the Paper and move in the cardinal direction(s) dashed. Diagonal dashes spawn two scissors on both of the cardinals dashed.
 entities.LylyraHelper/DashPaper.attributes.description.noParticleEffects=If checked, this entity does not emit particle effects (besides player trail effects)
 entities.LylyraHelper/DashPaper.attributes.description.noTrail=If checked, this entity will not add a trail of particle effects to the player when the player is inside the paper.
 #entities.LylyraHelper/DashPaper.attributes.description.FragileScissors=
 #entities.LylyraHelper/DashPaper.attributes.description.Flag=The name of the session flag to set. Flag is set to true
 #entities.LylyraHelper/DashPaper.attributes.description.Flag=If checked, the dash paper will 
+
+#Deathnote
+
+
+
+#Add Slicer Trigger
+
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.cutSize=The size of the hole cut by the Slicer, in pixels. Minimum: 8
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.direction=The side the Slicers added cut from. "All" will add four slicers to the trigger, one each of Up, Down, Left, and Right.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.entityTypes=(Optional) The full name of the type of entity(s) to attach to.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.SolidTiles,Celeste.CrushBlock).\nIf list is empty, Slicers will be added to all Entities in range of the Trigger.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.knifeLength=The maximum distance, in pixels, the Slicer extends beyond the attached entity's hitbox. Minimum: 1
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.roomwide=If checked, the trigger will attempt to add triggers to all applicable Entities in the room, regardless of if they are inside the trigger.\nIf unchecked, the trigger will only add Slicers to Entities inside the trigger.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.singleUse=If checked, the trigger will only attempt to add a Slicer to the first applicable Entity.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.sliceOnImpact=If checked, the Slicer(s) added will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the Slicer will not attempt cut until the Slicer no longer collides with the Cuttable Entity's hitbox.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.onLoadOnly=If checked, the Trigger will remove itself after the room is loaded.\nIf unchecked, the Trigger will be persistent and add Slicers to Entities spawned after loading as well, such as those created by the result of a Slicer cutting a Solid in pieces.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.flag=The session flag that needs to be active for the trigger to activate. Flag check is skipped if left blank.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.invert=If checked, the trigger will be off when the flag is set to true, and on when the flag is set to false.
+
