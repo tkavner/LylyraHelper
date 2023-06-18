@@ -39,7 +39,12 @@ laserCutterInFront.fieldInformation = {
         editable = false
     },
 	cutSize = {
-		fieldType = "integer"
+		fieldType = "integer",
+		minimumValue = 8
+	},
+	breakbeamThickness = {
+		fieldType = "integer",
+		minimumValue=1
 	}
 }
 
@@ -49,7 +54,8 @@ laserCutterPulse.fieldInformation = {
         editable = false
     },
 	cutSize = {
-		fieldType = "integer"
+		fieldType = "integer",
+		minimumValue = 8
 	}
 }
 
@@ -59,7 +65,8 @@ laserCutterFlag.fieldInformation = {
         editable = false
     },
 	cutSize = {
-		fieldType = "integer"
+		fieldType = "integer",
+		minimumValue = 8
 	}
 }
 
@@ -69,10 +76,12 @@ laserCutterBreakbeam.fieldInformation = {
         editable = false
     },
 	cutSize = {
-		fieldType = "integer"
+		fieldType = "integer",
+		minimumValue = 8
 	},
 	breakbeamThickness = {
-		fieldType = "integer"
+		fieldType = "integer",
+		minimumValue=1
 	}
 }
 
@@ -104,7 +113,8 @@ for _, dir in ipairs(directions) do
 				cooldown = 2.0,
 				firingLength = 1.0,
 				cutSize = 32,
-				direction = dir
+				direction = dir,
+				breakbeamThickness=32
 			}
 		})
 	table.insert(laserCutterBreakbeam.placements, {

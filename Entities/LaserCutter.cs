@@ -675,16 +675,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 switch (direction.ToLower())
                 {
                     case "up":
-                        breakbeam = new Breakbeam(Position - new Vector2(0, 640 - 16), this, new Vector2(32, 640)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position - new Vector2(0, 640 - 16), this, new Vector2(breakbeamThickness, 640)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                     case "down":
-                        breakbeam = new Breakbeam(Position - new Vector2(0, -24), this, new Vector2(32, 640)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position - new Vector2(0, -24), this, new Vector2(breakbeamThickness, 640)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                     case "left":
-                        breakbeam = new Breakbeam(Position - new Vector2(640 - 8, -4), this, new Vector2(640, 32)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position - new Vector2(640 - 8, -4), this, new Vector2(640, breakbeamThickness)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                     case "right":
-                        breakbeam = new Breakbeam(Position - new Vector2(0, -4), this, new Vector2(640, 32)); //TODO Change breakbeam sizing after finishing spriting
+                        breakbeam = new Breakbeam(Position - new Vector2(0, -4), this, new Vector2(640, breakbeamThickness)); //TODO Change breakbeam sizing after finishing spriting
                         break;
                 }
                 scene.Add(breakbeam);
