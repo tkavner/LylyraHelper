@@ -71,7 +71,7 @@ laserCutterBreakbeam.fieldInformation = {
 	cutSize = {
 		fieldType = "integer"
 	},
-	breakBeamThickness=32 = {
+	breakbeamThickness = {
 		fieldType = "integer"
 	}
 }
