@@ -31,7 +31,9 @@ for _, dir in ipairs(directions) do
 			roomwide = false,
 			cutSize = 16,
 			knifeLength = 8,
-			onLoadOnly=false
+			onLoadOnly=false,
+			flag="",
+			invert=false
 		}
 	}
 	table.insert(addSlicerOnLoadTrigger.placements, placement)

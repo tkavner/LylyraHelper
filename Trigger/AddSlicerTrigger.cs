@@ -25,6 +25,8 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private int cutSize;
         private bool onLoad;
         private bool used;
+        private bool invert;
+        private string flag;
 
         public AddSlicerTrigger(EntityData data, Vector2 offset) : base(data, offset)
         {
@@ -37,14 +39,16 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             knifeLength = data.Int("slicerLength", 8);
             cutSize = data.Int("cutSize", 16);
             onLoad = data.Bool("onLoadOnly", false);
+            flag = data.Attr("flag", "");
+            invert = data.Bool("invert", false);
         }
 
 
         public override void Update()
         {
             base.Update();
-            if (!used) 
-            { 
+            if (!used && CheckFlag())
+            {
                 foreach (Entity e in Scene.Entities)
                 {
                     if (e.Collider == null) continue;
@@ -52,7 +56,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                     TryAddSlicer(e);
                 }
             }
-            used = oneUse;
+            if (onLoad) Scene.Remove(this);
         }
 
         public static void Load()
@@ -61,16 +65,26 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         }
         public static void Unload()
         {
-            On.Monocle.Scene.Add_Entity += SlicerTriggerCheck;
+            On.Monocle.Scene.Add_Entity -= SlicerTriggerCheck;
+        }
+
+        public bool CheckFlag()
+        {
+            return flag == "" || (SceneAs<Level>().Session.GetFlag(flag) ^ invert);
         }
 
         private static void SlicerTriggerCheck(On.Monocle.Scene.orig_Add_Entity orig, Scene self, Entity entity)
         {
             orig.Invoke(self, entity);
+            Logger.Log("LylyraHelper", "Got this far");
             foreach (AddSlicerTrigger trigger in self.Tracker.GetEntities<AddSlicerTrigger>())
             {
-                if (entity.Collider == null && !trigger.onLoad && !trigger.used)
-                    trigger.TryAddSlicer(entity);
+                if (trigger.used) continue;
+                if (trigger.CheckFlag())
+                {
+                    if (entity.Collider == null || (entity.Collider != null && entity.CollideCheck(trigger)))
+                        trigger.TryAddSlicer(entity);
+                }
             }
         }
 
@@ -78,16 +92,17 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         {
             string entityName = entity.GetType().FullName;
             bool flag0 = entityTypes.Length == 0;
-            flag0 |= entityTypes.Contains(entityName);
+            flag0 = flag0 || entityTypes.Contains(entityName);
+            Logger.Log("LylyraHelper", "flag0" + flag0);
             if (flag0)
             {
                 bool tempCollide = this.Collidable;
                 this.Collidable = true;
                 bool collide = this.CollideCheck(entity);
                 this.Collidable = tempCollide;
-                used = oneUse;
                 if (collide || roomwide)
                 {
+                    used = oneUse;
                     Collider cUp = new Hitbox(entity.Collider.Width, entity.Collider.Height, -entity.Collider.Width / 2, -entity.Collider.Height / 2);
                     cUp.Height = cUp.Height + knifeLength;
                     cUp.Top -= knifeLength;
