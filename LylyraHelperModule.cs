@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Components;
+using Celeste.Mod.LylyraHelper.Effects;
 using Celeste.Mod.LylyraHelper.Triggers;
 using LylyraHelper.Entities;
 using LylyraHelper.Other;
@@ -33,6 +34,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             PaperHitbox.Load();
             AddSlicerTrigger.Load();
             typeof(ModExports).ModInterop();
+
+            Everest.Events.Level.OnLoadBackdrop += OnLoadBackdrop;
         }
 
         public override void Unload()
@@ -40,14 +43,24 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors.Unload();
             PaperHitbox.Unload();
             AddSlicerTrigger.Unload();
+            Everest.Events.Level.OnLoadBackdrop -= OnLoadBackdrop;
         }
 
         public override void LoadContent(bool firstLoad)
         {
             base.LoadContent(firstLoad);
             _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
-
         }
+
+        private Backdrop OnLoadBackdrop(MapData map, BinaryPacker.Element child, BinaryPacker.Element above)
+        {
+            if (child.Name.Equals("LylyraHelper/HexagonalGodray", StringComparison.OrdinalIgnoreCase))
+            {
+                return new HexagonalGodray(child.Attr("color"), child.Attr("fadeColor"), child.AttrInt("numberOfRays"), child.AttrFloat("speedX"), child.AttrFloat("speedY"), child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.AttrBool("hexLerp", false));
+            }
+            return null;
+        }
+
 
         [ModExportName("LylyraHelper.Slicer")]
         private static class ModExports
