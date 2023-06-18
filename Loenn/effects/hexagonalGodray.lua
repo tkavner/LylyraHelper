@@ -25,7 +25,7 @@ hexGodray.defaultData = {
     speedY = 8.0,
     rotation = 0.0,
     rotationRandomness = 0.0,
-    hsvLerp = false
+    hsvBlending = false
 }
 
 return hexGodray

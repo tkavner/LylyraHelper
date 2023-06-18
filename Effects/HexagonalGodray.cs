@@ -62,7 +62,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
         public float speedX;
         public float speedY;
-        private bool hsvLerp;
+        private bool hsvBlending;
         private float minRotation;
         private float maxRotation;
 
@@ -81,7 +81,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
             UseSpritebatch = false;
             speedX = speedx;
             speedY = speedy;
-            this.hsvLerp = hsvLerp;
+            this.hsvBlending = hsvLerp;
 
             this.minRotation = minRotation;
             this.maxRotation = Math.Max(0, maxRotation);
@@ -126,7 +126,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
                 Vector2 vector3 = new Vector2((int)num2, (int)num3);
 
                 Color color = Color.White;
-                if (hsvLerp)
+                if (hsvBlending)
                 {
                     color = HSVLerp(rayColor, fadeColor, percent) * Ease.CubeInOut(Calc.Clamp(((percent < 0.5f) ? percent : (1f - percent)) * 2f, 0f, 1f)) * fade;
                 } else
