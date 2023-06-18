@@ -1,7 +1,7 @@
 LylyraHelper was coded by @lyraohmi (discord) but there were many people who have helped along the way. This is the list of credits and thanks for other's contributions:
 
-Viv for encouraging me to finish this helper module in the first place and for their help navigating more nuanced parts of the Celeste codebase.
-Nerfred for making the scissor sprites and art help.
-TiltTheStars for coming up with the idea for Honeycomb Godrays
-Kataiser for the scissor sound effects
+Viv for encouraging me to finish this helper module in the first place and for their help navigating more nuanced parts of the Celeste and Everest code.
+Nerfred for making the scissor sprites, laser sprites, and art help.
+Kataiser for the scissor sound effects.
+TiltTheStars for coming up with the idea for Honeycomb Godrays.
 SJCord for generalized help and nudges along the way.
