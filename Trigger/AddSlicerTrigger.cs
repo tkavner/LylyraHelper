@@ -42,14 +42,17 @@ namespace Celeste.Mod.LylyraHelper.Triggers
 
         public override void Update()
         {
-            base.Update(); 
-            if (!used) foreach (Entity e in Scene.Entities)
-            {
-                if (e.Collider == null) continue;
-                TryAddSlicer(e);
-
+            base.Update();
+            if (!used) 
+            { 
+                foreach (Entity e in Scene.Entities)
+                {
+                    if (e.Collider == null) continue;
+                    if (e.Get<Slicer>() != null) continue;
+                    TryAddSlicer(e);
+                }
             }
-            used = true;
+            used = oneUse;
         }
 
         public static void Load()
