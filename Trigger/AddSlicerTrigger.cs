@@ -66,7 +66,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             orig.Invoke(self, entity);
             foreach (AddSlicerTrigger trigger in self.Tracker.GetEntities<AddSlicerTrigger>())
             {
-                if (entity.Collider == null && !trigger.oneUse)
+                if (entity.Collider == null && !trigger.onLoad && !trigger.used)
                     trigger.TryAddSlicer(entity);
             }
         }
@@ -82,6 +82,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                 this.Collidable = true;
                 bool collide = this.CollideCheck(entity);
                 this.Collidable = tempCollide;
+                used = oneUse;
                 if (collide || roomwide)
                 {
                     Collider cUp = new Hitbox(entity.Collider.Width, entity.Collider.Height, -entity.Collider.Width / 2, -entity.Collider.Height / 2);
@@ -104,28 +105,22 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                         entity.Add(new Slicer(Vector2.UnitY, cutSize, SceneAs<Level>(), knifeLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile));
                         entity.Add(new Slicer(Vector2.UnitX, cutSize, SceneAs<Level>(), knifeLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile));
                         entity.Add(new Slicer(-Vector2.UnitX, cutSize, SceneAs<Level>(), knifeLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile));
-
-                        if (oneUse) break;
                     }
                     else if (direction == "Up")
                     {
                         entity.Add(new Slicer(-Vector2.UnitY, cutSize, SceneAs<Level>(), knifeLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile));
-                        if (oneUse) break;
                     }
                     else if (direction == "Down")
                     {
                         entity.Add(new Slicer(Vector2.UnitY, cutSize, SceneAs<Level>(), knifeLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile));
-                        if (oneUse) break;
                     }
                     else if (direction == "Right")
                     {
                         entity.Add(new Slicer(Vector2.UnitX, cutSize, SceneAs<Level>(), knifeLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile));
-                        if (oneUse) break;
                     }
                     else if (direction == "Left")
                     {
                         entity.Add(new Slicer(-Vector2.UnitX, cutSize, SceneAs<Level>(), knifeLength, sliceOnImpact: sliceOnImpact, fragile: fragile));
-                        if (oneUse) break;
                     }
                 }
             }
