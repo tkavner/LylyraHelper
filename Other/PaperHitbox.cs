@@ -124,6 +124,21 @@ namespace LylyraHelper.Entities
             return orig.Invoke(self, collider);
         }
 
+        public override void Render(Camera camera, Color color)
+        {
+            base.Render(camera, color);
+            for (int i = 0; i < Width / 8; i++)
+            {
+                for (int j = 0; j < Height / 8; j++)
+                {
+                    if (!Parent.skip[i, j])
+                    {
+                        Draw.HollowRect(Parent.Position + new Vector2(i * 8, j * 8), 8, 8, Color.Red);
+                    }
+                }
+            }
+        }
+
         public static void Load()
         {
             On.Monocle.Collider.Collide_Collider += CollidePaper;
