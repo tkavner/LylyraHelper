@@ -13,21 +13,10 @@ using System.Threading.Tasks;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
-    [CustomEntity(new string[]
-{
-    "LylyraHelper/LaserCutterPulse = LoadPulse",
-    "LylyraHelper/LaserCutterBreakbeam = LoadBreakbeam",
-    "LylyraHelper/LaserCutterInFront = LoadInFront",
-    "LylyraHelper/LaserCutterFlag = LoadFlag"
-})]
+    [CustomEntity("LylyraHelper/LaserCutter")]
     public class LaserCutter : Solid
     {
 
-
-        public static Entity LoadPulse(Level level, LevelData levelData, Vector2 offset, EntityData data) => new LaserCutter(data, offset, FiringMode.Pulse);
-        public static Entity LoadBreakbeam(Level level, LevelData levelData, Vector2 offset, EntityData data) => new LaserCutter(data, offset, FiringMode.Breakbeam);
-        public static Entity LoadInFront(Level level, LevelData levelData, Vector2 offset, EntityData data) => new LaserCutter(data, offset, FiringMode.bbnls);
-        public static Entity LoadFlag(Level level, LevelData levelData, Vector2 offset, EntityData data) => new LaserCutter(data, offset, FiringMode.Flag);
 
         public class Laser : Entity
         {
@@ -549,7 +538,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         }
         public enum FiringMode
         {
-            bbnls, Breakbeam, Flag, Pulse
+            InFront, Breakbeam, Pulse
         }
 
         public class Breakbeam : Entity
@@ -574,7 +563,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             public void OnPlayer(Player player)
             {
-                if (Parent.mode == FiringMode.Breakbeam || Parent.mode == FiringMode.bbnls) Parent.Fire();
+                if (Parent.mode == FiringMode.Breakbeam || Parent.mode == FiringMode.InFront) Parent.Fire();
             }
 
         }
@@ -601,7 +590,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal Collider bigHitbox;
         private bool invert;
 
-        public LaserCutter(EntityData data, Vector2 offset, FiringMode fm) :
+        public LaserCutter(EntityData data, Vector2 offset) :
             base(data.Position + offset, 32, 32, false)
         {
             direction = data.Attr("direction", "Up");
@@ -610,7 +599,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             firingLength = data.Float("firingLength", 1F);
             cooldownTime = data.Float("cooldown", 2F);
             invert = data.Bool("invert", false);
-            mode = fm;
+            flagName = data.Attr("flag", "");
+            string strmode = data.Attr("mode", "breakbeam").ToLower();
+            if (strmode == "breakbeam") mode = FiringMode.Breakbeam;
+            else if (strmode == "in front") mode = FiringMode.InFront;
+            else mode = FiringMode.Pulse;
             Add(sprite = LylyraHelperModule.SpriteBank.Create("laserCutter" + direction));
             direction = direction.ToLower();
             sprite.Play("idle");
@@ -670,7 +663,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (mode == FiringMode.bbnls)
+            if (mode == FiringMode.InFront)
             {
                 switch (direction.ToLower())
                 {
@@ -715,6 +708,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         }
         private void Fire()
         {
+            if (!CheckFlag()) return;
             if (laserCooldown <= 0 && sprite.CurrentAnimationID == "idle")
             {
                 sprite.Play("fire", false);
@@ -800,12 +794,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 {
                     Fire();
                 }
-                if (laserCooldown <= 0 && sprite.CurrentAnimationID == "idle" && mode == FiringMode.Flag && (SceneAs<Level>().Session.GetFlag(flagName) ^ invert))
-                {
-                    Fire();
-                }
             }
         }
+
+        public bool CheckFlag() {
+            return flagName == "" || (SceneAs<Level>().Session.GetFlag(flagName) ^ invert);
+        }
+
         public override void Render()
         {
             if (laser != null) laser.Render();

@@ -89,10 +89,10 @@
     <None Include="Loenn\entities\bubbledScissors.lua" />
     <None Include="Loenn\entities\dashPaper.lua" />
     <None Include="Loenn\entities\deathnote.lua" />
-    <None Include="Loenn\entities\KnifeSpikes.lua" />
+    <None Include="Loenn\entities\knifeSpikes.lua" />
     <None Include="Loenn\entities\laserCutter.lua" />
     <None Include="Loenn\lang\en_gb.lang" />
-    <None Include="Loenn\triggers\AddSlicerTrigger.lua" />
+    <None Include="Loenn\triggers\addSlicerTrigger.lua" />
     <None Include="Loenn\triggers\removeSlicerTrigger.lua" />
   </ItemGroup>
   <ItemGroup>

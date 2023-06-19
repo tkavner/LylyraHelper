@@ -4,36 +4,17 @@ local utils = require("utils")
 local drawing = require("utils.drawing")
 
 local laserCutter = {}
-local laserCutterBreakbeam = {}
-local laserCutterFlag = {}
-local laserCutterPulse = {}
-local laserCutterInFront = {}
 
-laserCutterBreakbeam.name = "LylyraHelper/LaserCutterBreakbeam"
-laserCutterBreakbeam.placements = {}
-laserCutterBreakbeam.canResize = {false, false}
-laserCutterBreakbeam.depth = 0
 
-laserCutterFlag.name = "LylyraHelper/LaserCutterFlag"
-laserCutterFlag.placements = {}
-laserCutterFlag.canResize = {false, false}
-laserCutterFlag.depth = 0
-
-laserCutterPulse.name = "LylyraHelper/LaserCutterPulse"
-laserCutterPulse.placements = {}
-laserCutterPulse.canResize = {false, false}
-laserCutterPulse.depth = 0
-
-laserCutterInFront.name = "LylyraHelper/LaserCutterInFront"
-laserCutterInFront.placements = {}
-laserCutterInFront.canResize = {false, false}
-laserCutterInFront.depth = 0
+laserCutter.name = "LylyraHelper/LaserCutter"
+laserCutter.placements = {}
+laserCutter.canResize = {false, false}
+laserCutter.depth = 0
 
 local directions = {"Up", "Down", "Left", "Right"}
-local modes = {"Flag", "Pulse", "In Front", "Breakbeam"}
+local modes = {"Pulse", "In Front", "Breakbeam"}
 
-
-laserCutterInFront.fieldInformation = {
+laserCutter.fieldInformation = {
     direction = {
         options = directions,
         editable = false
@@ -44,89 +25,33 @@ laserCutterInFront.fieldInformation = {
 	},
 	breakbeamThickness = {
 		fieldType = "integer",
-		minimumValue=1
-	}
-}
-
-laserCutterPulse.fieldInformation = {
-    direction = {
-        options = directions,
-        editable = false
-    },
-	cutSize = {
-		fieldType = "integer",
-		minimumValue = 8
-	}
-}
-
-laserCutterFlag.fieldInformation = {
-    direction = {
-        options = directions,
-        editable = false
-    },
-	cutSize = {
-		fieldType = "integer",
-		minimumValue = 8
-	}
-}
-
-laserCutterBreakbeam.fieldInformation = {
-    direction = {
-        options = directions,
-        editable = false
-    },
-	cutSize = {
-		fieldType = "integer",
-		minimumValue = 8
+		minimumValue = 1
 	},
-	breakbeamThickness = {
-		fieldType = "integer",
-		minimumValue=1
+	mode = {
+		options = modes,
+		editable = false
 	}
 }
+	
+
+
 
 
 for _, dir in ipairs(directions) do
-	table.insert(laserCutterFlag.placements, {
-		name = "Laser Cutter (Flag, "..dir..")",
-		data = {
-				cooldown = 2.0,
-				firingLength = 1.0,
-				direction = dir,
-				cutSize = 32,
-				flag = "laser_cutter_activate",
-				invert = true
-			}
-		})
-	table.insert(laserCutterPulse.placements, {
-		name = "Laser Cutter (Pulse, "..dir..")",
-		data = {
-				cooldown = 2.0,
-				firingLength = 1.0,
-				cutSize = 32,
-				direction = dir
-			}
-		})
-	table.insert(laserCutterInFront.placements, {
-		name = "Laser Cutter (In Front, "..dir..")",
-		data = {
+	for __, m in ipairs(modes) do
+		table.insert(laserCutter.placements, {
+			name = "Laser Cutter ("..m..", "..dir..")",
+			data = {
 				cooldown = 2.0,
 				firingLength = 1.0,
 				cutSize = 32,
 				direction = dir,
-				breakbeamThickness=32
+				mode = m,
+				flag="",
+				invert=false
 			}
 		})
-	table.insert(laserCutterBreakbeam.placements, {
-		name = "Laser Cutter (Breakbeam, "..dir..")",
-		data = {
-				cooldown = 2.0,
-				firingLength = 1.0,
-				direction = dir,
-				cutSize = 32,
-				breakbeamThickness=32
-			}
-		})
+	end
 end
 
 function laserCutter.sprite(room, entity)
@@ -147,86 +72,5 @@ function laserCutter.sprite(room, entity)
 	end
 	return sprite
 end
-
-function laserCutterBreakbeam.sprite(room, entity)
-	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/laserCutter/idle00", {x = entity.x, y = entity.y, atlas = atlas})
-	direction = entity.direction
-	if (direction == "Right") then
-	sprite.rotation = math.pi / 2
-		sprite:setJustification(0.1, 1)
-	elseif (direction == "Down") then
-		sprite.rotation = math.pi
-		sprite:setJustification(0.9, 1)
-	elseif (direction == "Left") then
-		sprite.rotation = 3 * math.pi / 2
-		
-		sprite:setJustification(0.9, 0.2)
-	else 
-		sprite:setJustification(0.1, 0.2)
-	end
-	return sprite
-end
-
-function laserCutterFlag.sprite(room, entity)
-	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/laserCutter/idle00", {x = entity.x, y = entity.y, atlas = atlas})
-	direction = entity.direction
-	if (direction == "Right") then
-	sprite.rotation = math.pi / 2
-		sprite:setJustification(0.1, 1)
-	elseif (direction == "Down") then
-		sprite.rotation = math.pi
-		sprite:setJustification(0.9, 1)
-	elseif (direction == "Left") then
-		sprite.rotation = 3 * math.pi / 2
-		
-		sprite:setJustification(0.9, 0.2)
-	else 
-		sprite:setJustification(0.1, 0.2)
-	end
-	return sprite
-end
-
-function laserCutterPulse.sprite(room, entity)
-	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/laserCutter/idle00", {x = entity.x, y = entity.y, atlas = atlas})
-	direction = entity.direction
-	if (direction == "Right") then
-	sprite.rotation = math.pi / 2
-		sprite:setJustification(0.1, 1)
-	elseif (direction == "Down") then
-		sprite.rotation = math.pi
-		sprite:setJustification(0.9, 1)
-	elseif (direction == "Left") then
-		sprite.rotation = 3 * math.pi / 2
-		
-		sprite:setJustification(0.9, 0.2)
-	else 
-		sprite:setJustification(0.1, 0.2)
-	end
-	return sprite
-end
-
-function laserCutterInFront.sprite(room, entity)
-	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/laserCutter/idle00", {x = entity.x, y = entity.y, atlas = atlas})
-	direction = entity.direction
-	if (direction == "Right") then
-	sprite.rotation = math.pi / 2
-		sprite:setJustification(0.1, 1)
-	elseif (direction == "Down") then
-		sprite.rotation = math.pi
-		sprite:setJustification(0.9, 1)
-	elseif (direction == "Left") then
-		sprite.rotation = 3 * math.pi / 2
-		
-		sprite:setJustification(0.9, 0.2)
-	else 
-		sprite:setJustification(0.1, 0.2)
-	end
-	return sprite
-end
-
-table.insert(laserCutter, laserCutterFlag)
-table.insert(laserCutter, laserCutterInFront)
-table.insert(laserCutter, laserCutterBreakbeam)
-table.insert(laserCutter, laserCutterPulse)
 
 return laserCutter
