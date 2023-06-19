@@ -93,7 +93,6 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             string entityName = entity.GetType().FullName;
             bool flag0 = entityTypes.Length == 0;
             flag0 = flag0 || entityTypes.Contains(entityName);
-            Logger.Log("LylyraHelper", "flag0" + flag0);
             if (flag0)
             {
                 bool tempCollide = this.Collidable;
