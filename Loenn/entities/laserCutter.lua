@@ -14,29 +14,6 @@ laserCutter.depth = 0
 local directions = {"Up", "Down", "Left", "Right"}
 local modes = {"Pulse", "In Front", "Breakbeam"}
 
-laserCutter.fieldInformation = {
-    direction = {
-        options = directions,
-        editable = false
-    },
-	cutSize = {
-		fieldType = "integer",
-		minimumValue = 8
-	},
-	breakbeamThickness = {
-		fieldType = "integer",
-		minimumValue = 1
-	},
-	mode = {
-		options = modes,
-		editable = false
-	}
-}
-	
-
-
-
-
 for _, dir in ipairs(directions) do
 	for __, m in ipairs(modes) do
 		table.insert(laserCutter.placements, {
@@ -48,10 +25,36 @@ for _, dir in ipairs(directions) do
 				direction = dir,
 				mode = m,
 				flag="",
-				invert=false
+				invert=false,
+				breakbeamThickness=32
 			}
 		})
 	end
+end
+
+
+function laserCutter.fieldInformation(entity)
+	local x = 
+	{
+		direction = {
+			options = directions,
+			editable = false
+		},
+		cutSize = {
+			fieldType = "integer",
+			minimumValue = 8
+		},
+		breakbeamThickness = {
+			fieldType = "integer",
+			minimumValue = 1,
+			--editable = entity.mode ~= "Pulse"
+		},
+		mode = {
+			options = modes,
+			editable = false
+		}
+	}
+	return x
 end
 
 function laserCutter.sprite(room, entity)

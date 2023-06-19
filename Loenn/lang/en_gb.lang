@@ -19,28 +19,14 @@ entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_reflection=Knife Spik
 
 #Laser Cutter
 
-entities.LylyraHelper/LaserCutterFlag.attributes.description.direction=The direction the laser cutter fires.
-entities.LylyraHelper/LaserCutterFlag.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
-entities.LylyraHelper/LaserCutterFlag.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Minimum: 8
-entities.LylyraHelper/LaserCutterFlag.attributes.description.cooldown=The amount of time, in seconds, the laser cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the laser will activate as soon as possible.
-entities.LylyraHelper/LaserCutterFlag.attributes.description.flag=The session flag that needs to be active for the laser to fire. Laser will continously fire while the flag is active.
-entities.LylyraHelper/LaserCutterFlag.attributes.description.invert=If checked, the laser cutter will be off when the flag is set to true, and on when the flag is set to false.
-
-entities.LylyraHelper/LaserCutterPulse.attributes.description.direction=The direction the laser cutter fires.
-entities.LylyraHelper/LaserCutterPulse.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
-entities.LylyraHelper/LaserCutterPulse.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Minimum: 8
-entities.LylyraHelper/LaserCutterFlag.attributes.description.cooldown=The amount of time, in seconds, the Laser Cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the Laser Cutter will reactivate as soon as possible.
-
-entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.direction=The direction the laser cutter fires.
-entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
-entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Should be a multiple of 8. Minimum: 8
-entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.cooldown=The amount of time, in seconds, the Laser Cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the Laser Cutter will activate as soon as possible.
-entities.LylyraHelper/LaserCutterBreakbeam.attributes.description.breakbeamThickness=The size breakbeam, in pixels. Minimum: 1.
-
-entities.LylyraHelper/LaserCutterInFront.attributes.description.direction=The direction the laser cutter fires.
-entities.LylyraHelper/LaserCutterInFront.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
-entities.LylyraHelper/LaserCutterInFront.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Minimum: 8
-entities.LylyraHelper/LaserCutterInFront.attributes.description.cooldown=The amount of time, in seconds, the Laser Cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the Laser Cutter will activate as soon as possible.
+entities.LylyraHelper/LaserCutter.attributes.description.direction=The direction the laser cutter fires.
+entities.LylyraHelper/LaserCutter.attributes.description.firingLength=The amount of time, in seconds, the laser cutter should fire for.
+entities.LylyraHelper/LaserCutter.attributes.description.cutSize=The size of the hole cut by the Laser Cutter's Laser, in pixels. Minimum: 8
+entities.LylyraHelper/LaserCutter.attributes.description.cooldown=The amount of time, in seconds, the laser cutter takes to reactivate. If the cooldown is less than the amount of time to fire and reset the laser, the laser will activate as soon as possible.
+entities.LylyraHelper/LaserCutter.attributes.description.flag=(Optional) Session Flag that turns on the Laser Cutter.\nIf flag is left blank, no flag will be required to turn the Laser Cutter on.
+entities.LylyraHelper/LaserCutter.attributes.description.invert=If checked, the Laser Cutter will be off when the flag is set to true, and on when the flag is set to false.
+entities.LylyraHelper/LaserCutter.attributes.description.mode=Determines how the Laser Cutter fires.\nBreakbeam: Laser Cutter fires when walks into the line of sight of the Laser Cutter.\nIn Front: Laser Cutter fires when walks in front of of the Laser Cutter, ignoring solid blocks and terrain that may be blocking the way. The laser fired will still be blockable via terrain and solid blocks, however.\nPulse: The laser will attempt to fire as soon as the cooldown timer specified by 'cooldown' has expired.
+entities.LylyraHelper/LaserCutter.attributes.description.breakbeamThickness=Width of the breakbeam in Breakbeam / In Front mode. Not used if Laser Cutter is set to Pulse mode.
 
 #Dash Paper
 
