@@ -14,6 +14,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
     [CustomEntity("LylyraHelper/RemoveSlicerTrigger")]
     public class RemoveSlicerTrigger : Trigger
     {
+        private bool oneUse;
         private string[] entityTypes;
         private bool roomwide;
         private bool onLoad;
@@ -66,6 +67,10 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                 if (collide || roomwide)
                 {
                     entity.Remove(slicer);
+                    if (oneUse)
+                    {
+                        Scene.Remove(this);
+                    }
                 }
             }
         }
