@@ -14,7 +14,7 @@ addSlicerOnLoadTrigger.fieldInformation = {
 		fieldType = "integer",
 		minimumValue=8
 	},
-	knifeLength = {
+	slicerLength = {
 		fieldType = "integer",
 		minimumValue=1
 	}
@@ -30,7 +30,7 @@ for _, dir in ipairs(directions) do
 			direction = dir,
 			roomwide = false,
 			cutSize = 16,
-			knifeLength = 8,
+			slicerLength = 8,
 			onLoadOnly=false,
 			flag="",
 			invert=false
