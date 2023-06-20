@@ -1,5 +1,5 @@
 {be721364-ec75-44a6-9063-768cb2be6f11} event:/LylyraHelper/laser_beam
-{cbc3f196-5202-48e5-9eb8-738a1c34a929} event:/LylyraHelper/laser_fire
-{a82cd911-dea1-45ac-a91e-37e0add1d73c} event:/LylyraHelper/laser_power_down
-{54acca3e-76ac-43ea-a37a-ceeb79cba68d} event:/LylyraHelper/scissor_cut
+{c40e0306-96e4-4e3e-93f7-e1d9d25d9e08} event:/LylyraHelper/laser_power_up
+{968b6438-6df7-4eb6-99a8-afd116567a5f} event:/LylyraHelper/laser_power_down
+{0ef60b19-a59c-4d69-95f6-5a7df55529f4} event:/LylyraHelper/laser_fire
 {d718c322-cb94-4c1c-97b0-87ba84c125c0} bank:/LylyraHelper

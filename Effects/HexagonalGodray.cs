@@ -66,7 +66,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
         private float minRotation;
         private float maxRotation;
 
-        public HexagonalGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, bool hsvLerp)
+        public HexagonalGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, string blendingMode)
         {
             vertices = new VertexPositionColor[12 * numRays];
             rays = new HexRay[numRays];
@@ -81,7 +81,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
             UseSpritebatch = false;
             speedX = speedx;
             speedY = speedy;
-            this.hsvBlending = hsvLerp;
+            this.hsvBlending = blendingMode == "HSV";
 
             this.minRotation = minRotation;
             this.maxRotation = Math.Max(0, maxRotation);

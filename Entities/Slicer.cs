@@ -1154,8 +1154,10 @@ namespace Celeste.Mod.LylyraHelper.Components
         public override void DebugRender(Camera camera)
         {
             base.DebugRender(camera);
-            slicingCollider?.Render(camera, Color.Yellow);
+            if (slicingCollider != null) Draw.HollowRect(slicingCollider.TopLeft - new Vector2(1), slicingCollider.Width + 2, slicingCollider.Height + 2, Color.Yellow);
         }
+
+        
 
     }
 }

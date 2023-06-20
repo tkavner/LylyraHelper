@@ -19,5 +19,3 @@ function bubbledScissors.sprite(room, entity)
 
     return sprite
 end
-
-return bubbledScissors

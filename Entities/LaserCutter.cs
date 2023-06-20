@@ -16,8 +16,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
     [CustomEntity("LylyraHelper/LaserCutter")]
     public class LaserCutter : Solid
     {
-
-
         public class Laser : Entity
         {
             private Slicer Slicer;
@@ -74,17 +72,23 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     countdown -= newTimestamp - timestamp;
                     counter++;
                 }
-                if (countdown <= 0.2 && !firePlayed)
+                if (countdown <= 0.25 && !firePlayed)
                 {
                     firePlayed = true;
-                    Audio.Play("event:/LylyraHelper/laser_fire", Position, "fade", 0.8F);
+                    Audio.Play("event:/LylyraHelper/laser_fire", Parent.Position);
                 }
                 if (countdown <= 0 && !Visible)
                 {
                     Visible = true;
                     Collidable = true;
                     Parent.Collider = Parent.shortHitbox;
-                    beamAudioToken = Audio.Play("event:/LylyraHelper/laser_beam");
+                    beamAudioToken = Audio.Play("event:/LylyraHelper/laser_beam", Parent.Position);
+
+                    if (Parent.powerUpToken != null)
+                    {
+                        Audio.Stop(Parent.powerUpToken);
+                        Parent.powerUpToken = null;
+                    }
 
                 }
                 int min = int.MaxValue;
@@ -545,7 +549,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             private LaserCutter Parent;
 
-
             public Breakbeam(Vector2 Position, LaserCutter parent, Vector2 size) : base(Position)
             {
                 Add(new PlayerCollider(OnPlayer, new Hitbox(size.X, size.Y)));
@@ -559,7 +562,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Add(new PlayerCollider(OnPlayer, Collider));
                 Parent = parent;
             }
-
 
             public void OnPlayer(Player player)
             {
@@ -711,6 +713,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (!CheckFlag()) return;
             if (laserCooldown <= 0 && sprite.CurrentAnimationID == "idle")
             {
+                powerUpToken = Audio.Play("event:/LylyraHelper/laser_power_up", Position);
                 sprite.Play("fire", false);
                 firingTimer = firingLength;
                 laserCooldown = cooldownTime;
@@ -735,6 +738,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private float lerp = 0;
         private int breakbeamThickness;
+        EventInstance powerUpToken;
 
         public override void Update()
         {
@@ -747,7 +751,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 if (firingTimer <= 0 && (sprite.CurrentAnimationID == "fire" || sprite.CurrentAnimationID == "firecont"))
                 {
                     sprite.Play("reset");
-                    Audio.Play("event:/LylyraHelper/laser_power_down");
+                    Audio.Play("event:/LylyraHelper/laser_power_down", Position);
                     Scene.Remove(laser);
                     laser = null;
                     lerp = 0;

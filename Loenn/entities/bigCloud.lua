@@ -2,6 +2,7 @@ local drawableSprite = require("structs.drawable_sprite")
 
 local bigCloud = {}
 bigCloud.placements = {}
+bigCloud.canResize = {false, false}
 bigCloud.name = "LylyraHelper/BigCloud"
 
 table.insert(bigCloud.placements, {
@@ -13,8 +14,10 @@ table.insert(bigCloud.placements, {
 			}
 		})
 
+
+
 function bigCloud.sprite(room, entity)
-	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/laserCutter/bigcloud00", {x = entity.x, y = entity.y, atlas = atlas})
+	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/bigCloud/bigcloud00", {x = entity.x, y = entity.y, atlas = atlas})
 	
 	sprite:setJustification(0.5, 0.5)
 	

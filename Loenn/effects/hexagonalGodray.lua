@@ -4,6 +4,8 @@ hexGodray.name = "LylyraHelper/HexagonalGodray"
 hexGodray.canBackground = false
 hexGodray.canForeground = true
 
+blendingModes = {"HSV", "RGB"}
+
 hexGodray.fieldInformation = {
     color = {
         fieldType = "color"
@@ -14,6 +16,10 @@ hexGodray.fieldInformation = {
     numberOfRays = {
         fieldType = "integer",
         minimumValue = 1
+    },
+    blendingMode = {
+        options = blendingModes,
+        editable = false
     }
 }
 
@@ -25,7 +31,7 @@ hexGodray.defaultData = {
     speedY = 8.0,
     rotation = 0.0,
     rotationRandomness = 0.0,
-    hsvBlending = false
+    blendingMode="HSV"
 }
 
 return hexGodray
