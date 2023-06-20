@@ -1,21 +1,43 @@
+#Hexagonal Godray
+
+style.effects.LylyraHelper/HexagonalGodray.description.color=The colour the godrays should start as.
+style.effects.LylyraHelper/HexagonalGodray.description.fadeColor=The colour godrays should end as.
+style.effects.LylyraHelper/HexagonalGodray.description.numberOfRays=The number of godrays that will attempted to be rendered simultaneously.
+style.effects.LylyraHelper/HexagonalGodray.description.speedX=The speed at which godrays should travel horizontally.
+style.effects.LylyraHelper/HexagonalGodray.description.speedY=The speed at which godrays should travel vertically.
+style.effects.LylyraHelper/HexagonalGodray.description.rotation=How many degrees to rotate each godray by.
+style.effects.LylyraHelper/HexagonalGodray.description.rotationRandomness=Adds a random amount to the rotation of each godray in degrees to each hexagon between -randomness and +randomness. Set to 0 to not add randomness to rotations.
+style.effects.LylyraHelper/HexagonalGodray.description.blendingMode=What color format to use when blending color and fadeColor. Different formats will achieve different effects.\nHSV:Best when you have dissimilar colors (example: red and green)\nRGB: Good when your colors are similar (example: red and dark red)
+
 #Knife Spikes
 
 entities.LylyraHelper/KnifeSpikesUp.placements.name.up_default=Knife Spikes (Up, Default)
 entities.LylyraHelper/KnifeSpikesUp.placements.name.up_outline=Knife Spikes (Up, Outline)
 entities.LylyraHelper/KnifeSpikesUp.placements.name.up_cliffside=Knife Spikes (Up, Cliffside)
 entities.LylyraHelper/KnifeSpikesUp.placements.name.up_reflection=Knife Spikes (Up, Reflection)
+entities.LylyraHelper/KnifeSpikesLeft.placements.name.up_tentacles=Knife Spikes (Up, Tentacles)
 entities.LylyraHelper/KnifeSpikesRight.placements.name.right_default=Knife Spikes (Right, Default)
 entities.LylyraHelper/KnifeSpikesRight.placements.name.right_outline=Knife Spikes (Right, Outline)
 entities.LylyraHelper/KnifeSpikesRight.placements.name.right_cliffside=Knife Spikes (Right, Cliffside)
 entities.LylyraHelper/KnifeSpikesRight.placements.name.right_reflection=Knife Spikes (Right, Reflection)
+entities.LylyraHelper/KnifeSpikesLeft.placements.name.right_tentacles=Knife Spikes (Right, Tentacles)
 entities.LylyraHelper/KnifeSpikesDown.placements.name.down_default=Knife Spikes (Down, Default)
 entities.LylyraHelper/KnifeSpikesDown.placements.name.down_outline=Knife Spikes (Down, Outline)
 entities.LylyraHelper/KnifeSpikesDown.placements.name.down_cliffside=Knife Spikes (Down, Cliffside)
 entities.LylyraHelper/KnifeSpikesDown.placements.name.down_reflection=Knife Spikes (Down, Reflection)
+entities.LylyraHelper/KnifeSpikesLeft.placements.name.down_tentacles=Knife Spikes (Down, Tentacles)
 entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_default=Knife Spikes (Left, Default)
 entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_outline=Knife Spikes (Left, Outline)
 entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_cliffside=Knife Spikes (Left, Cliffside)
 entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_reflection=Knife Spikes (Left, Reflection)
+entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_tentacles=Knife Spikes (Left, Tentacles)
+
+
+entities.LylyraHelper/KnifeSpikesUp.attributes.description.sliceOnImpact=If checked, the KnifeSpikes will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the KnifeSpikes will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox
+entities.LylyraHelper/KnifeSpikesRight.attributes.description.sliceOnImpact=If checked, the KnifeSpikes will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the KnifeSpikes will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox
+entities.LylyraHelper/KnifeSpikesDown.attributes.description.sliceOnImpact=If checked, the KnifeSpikes will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the KnifeSpikes will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox
+entities.LylyraHelper/KnifeSpikesLeft.attributes.description.sliceOnImpact=If checked, the KnifeSpikes will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the KnifeSpikes will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox
+
 
 #Laser Cutter
 
@@ -45,12 +67,20 @@ entities.LylyraHelper/DashPaper.attributes.description.noTrail=If checked, this 
 
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.cutSize=The size of the hole cut by the Slicer, in pixels. Minimum: 8
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.direction=The side the Slicers added cut from. "All" will add four slicers to the trigger, one each of Up, Down, Left, and Right.
-triggers.LylyraHelper/AddSlicerTrigger.attributes.description.entityTypes=(Optional) The full name of the type of entity(s) to attach to.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.SolidTiles,Celeste.CrushBlock).\nIf list is empty, Slicers will be added to all Entities in range of the Trigger.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.entityTypes=(Optional) The full name of the type of entity(s) to attach Slicers fto.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.SolidTiles,Celeste.CrushBlock).\nIf list is empty, Slicers will be added to all Entities in range of the Trigger.
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.slicerLength=The maximum distance, in pixels, the Slicer extends beyond the attached entity's hitbox. Minimum: 1
-triggers.LylyraHelper/AddSlicerTrigger.attributes.description.roomwide=If checked, the trigger will attempt to add triggers to all applicable Entities in the room, regardless of if they are inside the trigger.\nIf unchecked, the trigger will only add Slicers to Entities inside the trigger.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.roomwide=If checked, the trigger will attempt to add Slicers to all applicable Entities in the room, regardless of if they are inside the trigger.\nIf unchecked, the trigger will only add Slicers to Entities inside the trigger.
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.singleUse=If checked, the trigger will only attempt to add a Slicer to the first applicable Entity.
-triggers.LylyraHelper/AddSlicerTrigger.attributes.description.sliceOnImpact=If checked, the Slicer added will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the Slicer will not attempt cut until the Slicer no longer collides with the Cuttable Entity's hitbox.
+triggers.LylyraHelper/AddSlicerTrigger.attributes.description.sliceOnImpact=If checked, the Slicer added will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the Slicer will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox.
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.onLoadOnly=If checked, the Trigger will remove itself after the room is loaded.\nIf unchecked, the Trigger will be persistent and add Slicers to Entities spawned after loading as well, such as those created by the result of a Slicer cutting a Solid in pieces.
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.flag=The session flag that needs to be active for the trigger to activate. Flag check is skipped if left blank.
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.invert=If checked, the trigger will be off when the flag is set to true, and on when the flag is set to false.
 
+#Remove Slicer Trigger
+
+triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.roomwide=If checked, the trigger will attempt to remove Slicers from all applicable Entities in the room, regardless of if they are inside the trigger.\nIf unchecked, the trigger will only remove Slicers from Entities inside the trigger.
+triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.singleUse=If checked, the trigger will only attempt to remove a Slicer from the first applicable Entity.
+triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.onLoadOnly=If checked, the Trigger will remove itself after the room is loaded.\nIf unchecked, the Trigger will be persistent and remove Slicers from Entities who are in range of the trigger after room load.
+triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.flag=The session flag that needs to be active for the trigger to activate. If left blank, the Slicer will always be ready to slice.
+triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.invert=If checked, the trigger will be off when the Session Flag is set to true, and on when the Session Flag is set to false.
+triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.entityTypes=(Optional) The full name of the type of entity(s) to remove Slicers from.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.SolidTiles,Celeste.CrushBlock).\nIf list is empty, Slicers will be removed from all Entities in range of the Trigger.
