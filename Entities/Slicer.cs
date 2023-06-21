@@ -361,9 +361,6 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
 
             Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.FloatySpaceBlock", true, true);
-            //get group and disassemble
-            
-
             Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
 
             Vector2 b1Pos = resultArray[0];
@@ -376,7 +373,6 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             FloatySpaceBlock b1 = null;
             FloatySpaceBlock b2 = null;
-
 
             var tileTypeField = bType.GetField("tileType", BindingFlags.NonPublic | BindingFlags.Instance);
             List<StaticMover> staticMovers = (List<StaticMover>)original.GetType().GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
@@ -416,6 +412,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                 FloatySpaceBlock master = (FloatySpaceBlock)bType.GetField("master", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
                 group = master.Group;
             }
+
+            //disassemble group
             if (group.Count > 1) { 
                 foreach (FloatySpaceBlock block in group)
                 {
@@ -440,7 +438,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             masterCuttingList.Add(original);
             Scene.Remove(original);
             sliceStartPositions.Remove(original);
-
         }
 
         private void SliceBounceBlock(BounceBlock original)
@@ -1272,8 +1269,5 @@ namespace Celeste.Mod.LylyraHelper.Components
             base.DebugRender(camera);
             if (slicingCollider != null) Draw.HollowRect(slicingCollider.TopLeft - new Vector2(1), slicingCollider.Width + 2, slicingCollider.Height + 2, Color.Yellow);
         }
-
-        
-
     }
 }
