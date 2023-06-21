@@ -34,6 +34,9 @@ namespace Celeste.Mod.LylyraHelper.Components
         private Vector2 ColliderOffset;
         private Action entityCallback;
 
+        private static List<Entity> masterCuttingList = new List<Entity>();
+        private static ulong lastPurge;
+
         public int entitiesCut { get; private set; }
 
         public Slicer(
@@ -98,12 +101,19 @@ namespace Celeste.Mod.LylyraHelper.Components
         public override void Update()
         {
             base.Update();
+            double oldTime = lastPurge;
+            if (Engine.FrameCounter != lastPurge)
+            {
+                lastPurge  = Engine.FrameCounter;
+                masterCuttingList.Clear();
+            }
+
+
             Vector2 positionHold = Entity.Position;
             Entity.Position = Entity.Position + ColliderOffset;
             Collider tempHold = Entity.Collider;
             if (slicingCollider != null) Entity.Collider = slicingCollider;
             if(this.Entity.Collidable) CheckCollisions();
-            
             Slice();
             Entity.Position = positionHold;
             Entity.Collider = tempHold;
@@ -148,6 +158,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             foreach (Entity d in Scene.Entities)
             {
                 if (d == Entity) continue;
+                if (masterCuttingList.Contains(d)) continue;
 
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
                 //custom entities from other mods
@@ -187,7 +198,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                     d.GetType() == typeof(MoveBlock) || 
                     d.GetType() == typeof(DashBlock) ||
                     d.GetType() == typeof(StarJumpBlock) ||
-                    d.GetType() == typeof(BounceBlock))
+                    d.GetType() == typeof(BounceBlock) ||
+                    d.GetType() == typeof(FloatySpaceBlock))
                 {
                     if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                     {
@@ -261,6 +273,11 @@ namespace Celeste.Mod.LylyraHelper.Components
                     sliceStartPositions.Remove(d);
                     return true;
                 }
+                if (masterCuttingList.Contains(d))
+                {
+                    sliceStartPositions.Remove(d);
+                    return true;
+                }
                 if (d is ICuttable icut)
                 {
                     if ((!d.CollideCheck(Entity)) || collisionOverride || sliceOnImpact)
@@ -320,6 +337,11 @@ namespace Celeste.Mod.LylyraHelper.Components
                             SliceBounceBlock(d as BounceBlock);
                             return true;
                         }
+                        else if (d is FloatySpaceBlock)
+                        {
+                            SliceFloatySpaceBlock(d as FloatySpaceBlock);
+                            return true;
+                        }
                     }
                     else if (d is CrystalStaticSpinner)
                     {
@@ -333,6 +355,92 @@ namespace Celeste.Mod.LylyraHelper.Components
 
                 return false;
             });
+        }
+
+        private void SliceFloatySpaceBlock(FloatySpaceBlock original)
+        {
+
+            Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.FloatySpaceBlock", true, true);
+            //get group and disassemble
+            
+
+            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, cutSize);
+
+            Vector2 b1Pos = resultArray[0];
+            Vector2 b2Pos = resultArray[1];
+            int b1Width = (int)resultArray[2].X;
+            int b1Height = (int)resultArray[2].Y;
+
+            int b2Width = (int)resultArray[3].X;
+            int b2Height = (int)resultArray[3].Y;
+
+            FloatySpaceBlock b1 = null;
+            FloatySpaceBlock b2 = null;
+
+
+            var tileTypeField = bType.GetField("tileType", BindingFlags.NonPublic | BindingFlags.Instance);
+            List<StaticMover> staticMovers = (List<StaticMover>)original.GetType().GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+            char tileTypeChar = (char)tileTypeField.GetValue(original);
+
+            if (tileTypeChar == '1')
+            {
+                Audio.Play("event:/game/general/wall_break_dirt", Entity.Position);
+            }
+            else if (tileTypeChar == '3')
+            {
+                Audio.Play("event:/game/general/wall_break_ice", Entity.Position);
+            }
+            else if (tileTypeChar == '9')
+            {
+                Audio.Play("event:/game/general/wall_break_wood", Entity.Position);
+            }
+            else
+            {
+                Audio.Play("event:/game/general/wall_break_stone", Entity.Position);
+            }
+            if (b1Width >= 8 && b1Height >= 8)
+            {
+                b1 = new FloatySpaceBlock(b1Pos, b1Width, b1Height, tileTypeChar, false);
+                Scene.Add(b1);
+                PropertyInfo pi = bType.GetProperty("Scene");
+            }
+
+            if (b2Width >= 8 && b2Height >= 8)
+            {
+                b2 = new FloatySpaceBlock(b2Pos, b2Width, b2Height, tileTypeChar, false);
+                Scene.Add(b2);
+            }
+            List<FloatySpaceBlock> group = original.Group;
+            if (!original.MasterOfGroup)
+            {
+                FloatySpaceBlock master = (FloatySpaceBlock)bType.GetField("master", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(original);
+                group = master.Group;
+            }
+            if (group.Count > 1) { 
+                foreach (FloatySpaceBlock block in group)
+                {
+                    if (block == original) continue;
+                    if (masterCuttingList.Contains(block)) continue;
+                    Scene.Add(new FloatySpaceBlock(block.Position, block.Width, block.Height, tileTypeChar, false));
+                    Scene.Remove(block);
+                    masterCuttingList.Add(block);
+                }
+
+            }
+
+            foreach (StaticMover mover in staticMovers)
+            {
+                HandleStaticMover(Scene, Direction, Entity, original, b1, b2, mover, 8);
+            }
+
+            AddParticles(
+                original.Position,
+                new Vector2(original.Width, original.Height),
+                Calc.HexToColor("444444"));
+            masterCuttingList.Add(original);
+            Scene.Remove(original);
+            sliceStartPositions.Remove(original);
+
         }
 
         private void SliceBounceBlock(BounceBlock original)
@@ -355,6 +463,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             float respawnTimer = (float)bType.GetField("respawnTimer", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(original);
             string state = (string)bType.GetField("state", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(original).ToString();
 
+            masterCuttingList.Add(original);
             Scene.Remove(original);
             sliceStartPositions.Remove(original);
             if (respawnTimer > 0 || state == "Broken")
@@ -380,6 +489,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         private void SliceDashBlock(DashBlock dashBlock)
         {
             dashBlock.Break(Entity.Position, Direction, true);
+            masterCuttingList.Add(dashBlock);
             sliceStartPositions.Remove(dashBlock);
         }
 
@@ -401,6 +511,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             Type bType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.StarJumpBlock", true, true);
             bool sinks = (bool) bType.GetField("sinks", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(original);
 
+            masterCuttingList.Add(original);
             Scene.Remove(original);
             sliceStartPositions.Remove(original);
 
@@ -436,6 +547,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 HandleStaticMover(Scene, Direction, Entity, original, d1, d2, mover, 8);
             }
+            masterCuttingList.Add(original);
             Scene.Remove(original);
             sliceStartPositions.Remove(original);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("000000"));
@@ -502,6 +614,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 HandleStaticMover(Scene, Direction, Entity, original, cb1, cb2, mover, 8);
             }
+            masterCuttingList.Add(original);
             Scene.Remove(original);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("62222b"));
 
@@ -558,6 +671,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             bool vertical = direction == MoveBlock.Directions.Up || direction == MoveBlock.Directions.Down;
 
+            masterCuttingList.Add(original);
             sliceStartPositions.Remove(original);
             Scene.Remove(original);
 
@@ -637,6 +751,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 original.Position,
                 new Vector2(original.Width, original.Height),
                 Calc.HexToColor("444444"));
+            masterCuttingList.Add(original);
             Scene.Remove(original);
             sliceStartPositions.Remove(original);
         }
@@ -701,6 +816,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 int grace = 5;
                 if (Spikes.Directions.Left == spike.Direction && furthestLeft > spike.Position.X + grace)
                 {
+
                     Scene.Remove(spike);
                     return;
                 }
