@@ -118,14 +118,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             if (Scene.Tracker.GetEntity<Player>().CollideCheck(this))
             {
-                Audio.Play("event:/char/madeline/jump");
                 Activate(direction);
             }
         }
 
         internal virtual void Activate(Vector2 direction)
         {
-            Audio.Play("event:/game/04_cliffside/cloud_pink_boost", Position);
             Player p = base.Scene.Tracker.GetEntity<Player>();
             var session = SceneAs<Level>().Session;
             session.Inventory.Dashes = p.MaxDashes;

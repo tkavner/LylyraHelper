@@ -45,5 +45,3 @@ function deathnote.rotate(room, entity, direction)
 
     return true
 end
-
-return deathnote
