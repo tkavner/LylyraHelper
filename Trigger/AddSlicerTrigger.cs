@@ -76,6 +76,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private static void SlicerTriggerCheck(On.Monocle.Scene.orig_Add_Entity orig, Scene self, Entity entity)
         {
             orig.Invoke(self, entity);
+            if (self == null || self.Tracker == null) return;
             foreach (AddSlicerTrigger trigger in self.Tracker.GetEntities<AddSlicerTrigger>())
             {
                 if (trigger.used) continue;

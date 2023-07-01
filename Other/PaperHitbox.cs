@@ -83,6 +83,7 @@ namespace LylyraHelper.Entities
 
         private static bool CollidePaper(On.Monocle.Collider.orig_Collide_Collider orig, Collider self, Collider collider)
         {
+            if ((self == null) || (collider == null)) return false;
             if (self is PaperHitbox || collider is PaperHitbox)
             {
                 PaperHitbox ph = null;
