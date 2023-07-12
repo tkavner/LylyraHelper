@@ -17,8 +17,45 @@ namespace Celeste.Mod.LylyraHelper.Components
     [Tracked(false)]
     public class Slicer : Component
     {
+        public class SlicerSettings {
+            public SlicerSettings(string settings)
+            {
+                string[] types = default_string.Split(',');
+                if (types.Length > 0)
+                {
+                    SliceableList = types.ToList();
+                } else
+                {
+                    //list empty.
+                }
+            }
+            private static SlicerSettings _default = new SlicerSettings(default_string);
+            private static string default_string = "Celeste.CrushBlock,Celeste.MoveBlock,Celeste.BounceBlock";
+            private List<string> SliceableList;
 
-        private List<Entity> slicingEntities = new List<Entity>();
+            public static SlicerSettings DefaultSettings { 
+                get 
+                { 
+                    return _default; 
+                } 
+                set 
+                { 
+                    _default = value; 
+                } 
+            }
+
+            public bool CanSlice(Type type)
+            {
+                return CanSlice(type.FullName);
+            }
+
+            private bool CanSlice(string fullName)
+            {
+                return SliceableList.Contains(fullName);
+            }
+        }
+
+    private List<Entity> slicingEntities = new List<Entity>();
         //some entities take a frame advancement to activate properly (Such as Kevins and MoveBlocks). This list is for those entities.
         private List<Entity> secondFrameActivation = new List<Entity>();
         private List<Entity> intermediateFrameActivation = new List<Entity>();
@@ -36,6 +73,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static List<Entity> masterCuttingList = new List<Entity>();
         private static ulong lastPurge;
+        private SlicerSettings settings;
 
         public int entitiesCut { get; private set; }
 
@@ -53,15 +91,16 @@ namespace Celeste.Mod.LylyraHelper.Components
         }
 
         public Slicer(
-            Vector2 Direction, 
-            int cutSize, 
-            Level level, 
-            int directionalOffset, 
+            Vector2 Direction,
+            int cutSize,
+            Level level,
+            int directionalOffset,
             Vector2 colliderOffset,
-            Collider slicingCollider = null, 
-            bool active = true, 
-            bool sliceOnImpact = false, 
-            bool fragile = false) : base(active, false)
+            Collider slicingCollider = null,
+            bool active = true,
+            bool sliceOnImpact = false,
+            bool fragile = false,
+            string settings = "") : base(active, false)
         {
             this.slicingCollider = slicingCollider;
             this.Direction = Direction;
@@ -71,6 +110,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             this.sliceOnImpact = sliceOnImpact;
             this.fragile = fragile;
             ColliderOffset = colliderOffset;
+            this.settings = settings != "" ? new SlicerSettings(settings) : SlicerSettings.DefaultSettings;
             if (Cuttable.paperScraps == null)
             {
                 Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
@@ -97,6 +137,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
+        
 
         public override void Update()
         {
@@ -125,7 +166,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             StaticMover sm = Entity.Get<StaticMover>();
             Vector2 Position = Entity.Position;
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for speed)
-            foreach (Paper d in Scene.Tracker.GetEntities<DashPaper>())
+
+            if (settings.CanSlice(typeof(DashPaper))) foreach (Paper d in Scene.Tracker.GetEntities<DashPaper>())
             {
                 if (d == Entity) continue;
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
@@ -140,7 +182,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
             }
 
-            foreach (Paper d in base.Scene.Tracker.GetEntities<DeathNote>())
+            if (settings.CanSlice(typeof(DeathNote))) foreach (Paper d in base.Scene.Tracker.GetEntities<DeathNote>())
             {
                 if (d == Entity) continue;
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
@@ -159,6 +201,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 if (d == Entity) continue;
                 if (masterCuttingList.Contains(d)) continue;
+                if (!settings.CanSlice(d.GetType())) continue;
 
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
                 //custom entities from other mods
