@@ -100,6 +100,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 Slicer.ModinteropHandleStaticMover(dynData, original, cb1, cb2, mover, minLength);
             }
+
+            public static DynamicData GetSlicer(Entity entity)
+            {
+                return new DynamicData(entity.Get<Slicer>());
+            }
         }
 
     }

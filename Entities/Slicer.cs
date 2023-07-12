@@ -208,14 +208,14 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                 }
             }
-            foreach (CrystalStaticSpinner d in SceneAs<Level>().Tracker.GetEntities<CrystalStaticSpinner>())
+            /*foreach (CrystalStaticSpinner d in SceneAs<Level>().Tracker.GetEntities<CrystalStaticSpinner>())
             {
                 if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
                 {
                     slicingEntities.Add(d);
                     sliceStartPositions.Add(d, Position);
                 }
-            }
+            }*/
         }
 
         public void AddListener(Action p)
