@@ -1,4 +1,5 @@
-﻿using Celeste.Mod.Helpers;
+﻿using Celeste.Mod.Entities;
+using Celeste.Mod.Helpers;
 using Celeste.Mod.LylyraHelper.Entities;
 using Celeste.Mod.LylyraHelper.Intefaces;
 using Microsoft.Xna.Framework;
@@ -20,17 +21,18 @@ namespace Celeste.Mod.LylyraHelper.Components
         public class SlicerSettings {
             public SlicerSettings(string settings)
             {
-                string[] types = default_string.Split(',');
-                if (types.Length > 0)
+                if (settings == null) settings = "";
+                string[] types = default_string?.Split(',');
+                if (types == null || types.Length == 0)
                 {
-                    SliceableList = types.ToList();
-                } else
-                {
-                    //list empty.
+                    SliceableList = new List<string>();
+                    return;
                 }
+                SliceableList = types.ToList();
             }
+
             private static SlicerSettings _default = new SlicerSettings(default_string);
-            private static string default_string = "Celeste.CrushBlock,Celeste.MoveBlock,Celeste.BounceBlock";
+            private static string default_string = "";
             private List<string> SliceableList;
 
             public static SlicerSettings DefaultSettings { 
@@ -41,17 +43,17 @@ namespace Celeste.Mod.LylyraHelper.Components
                 set 
                 { 
                     _default = value; 
-                } 
+                }
             }
 
             public bool CanSlice(Type type)
             {
-                return CanSlice(type.FullName);
+                return CanSlice(type.FullName) || CanSlice(type.Name);
             }
 
-            private bool CanSlice(string fullName)
+            private bool CanSlice(string name)
             {
-                return SliceableList.Contains(fullName);
+                return SliceableList.Contains(name);
             }
         }
 
@@ -110,6 +112,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             this.sliceOnImpact = sliceOnImpact;
             this.fragile = fragile;
             ColliderOffset = colliderOffset;
+            settings = settings.Trim();
             this.settings = settings != "" ? new SlicerSettings(settings) : SlicerSettings.DefaultSettings;
             if (Cuttable.paperScraps == null)
             {
@@ -196,7 +199,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                 }
             }
-
             foreach (Entity d in Scene.Entities)
             {
                 if (d == Entity) continue;

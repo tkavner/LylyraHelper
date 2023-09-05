@@ -61,6 +61,7 @@
     <Compile Include="Components\Cuttable.cs" />
     <Compile Include="Effects\HexagonalGodray.cs" />
     <Compile Include="Entities\BigCloud.cs" />
+    <Compile Include="Entities\GlobalSlicerSettings.cs" />
     <Compile Include="Entities\KnifeSpikes.cs" />
     <Compile Include="Components\PaperComponent.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
@@ -91,12 +92,16 @@
     <None Include="Loenn\entities\deathnote.lua" />
     <None Include="Loenn\entities\knifeSpikes.lua" />
     <None Include="Loenn\entities\laserCutter.lua" />
+    <None Include="Loenn\entities\slicerController.lua" />
     <None Include="Loenn\lang\en_gb.lang" />
     <None Include="Loenn\triggers\addSlicerTrigger.lua" />
     <None Include="Loenn\triggers\removeSlicerTrigger.lua" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="credits.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Loenn\ui\forms\fields\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
