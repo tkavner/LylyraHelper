@@ -22,7 +22,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             public SlicerSettings(string settings)
             {
                 if (settings == null) settings = "";
-                string[] types = default_string?.Split(',');
+                string[] types = settings?.Split(',');
                 if (types == null || types.Length == 0)
                 {
                     SliceableList = new List<string>();
@@ -38,7 +38,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             public static SlicerSettings DefaultSettings { 
                 get 
                 { 
-                    return _default; 
+                    return _default;
                 } 
                 set 
                 { 

@@ -8,7 +8,7 @@ slicerController.name = "LylyraHelper/SlicerController"
 table.insert(slicerController.placements, {
 		name = "Slicer Controller",
 		data = {
-			sliceableEntities = ""
+			sliceableEntityTypes = ""
 			}
 		})
 

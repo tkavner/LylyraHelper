@@ -61,7 +61,7 @@
     <Compile Include="Components\Cuttable.cs" />
     <Compile Include="Effects\HexagonalGodray.cs" />
     <Compile Include="Entities\BigCloud.cs" />
-    <Compile Include="Entities\GlobalSlicerSettings.cs" />
+    <Compile Include="Entities\SlicerController.cs" />
     <Compile Include="Entities\KnifeSpikes.cs" />
     <Compile Include="Components\PaperComponent.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
