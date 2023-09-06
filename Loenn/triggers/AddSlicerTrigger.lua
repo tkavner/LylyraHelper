@@ -33,7 +33,8 @@ for _, dir in ipairs(directions) do
 			slicerLength = 8,
 			onLoadOnly=false,
 			flag="",
-			invert=false
+			invert=false,
+			sliceableEntityTypes=""
 		}
 	}
 	table.insert(addSlicerOnLoadTrigger.placements, placement)

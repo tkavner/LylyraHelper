@@ -20,6 +20,7 @@ table.insert(paper.placements, {
         spawnScissors = false,
 		noParticleEffects = false,
         noTrail = false,
+		sliceableEntityTypes = ""
 		--flag = "",
 		--invertFlag = false
     }

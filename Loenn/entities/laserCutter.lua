@@ -26,7 +26,8 @@ for _, dir in ipairs(directions) do
 				mode = m,
 				flag="",
 				invert=false,
-				breakbeamThickness=32
+				breakbeamThickness=32,
+				sliceableEntityTypes=""
 			}
 		})
 	end
