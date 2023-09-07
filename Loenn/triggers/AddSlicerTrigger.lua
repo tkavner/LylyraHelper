@@ -16,9 +16,6 @@ addSlicerOnLoadTrigger.fieldInformation = {
 	slicerLength = {
 		fieldType = "integer",
 		minimumValue=1
-	},
-	slicerSettings = {
-		fieldType = "LylyraHelper.TypeField"
 	}
 }
 
