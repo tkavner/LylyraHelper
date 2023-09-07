@@ -36,7 +36,7 @@ for _, dir in ipairs(directions) do
 			onLoadOnly=false,
 			flag="",
 			invert=false,
-			slicerSettings=""
+			sliceableEntityTypes=""
 		}
 	}
 	table.insert(addSlicerOnLoadTrigger.placements, placement)

@@ -13,6 +13,7 @@ for _, dir in ipairs(directions) do
     local spikes = spikeHelper.createEntityHandler("LylyraHelper/KnifeSpikes" .. dir, dirLower, false, false)
 	for _, placement in ipairs(spikes.placements) do
 		placement.data.sliceOnImpact = false
+		placement.data.sliceableEntityTypes = ""
 	end
     table.insert(knifeSpikes, spikes)
 end

@@ -14,6 +14,7 @@ using global::Celeste.Mod;
 using global::Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
+using MonoMod.Utils;
 using static Celeste.Mod.LylyraHelper.Entities.Paper;
 
 namespace Celeste.Mod.LylyraHelper.Entities
@@ -266,12 +267,24 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             }
             var tempHold = Collider;
+
             Collider = directionalColliderHalf1;
-            bool flag1 = CollideCheck<SolidTiles>();
-            Collider = tempHold;
+            List<Entity> list1 = CollideAll<Solid>();
+            bool flag1 = false;
+            Slicer.SlicerSettings settings = slicer.settings;
+            foreach (Entity entity in list1) {
+                flag1 = flag1 || !settings.CanSlice(entity.GetType());
+            }
 
             Collider = directionalColliderHalf2;
-            bool flag2 = CollideCheck<SolidTiles>();
+
+            List<Entity> list2 = CollideAll<Solid>();
+            bool flag2 = false;
+            foreach (Entity entity in list2)
+            {
+                flag2 = flag2 || !settings.CanSlice(entity.GetType());
+            }
+
             Collider = tempHold;
 
             breaking = (flag1 && flag2) || breaking;
@@ -316,7 +329,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (self == null) return;
             self.CollideDo<Scissors>(
                 scissors => {
-                    scissors.OnExplosion();
                     Type bumperType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Bumper", true, true);
 
                     float respawnTimer = (float) bumperType.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
@@ -346,6 +358,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                             Audio.Play("event:/game/06_reflection/pinballbumper_hit", self.Position);
                         }
 
+                        scissors.OnExplosion();
                         VertexLight light = (VertexLight)bumperType?.GetField("light", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
                         BloomPoint bloom = (BloomPoint)bumperType?.GetField("bloom", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
                         Sprite sprite = (Sprite)bumperType?.GetField("sprite", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
@@ -360,6 +373,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         self.SceneAs<Level>().Displacement.AddBurst(self.Center, 0.3f, 8f, 32f, 0.8f);
                         self.SceneAs<Level>().Particles.Emit(Bumper.P_Launch, 12, self.Center + vector * 12f, Vector2.One * 3f, vector.Angle());
                     }
+
                 });
         }
 
