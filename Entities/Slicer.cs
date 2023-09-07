@@ -388,8 +388,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                             return true;
                         }
                     }
-                    else if (d is CrystalStaticSpinner)
+                    else if (d is CrystalStaticSpinner && CustomSlicingActions.ContainsKey(d.GetType()))
                     {
+
                         (d as CrystalStaticSpinner).Destroy();
                         sliceStartPositions.Remove(d);
                         return true;

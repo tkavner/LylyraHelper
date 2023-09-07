@@ -38,6 +38,10 @@ entities.LylyraHelper/KnifeSpikesRight.attributes.description.sliceOnImpact=If c
 entities.LylyraHelper/KnifeSpikesDown.attributes.description.sliceOnImpact=If checked, the KnifeSpikes will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the KnifeSpikes will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox
 entities.LylyraHelper/KnifeSpikesLeft.attributes.description.sliceOnImpact=If checked, the KnifeSpikes will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the KnifeSpikes will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox
 
+entities.LylyraHelper/KnifeSpikesUp.attributes.description.sliceableEntityTypes=The full name of the type(s) of entity(s) the Knife Spikes can slice.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nIf list is empty, nothing will be able to be sliced by this slicer.\nThis overrides the settings set by a Slicer Controller.
+entities.LylyraHelper/KnifeSpikesDown.attributes.description.sliceableEntityTypes=The full name of the type(s) of entity(s) the Knife Spikes can slice.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nIf list is empty, nothing will be able to be sliced by this slicer.\nThis overrides the settings set by a Slicer Controller.
+entities.LylyraHelper/KnifeSpikesRight.attributes.description.sliceableEntityTypes=The full name of the type(s) of entity(s) the Knife Spikes can slice.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nIf list is empty, nothing will be able to be sliced by this slicer.\nThis overrides the settings set by a Slicer Controller.
+entities.LylyraHelper/KnifeSpikesLeft.attributes.description.sliceableEntityTypes=The full name of the type(s) of entity(s) the Knife Spikes can slice.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nIf list is empty, nothing will be able to be sliced by this slicer.\nThis overrides the settings set by a Slicer Controller.
 
 #Laser Cutter
 
@@ -49,6 +53,8 @@ entities.LylyraHelper/LaserCutter.attributes.description.flag=(Optional) Session
 entities.LylyraHelper/LaserCutter.attributes.description.invert=If checked, the Laser Cutter will be off when the flag is set to true, and on when the flag is set to false.
 entities.LylyraHelper/LaserCutter.attributes.description.mode=Determines how the Laser Cutter fires.\nBreakbeam: Laser Cutter fires when walks into the line of sight of the Laser Cutter.\nIn Front: Laser Cutter fires when walks in front of of the Laser Cutter, ignoring solid blocks and terrain that may be blocking the way. The laser fired will still be blockable via terrain and solid blocks, however.\nPulse: The laser will attempt to fire as soon as the cooldown timer specified by 'cooldown' has expired.
 entities.LylyraHelper/LaserCutter.attributes.description.breakbeamThickness=Width of the breakbeam in Breakbeam / In Front mode. Not used if Laser Cutter is set to Pulse mode.
+entities.LylyraHelper/LaserCutter.attributes.description.sliceableEntityTypes=The full name of the type(s) of entity(s) the Laser Cutter can slice.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nIf list is empty, nothing will be able to be sliced by this slicer.\nThis overrides the settings set by a Slicer Controller.
+
 
 #Dash Paper
 
@@ -61,7 +67,9 @@ entities.LylyraHelper/DashPaper.attributes.description.noTrail=If checked, this 
 
 #Deathnote
 
+#Slicer Controller
 
+entities.LylyraHelper/SlicerController.attributes.description.sliceableEntityTypes=The full name of the type(s) of entity(s) the slicers can slice.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nIf list is empty, nothing will be able to be sliced by this slicer.
 
 #Add Slicer Trigger
 
@@ -75,6 +83,7 @@ triggers.LylyraHelper/AddSlicerTrigger.attributes.description.sliceOnImpact=If c
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.onLoadOnly=If checked, the Trigger will remove itself after the room is loaded.\nIf unchecked, the Trigger will be persistent and add Slicers to Entities spawned after loading as well, such as those created by the result of a Slicer cutting a Solid in pieces.
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.flag=The session flag that needs to be active for the trigger to activate. Flag check is skipped if left blank.
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.invert=If checked, the trigger will be off when the flag is set to true, and on when the flag is set to false.
+entities.LylyraHelper/AddSlicerTrigger.attributes.description.sliceableEntityTypes=The full name of the type(s) of entity(s) the Slicer(s) added can slice.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nIf list is empty, nothing will be able to be sliced by this slicer.\nThis overrides the settings set by a Slicer Controller.
 
 #Remove Slicer Trigger
 
