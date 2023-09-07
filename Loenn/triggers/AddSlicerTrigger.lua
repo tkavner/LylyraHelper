@@ -1,7 +1,6 @@
 local addSlicerOnLoadTrigger = {}
 addSlicerOnLoadTrigger.name = "LylyraHelper/AddSlicerTrigger"
 addSlicerOnLoadTrigger.placements = {}
-
 local directions = {"Up", "Down", "Right", "Left", "All"}
 
 
@@ -17,6 +16,9 @@ addSlicerOnLoadTrigger.fieldInformation = {
 	slicerLength = {
 		fieldType = "integer",
 		minimumValue=1
+	},
+	slicerSettings = {
+		fieldType = "LylyraHelper.TypeField"
 	}
 }
 
@@ -33,7 +35,8 @@ for _, dir in ipairs(directions) do
 			slicerLength = 8,
 			onLoadOnly=false,
 			flag="",
-			invert=false
+			invert=false,
+			slicerSettings=""
 		}
 	}
 	table.insert(addSlicerOnLoadTrigger.placements, placement)

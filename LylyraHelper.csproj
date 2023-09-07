@@ -94,6 +94,7 @@
     <None Include="Loenn\lang\en_gb.lang" />
     <None Include="Loenn\triggers\addSlicerTrigger.lua" />
     <None Include="Loenn\triggers\removeSlicerTrigger.lua" />
+    <None Include="Loenn\ui\forms\fields\typeField.lua" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="credits.txt" />
