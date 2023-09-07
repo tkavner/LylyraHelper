@@ -267,17 +267,25 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             }
             var tempHold = Collider;
+
             Collider = directionalColliderHalf1;
-            List<Entity> list1 = CollideAll<SolidTiles>();
-            bool flag1 = list1.Count > 0;
-            Collider = tempHold;
+            List<Entity> list1 = CollideAll<Solid>();
+            bool flag1 = false;
+            Slicer.SlicerSettings settings = slicer.settings;
+            foreach (Entity entity in list1) {
+                flag1 = flag1 || !settings.CanSlice(entity.GetType());
+            }
 
             Collider = directionalColliderHalf2;
 
-            List<Entity> list2 = CollideAll<SolidTiles>();
-            bool flag2 = list2.Count > 0;
-            Collider = tempHold;
+            List<Entity> list2 = CollideAll<Solid>();
+            bool flag2 = false;
+            foreach (Entity entity in list2)
+            {
+                flag2 = flag2 || !settings.CanSlice(entity.GetType());
+            }
 
+            Collider = tempHold;
 
             breaking = (flag1 && flag2) || breaking;
             

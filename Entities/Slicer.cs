@@ -75,7 +75,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static List<Entity> masterCuttingList = new List<Entity>();
         private static ulong lastPurge;
-        private SlicerSettings settings;
+        public SlicerSettings settings;
 
         public int entitiesCut { get; private set; }
 
