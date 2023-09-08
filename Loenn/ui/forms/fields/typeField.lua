@@ -1,49 +1,77 @@
 local stringField = require("ui.forms.fields.string")
 local state = require("loaded_state")
-local utils = require("util.utils")
+local utils = require("utils")
+local languageRegistry = require("language_registry")
+local uiElements = require("ui.elements")
+
 
 local listOfTypeField = {}
 listOfTypeField.fieldType = "LylyraHelper.TypeField"
 
+
+local function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
 local function getEntitiesInBox(room)
     local theEntity = nil
-    for entity in room.entities do
-        if entity and entity.name == "TBA-LockOn-Controller-Entity" then
-            theEntity = Entity
+    for _, entity in ipairs(room.entities) do
+        if entity and entity["_name"] and (entity["_name"] == "LylyraHelper/SlicerController" or entity["_name"] == "Slicer Controller") then
+            theEntity = entity
             break
+        else
+            print(dump(entity))
         end
     end
-    local r1 = utils.rectangle(theEntity.x, theEntity.y, theEntity.Width, theEntity.Height)
-    if theEntity then
+    if theEntity and theEntity.width and theEntity.height  then
+        local r1 = utils.rectangle(theEntity.x, theEntity.y, theEntity.width, theEntity.height)
         local listofEntityNames = {}
-        for entity in room.entities do
-            local r2 = utils.rectangle(entity.x, entity.y, entity.Width, entity.Height)
+        for _, entity in ipairs(room.entities) do
+            local r2 = nil
+            local e2Width = entity.width or entity.Width or 8
+            local e2Height = entity.height or entity.Height or 8
+            r2 = utils.rectangle(entity.x, entity.y, e2Width, e2Height)
             if utils.aabbCheck(r1, r2) then
-                if not utils.contains(entity.name, listofEntityNames)
-                    tables.insert(listofEntityNames, entity.name)
+                if not utils.contains(entity["_name"], listofEntityNames) then
+                    if theEntity["_name"] ~= entity["_name"] then
+                        table.insert(listofEntityNames, entity["_name"])
+                    end
                 end
             end
         end
-        local namesAsString = ""
+        local nameAsString = ""
         --format table into string here
         for _, entityname in ipairs(listofEntityNames) do
             nameAsString = nameAsString..entityname..","
         end
+        print(nameAsString)
+        if #nameAsString == 0 then
+            return " "
+        end
         return string.sub(nameAsString, 1, -2)
     else
-        return ""
+        print("SlicerControllerNotFound")
+        return "SlicerControllerNotFound"
     end
-
 end
+
 
 local function buttonPressed(formField)
     return function (element)
-        
-        
 
-
-
-        formField.field.text = getEntitiesInBox(state.getSelectedRoom())--should return the list of stuff here
+        formField.field.text = tostring(getEntitiesInBox(state.getSelectedRoom()))
+        if formField.field.text == "" then 
+            formField.field.text = "" 
+        end
         formField.field.index = #formField.field.text
 
         formField:notifyFieldChanged()
@@ -58,7 +86,7 @@ local function fieldCallback(self, value, prev)
     -- should just be button.width, but that isn't correct initially :(
     local offset = -font:getWidth(button.text) - (2 * button.style.padding)
 
-    self.button.x = -font:getWidth(text) + self.minWidth + offset - 40
+    self.button.x = -font:getWidth(text) + self.minWidth + offset
 end
 
 function listOfTypeField.getElement(name, value, options)
@@ -74,13 +102,12 @@ function listOfTypeField.getElement(name, value, options)
 
         local string = tostring(v)
 
-        return utils.isString(string)
+        return type(string) == "string"
     end
-    options.options = attachGroupHelper.findAllGroupsAsList(loadedState.getSelectedRoom())
 
     local formField = stringField.getElement(name, value, options)
 
-    local button = uiElements.button("Auto Add", buttonPressed(formField))
+    local button = uiElements.button("Auto", buttonPressed(formField))
 
     button.style.padding *= 0.36
     button.style.spacing = 0
