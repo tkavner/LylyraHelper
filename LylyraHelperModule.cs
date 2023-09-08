@@ -34,6 +34,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             PaperHitbox.Load();
             AddSlicerTrigger.Load();
             typeof(ModExports).ModInterop();
+            FrostHelperImports.Load();
 
             Everest.Events.Level.OnLoadBackdrop += OnLoadBackdrop;
         }
