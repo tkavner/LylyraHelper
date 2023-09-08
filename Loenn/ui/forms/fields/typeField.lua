@@ -3,11 +3,8 @@ local state = require("loaded_state")
 local utils = require("utils")
 local languageRegistry = require("language_registry")
 local uiElements = require("ui.elements")
-
-
 local listOfTypeField = {}
 listOfTypeField.fieldType = "LylyraHelper.TypeField"
-
 
 local function dump(o)
    if type(o) == 'table' then
@@ -63,7 +60,6 @@ local function getEntitiesInBox(room)
         return "SlicerControllerNotFound"
     end
 end
-
 
 local function buttonPressed(formField)
     return function (element)
@@ -128,6 +124,5 @@ function listOfTypeField.getElement(name, value, options)
 
     return formField
 end
-
 
 return listOfTypeField

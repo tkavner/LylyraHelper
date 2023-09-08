@@ -101,8 +101,6 @@
   <ItemGroup>
     <Content Include="credits.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Loenn\ui\forms\fields\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
