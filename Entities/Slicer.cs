@@ -248,8 +248,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                         bool respawning = ((float)boosterType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(d) > 0);
                         if (!respawning) booster.PlayerReleased();
                     }
-                }
+                } 
                 else if (
+                    d.GetType() == typeof(CrystalStaticSpinner) ||
                     d.GetType() == typeof(CrushBlock) || 
                     d.GetType() == typeof(FallingBlock) || 
                     d.GetType() == typeof(DreamBlock) || 
@@ -266,14 +267,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                 }
             }
-            /*foreach (CrystalStaticSpinner d in SceneAs<Level>().Tracker.GetEntities<CrystalStaticSpinner>())
-            {
-                if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
-                {
-                    slicingEntities.Add(d);
-                    sliceStartPositions.Add(d, Position);
-                }
-            }*/
         }
 
         public void AddListener(Action p)
@@ -401,7 +394,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                             return true;
                         }
                     }
-                    else if (d is CrystalStaticSpinner && CustomSlicingActions.ContainsKey(d.GetType()))
+                    else if (d is CrystalStaticSpinner)
                     {
 
                         (d as CrystalStaticSpinner).Destroy();
