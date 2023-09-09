@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using static Celeste.GaussianBlur;
+using static Celeste.Tentacles;
 
 namespace Celeste.Mod.LylyraHelper.Components
 {
@@ -805,398 +807,633 @@ namespace Celeste.Mod.LylyraHelper.Components
             sliceStartPositions.Remove(original);
         }
 
-        //currently handles vanilla static movers (basically just spikes and springs). Welcome to hell.
-        private static void HandleStaticMover(Scene Scene, Vector2 Direction, Entity Entity, Entity parent, Solid cb1, Solid cb2, StaticMover mover, int minLength, DynamicData dynData = null)
+        private static void HandleBottomSideSpikes(
+    Scene Scene,
+    Vector2 Direction,
+    Solid cb1,
+    Solid cb2,
+    StaticMover mover)
         {
+            Entity spikes = mover.Entity;
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
 
-            Vector2 cb1Pos = Vector2.Zero;
-            Vector2 cb2Pos = Vector2.Zero;
-            int cb1Width = 0;
-            int cb1Height = 0;
-            int cb2Width = 0;
-            int cb2Height = 0;
+            //figure out case type, split 
+            //case 1: horizontal slicer (direction.x != 0), slicer going through top side. Cb1 will not be added. Solution: Reattach
+            //case 2: horizontal slicer (direction.x != 0), slicer going through middle. both will be added. Solution: Reattach
+            //case 2: horizontal slicer (direction.x != 0), slicer going through bottom side. Cb2 will not be added. Solution: Delete
 
-            if (!cb1Added && !cb2Added)
+            //case 4: vertical slicer (direction.x == 0), slicer going through left side. Cb1 will not be added.
+            //case 5: vertical slicer (direction.x == 0), slicer going through middle. both will be added.
+            //case 6: vertical slicer (direction.x == 0), slicer going through right side. Cb2 will not be added.
+
+            //case 2 & 1 are identical (ignore)
+
+            //case 1-3: horizontal slicer
+
+            if (Direction.X != 0)
             {
-
-                Scene.Remove(mover.Entity);
-                return;
-            }
-
-            if (cb1Added)
-            {
-                cb1Pos = cb1.Position;
-                cb1Width = (int)cb1.Width;
-                cb1Height = (int)cb1.Height;
-            }
-            if (cb2Added)
-            {
-                cb2Pos = cb2.Position;
-                cb2Width = (int)cb2.Width;
-                cb2Height = (int)cb2.Height;
-            }
-
-
-            float furthestLeft = cb1Added ? cb1Pos.X : cb2Pos.X;
-            float furthestRight = cb2Added ? cb2Pos.X + cb2Width : cb1Pos.X + cb1Width;
-
-            float furthestUp = cb1Added ? cb1Pos.Y : cb2Pos.Y;
-            float furthestDown = cb2Added ? cb2Pos.Y + cb2Height : cb1Pos.Y + cb1Height;
-
-            mover.Platform = null;
-            Type cbType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Solid", true, true);
-            if (CustomStaticHandlerActions.ContainsKey(mover.Entity.GetType()))
-            {
-                CustomStaticHandlerActions[mover.Entity.GetType()].Invoke(mover.Entity, dynData);
-            }
-            else if (mover.Entity is Spikes || mover.Entity is KnifeSpikes)
-            {
-                //destroy all parts of spikes that aren't connected anymore.
-                //switch depending on direction
-                Spikes spike = mover.Entity as Spikes;
-                Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
-                string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spike);
-                bool useYCoordinates = (spike.Direction == Spikes.Directions.Left || spike.Direction == Spikes.Directions.Right) || Direction.X != 0;
-                
-                bool spikesOnCB1 = cb1Added && (spike.Y <= cb1Pos.Y + cb1Height && useYCoordinates) || (spike.X < cb1Pos.X + cb1Width && !useYCoordinates); //check if spikes start before the hole to see if part of them should be on cb1
-                bool spikesOnCB2 = cb2Added && (spike.Y + spike.Height >= cb2Pos.Y && useYCoordinates) || (spike.X + spike.Width > cb2Pos.X && !useYCoordinates); //check if the spikes extend past the hole to see if part of them should be on cb2
-                int grace = 5;
-                if (Spikes.Directions.Left == spike.Direction && furthestLeft > spike.Position.X + grace)
+                //case 1
+                if (cb1Added && !cb2Added)
                 {
-
-                    Scene.Remove(spike);
+                    Scene.Remove(spikes);
                     return;
                 }
-                else if (Spikes.Directions.Right == spike.Direction && furthestRight < spike.Position.X - grace)
+                //case 2 & 3
+                else if (cb2Added)
                 {
-                    Scene.Remove(spike);
-                    return;
-                }
-                else if (Spikes.Directions.Up == spike.Direction && furthestUp > spike.Position.Y + grace)
-                {
-                    Scene.Remove(spike);
-                    return;
-                }
-                else if (Spikes.Directions.Down == spike.Direction && furthestDown < spike.Position.Y - grace)
-                {
-                    Scene.Remove(spike);
-                    return;
-                }
-                if (!spikesOnCB1 && !spikesOnCB2)
-                {
-                    Scene.Remove(spike);
-                    return;
-                }
-                switch (spike.Direction)
-                {
-                    case Spikes.Directions.Left:
-                    case Spikes.Directions.Right:
-                        //clipping logic: in the case of left spikes, compare to left side edge (cb1Pos.X), then check for a hole on left side (cb1Pos.Y + cb1Height) to the top of the spikes. 
-                        //if cb1Pos.X < parent.Position.X then the spikes are no longer attached and should be removed
-                        if ((cb1Pos.Y + cb1Height < spike.Y + spike.Height && cb1Added) || (cb2Pos.Y > spike.Y && cb2Pos.Y < spike.Y + spike.Height && cb2Added)) //then the spikes intersect the hole. 
-                        {
-                            if (spikesOnCB1)
-                            {
-                                float spikePosY = spike.Y;
-                                float spikePosX = spike.X;
-                                switch (spike.Direction)
-                                {
-                                    case Spikes.Directions.Left:
-                                        spikePosY = spike.Y;
-                                        spikePosX = cb1Pos.X;
-                                        break;
-                                    case Spikes.Directions.Right:
-                                        spikePosY = spike.Y;
-                                        spikePosX = cb1Pos.X + cb1Width;
-                                        break;
-                                }
-                                int spikeHeight = (int)(cb1Pos.Y + cb1Height - spike.Y);
-                                if (spikeHeight >= minLength)
-                                {
-                                    if (spike is KnifeSpikes)
-                                    {
-                                        Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
-                                        Scene.Add(newSpike1);
-                                    }
-                                    else
-                                    {
-                                        Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType);
-                                        Scene.Add(newSpike1);
-
-                                    }
-                                }
-                            }
-                            if (spikesOnCB2)
-                            {
-                                float spikePosY = cb2Pos.Y;
-                                int spikeHeight = (int)(spike.Y + spike.Height - cb2Pos.Y);
-                                float spikePosX = spike.X;
-                                switch (spike.Direction)
-                                {
-                                    case Spikes.Directions.Left:
-                                        spikePosY = cb2Pos.Y;
-                                        spikePosX = cb2Pos.X;
-                                        break;
-                                    case Spikes.Directions.Right:
-                                        spikePosY = cb2Pos.Y;
-                                        spikePosX = cb2Pos.X + cb2Width;
-
-                                        break;
-                                }
-                                if (spikeHeight >= minLength)
-                                {
-                                    if (spike is KnifeSpikes)
-                                    {
-                                        Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
-                                        Scene.Add(newSpike1);
-
-                                    }
-                                    else
-                                    {
-                                        Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeHeight, spike.Direction, overrideType);
-                                        Scene.Add(newSpike1);
-
-
-                                    }
-                                }
-                            }
-
-                            Scene.Remove(spike);
-                        }
-                        else //this means spikes do not intersect the hole but are attached to a block still. Update Spike positions so they do not desync from their object as it respawns
-                        {
-                            if (spikesOnCB1)
-                            {
-                                mover.Platform = cb1;
-                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
-                                staticMovers.Add(mover);
-                                switch (spike.Direction)
-                                {
-                                    case Spikes.Directions.Left:
-                                        spike.Position = new Vector2(cb1Pos.X, spike.Y);
-
-                                        break;
-                                    case Spikes.Directions.Right:
-                                        spike.Position = new Vector2(cb1Pos.X + cb1Width, spike.Y);
-                                        break;
-                                }
-                            }
-                            if (spikesOnCB2)
-                            {
-                                mover.Platform = cb2;
-                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb2);
-
-                                staticMovers.Add(mover);
-                                switch (spike.Direction)
-                                {
-                                    case Spikes.Directions.Left:
-                                        spike.Position = new Vector2(cb2Pos.X, spike.Y);
-                                        break;
-                                    case Spikes.Directions.Right:
-                                        spike.Position = new Vector2(cb2Pos.X + cb2Width, spike.Y);
-                                        break;
-                                }
-                            }
-                        }
-                        break;
-
-                    case Spikes.Directions.Up:
-                    case Spikes.Directions.Down:
-                        //compare to right side edge (cb1Pos.X + cb1Width), then check for a hole on right side (cb1Pos.Y + cb1Height)
-
-                        
-                        if ((cb1Pos.X + cb1Width < spike.X + spike.Width && cb1Added) || (cb2Pos.X > spike.X && cb2Pos.X < spike.X + spike.Width && cb2Added)) //then the spikes intersect the hole. check if the spikes extend past the hole (cb2Pos.Y)
-                        {
-                            Scene.Remove(spike);
-
-                            if (spikesOnCB1)
-                            {
-                                float spikePosX = spike.X;
-                                int spikeWidth = (int)(cb1Pos.X + cb1Width - spike.X);
-                                float spikePosY = cb1Pos.Y;
-                                int spikeHeight = (int)(spike.Y + spike.Height - cb1Pos.Y);
-                                switch (spike.Direction)
-                                {
-                                    case Spikes.Directions.Up:
-                                        spikePosY = cb1Pos.Y;
-                                        spikePosX = cb1Pos.X;
-                                        break;
-                                    case Spikes.Directions.Down:
-                                        spikePosY = cb1Pos.Y + cb1Height;
-                                        spikePosX = cb1Pos.X;
-                                        break;
-                                }
-                                if (spikeWidth >= minLength)
-                                {
-                                    if (spike is KnifeSpikes)
-                                    {
-                                        Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
-                                        Scene.Add(newSpike1);
-                                    }
-                                    else
-                                    {
-                                        Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType);
-                                        Scene.Add(newSpike1);
-                                    }
-                                }
-                            }
-                            if (spikesOnCB2)
-                            {
-                                float spikePosX = cb2Pos.X;
-                                int spikeWidth = (int)(spike.X + spike.Width - cb2Pos.X);
-                                float spikePosY = cb2Pos.Y;
-                                int spikeHeight = (int)(spike.Y + spike.Height - cb2Pos.Y);
-                                switch (spike.Direction)
-                                {
-                                    case Spikes.Directions.Up:
-                                        spikePosY = cb2Pos.Y;
-                                        spikePosX = cb2Pos.X;
-                                        break;
-                                    case Spikes.Directions.Down:
-                                        spikePosY = cb2Pos.Y + cb2Height;
-                                        spikePosX = cb2Pos.X;
-                                        break;
-                                }
-                                if (spikeWidth >= minLength)
-                                {
-
-                                    if (spike is KnifeSpikes)
-                                    {
-
-                                        Spikes newSpike1 = new KnifeSpikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType, (spike as KnifeSpikes).sliceOnImpact);
-                                        Scene.Add(newSpike1);
-
-                                    }
-                                    else
-                                    {
-                                        Spikes newSpike1 = new Spikes(new Vector2(spikePosX, spikePosY), spikeWidth, spike.Direction, overrideType);
-                                        Scene.Add(newSpike1);
-                                    }
-                                }
-                            }
-                        }
-                        else //this means spikes do not intersect the hole but are attached to a block still. Update Spike positions so they do not desync from their object as it respawns
-                        {
-                            if (spikesOnCB1)
-                            {
-                                mover.Platform = cb1;
-                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
-                                staticMovers.Add(mover);
-                                switch (spike.Direction)
-                                {
-                                    case Spikes.Directions.Up:
-                                        spike.Position = new Vector2(spike.X, cb1Pos.Y);
-                                        break;
-                                    case Spikes.Directions.Down:
-                                        spike.Position = new Vector2(spike.X, cb1Pos.Y + cb1Height);
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                mover.Platform = cb2;
-                                List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb2);
-                                staticMovers.Add(mover);
-                                switch (spike.Direction)
-                                {
-                                    case Spikes.Directions.Up:
-                                        spike.Position = new Vector2(spike.X, cb2Pos.Y);
-                                        break;
-                                    case Spikes.Directions.Down:
-                                        spike.Position = new Vector2(spike.X, cb2Pos.Y + cb2Height);
-                                        break;
-                                }
-                            }
-                        }
-                        break;
+                    ReattachStaticMover(cb2, mover, Orientation.Down);
                 }
             }
-            else if (mover.Entity is Spring)
+            else
             {
-                Spring spring = mover.Entity as Spring;
-                if (Spring.Orientations.WallLeft == spring.Orientation && furthestLeft > spring.Position.X)
+                //case 4: left side cut
+                if (!cb1Added && cb2Added)
                 {
-                    Scene.Remove(spring);
-                    return;
-                }
-                else if (Spring.Orientations.WallRight == spring.Orientation && furthestRight < spring.Position.X)
-                {
-                    Scene.Remove(spring);
-                    return;
-                }
-                else if (Spring.Orientations.Floor == spring.Orientation && furthestUp > spring.Position.Y)
-                {
-                    Scene.Remove(spring);
-                    return;
-                }
-                //if the spring intersects the hole, delete it, else change its attached item
-                bool springOnCB1 = cb1Added && ((spring.X < cb1Pos.X + cb1Width && Direction.X != 0) || (spring.Y < cb1Pos.Y + cb1Height && Direction.X == 0)); //check if spikes start before the hole to see if part of them should be on cb1
-                bool springOnCB2 = cb2Added && ((spring.X < cb2Pos.X && Direction.X != 0) || (spring.Y < cb2Pos.Y && Direction.X == 0)); //check if spikes start before the hole to see if part of them should be on cb1
-
-                if (Direction.X == 0) //y (up/down) movement
-                {
-                    if (spring.CollideRect(new Rectangle((int)(cb1Pos.X + cb1Width), (int)(cb1Pos.Y - 1), (int)(cb2Pos.X - (cb1Pos.X + cb1Width)), cb1Height + 2)))
+                    //find out if our spikes are completely taken out (right of spikes is less than right of cut / left of cb2
+                    if (cb2.Left >= spikes.Right)
                     {
-                        Scene.Remove(spring);
+                        Scene.Remove(spikes);
                         return;
-                    } else
-                    {
-                        if (cb1Added && springOnCB1)
-                        {
-                            mover.Platform = cb1;
-                            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb1);
-
-                            spring.Position = new Vector2(cb1.X, cb1.Y);
-                            staticMovers.Add(mover);
-                        }
-                        else if (cb2Added && springOnCB2)
-                        {
-                            mover.Platform = cb2;
-                            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cb2);
-
-                            spring.Position = new Vector2(cb2.X, cb2.Y);
-                            staticMovers.Add(mover);
-                        }
-                        else
-                        {
-                            Scene.Remove(spring);
-                            return;
-                        }
                     }
+                    //find out if spikes were untouched (left of spikes is greater than right of cut / left of cb2)
+                    if (spikes.Left >= cb2.Left)
+                    {
+                        //do nothing? reattachment needed at best
+                        ReattachStaticMover(cb2, mover, Orientation.Down);
+                        return;
+                    }
+                    //spikes were cut. spikes should be remade.
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.BottomLeft, (int)(spikes.Right - cb2.Left), Orientation.Down);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
+                    Scene.Remove(spikes);
+                    return;
                 }
+                //case 5: vertical middle cut
+                else if (cb1Added && cb2Added)
+                {
+                    //find if the spikes were completely removed
+                    if (cb1.Right <= spikes.Left && cb2.Left >= spikes.Right)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were unharmed
+                    if (cb1.Right >= spikes.Right || cb2.Left <= spikes.Left)
+                    {
+                        ReattachStaticMover(cb1, mover, Orientation.Down);
+                        return;
+                    }
+                    //then they intersect the hole. up to two spikes can be added in this case
+                    if (cb1.Right > spikes.Left)
+                    {
+                        Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopLeft, (int)(cb1.Right - spikes.Left), Orientation.Down);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
+                    }
+                    if (cb2.Left < spikes.Right)
+                    {
+                        Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.BottomLeft, (int)(spikes.Right - cb2.Left), Orientation.Down);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
+                    }
+                    Scene.Remove(spikes);
+                    return;
+                }
+                //case 6
+                else if (cb1Added && !cb2Added)
+                {
+                    //find out if our spikes are completely taken out (top of spikes is less than top of cut / bottom of cb1
+                    if (cb1.Right <= spikes.Left)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were untouched (bottom of spikes is greater than top of cut / bottom of cb1)
+                    if (spikes.Right <= cb1.Right)
+                    {
+                        //do nothing? reattachment needed at best
+                        ReattachStaticMover(cb1, mover, Orientation.Down);
+                        return;
+                    }
+                    //spikes were cut. spikes should be remade.
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopLeft, (int)(cb1.Right - spikes.Left), Orientation.Down);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
+                    Scene.Remove(spikes);
+                    return;
+                }
+            }
+        }
+
+        private static void HandleTopSideSpikes(
+            Scene Scene,
+            Vector2 Direction,
+            Solid cb1,
+            Solid cb2,
+            StaticMover mover)
+        {
+            Entity spikes = mover.Entity;
+            bool cb1Added = cb1 != null;
+            bool cb2Added = cb2 != null;
+
+
+            //figure out case type, split 
+            //case 1: horizontal slicer (direction.x != 0), slicer going through top side. Cb1 will not be added. Solution: Delete
+            //case 2: horizontal slicer (direction.x != 0), slicer going through middle. both will be added. Solution: Reattach
+            //case 2: horizontal slicer (direction.x != 0), slicer going through bottom side. Cb2 will not be added. Solution: Reattach
+
+            //case 4: vertical slicer (direction.x == 0), slicer going through left side. Cb1 will not be added.
+            //case 5: vertical slicer (direction.x == 0), slicer going through middle. both will be added.
+            //case 6: vertical slicer (direction.x == 0), slicer going through right side. Cb2 will not be added.
+
+            //case 2 & 3 are identical (ignore)
+
+            //case 1-3: horizontal slicer
+
+            if (Direction.X != 0)
+            {
+                //case 1
+                if (!cb1Added && cb2Added)
+                {
+                    Scene.Remove(spikes);
+                    return;
+                }
+                //case 2 & 3
                 else
                 {
-                    if (spring.CollideRect(new Rectangle((int)(cb1Pos.X - 1), (int)(cb1Pos.Y + cb1Height), cb1Width + 2, (int)(cb2Pos.Y - (cb1Pos.Y + cb1Height)))))
+                    ReattachStaticMover(cb1, mover, Orientation.Up);
+                }
+            } else
+            {
+                //case 4: left side cut
+                if (!cb1Added && cb2Added)
+                {
+                    //find out if our spikes are completely taken out (right of spikes is less than right of cut / left of cb2
+                    if (cb2.Left >= spikes.Right)
                     {
-                        Scene.Remove(spring);
+                        Scene.Remove(spikes);
                         return;
                     }
-                    else
+                    //find out if spikes were untouched (left of spikes is greater than right of cut / left of cb2)
+                    if (spikes.Left >= cb2.Left)
                     {
-                        if (cb1Added && springOnCB1)
-                        {
-                            mover.Platform = cb1;
-                            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
-                                GetValue(cb1);
-                            staticMovers.Add(mover);
-                        }
-                        else if (cb2Added && springOnCB2)
-                        {
-                            mover.Platform = cb2;
-                            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).
-                                GetValue(cb2);
-                            staticMovers.Add(mover);
-                        }
-                        else
-                        {
-                            Scene.Remove(spring);
-                            return;
-                        }
+                        //do nothing? reattachment needed at best
+                        ReattachStaticMover(cb2, mover, Orientation.Up);
+                        return;
                     }
+                    //spikes were cut. spikes should be remade.
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopLeft, (int)(spikes.Right - cb2.Left), Orientation.Up);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
+                    Scene.Remove(spikes);
+                    return;
+                }
+                //case 5: vertical middle cut
+                else if (cb1Added && cb2Added)
+                {
+                    //find if the spikes were completely removed
+                    if (cb1.Right <= spikes.Left && cb2.Left >= spikes.Right)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were unharmed
+                    if (cb1.Right >= spikes.Right || cb2.Left <= spikes.Left)
+                    {
+                        ReattachStaticMover(cb1, mover, Orientation.Up);
+                        return;
+                    }
+                    //then they intersect the hole. up to two spikes can be added in this case
+                    if (cb1.Right > spikes.Left)
+                    {
+                        Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.BottomLeft, (int)(cb1.Right - spikes.Left), Orientation.Up);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
+                    }
+                    if (cb2.Left < spikes.Right)
+                    {
+                        Entity newSpikes = 
+                        GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopLeft, (int)(spikes.Right - cb2.Left), Orientation.Up);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
+                    }
+                    Scene.Remove(spikes);
+                    return;
+                }
+                //case 6
+                else if (cb1Added && !cb2Added)
+                {
+                    //find out if our spikes are completely taken out (top of spikes is less than top of cut / bottom of cb1
+                    if (cb1.Right <= spikes.Left)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were untouched (bottom of spikes is greater than top of cut / bottom of cb1)
+                    if (spikes.Right <= cb1.Right)
+                    {
+                        //do nothing? reattachment needed at best
+                        ReattachStaticMover(cb1, mover, Orientation.Up);
+                        return;
+                    }
+                    //spikes were cut. spikes should be remade.
+                    Entity newSpikes =
+                    GetNewStaticMoverEntity(Scene, mover.Entity, spikes.BottomLeft, (int)(cb1.Right - spikes.Left), Orientation.Up);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
+                    Scene.Remove(spikes);
+                    return;
                 }
             }
+        }
+
+        private static void HandleLeftSideSpikes(
+            Scene Scene, 
+            Vector2 Direction, 
+            Solid cb1, 
+            Solid cb2, 
+            StaticMover mover)
+        {
+            Entity spikes = mover.Entity;
+            bool cb1Added = cb1 != null;
+            bool cb2Added = cb2 != null;
+
+
+            //figure out case type, split 
+            //case 1: horizontal slicer (direction.x != 0), slicer going through top side. Cb1 will not be added.
+            //case 2: horizontal slicer (direction.x != 0), slicer going through middle. both will be added.
+            //case 2: horizontal slicer (direction.x != 0), slicer going through bottom side. Cb2 will not be added.
+
+            //case 4: vertical slicer (direction.x == 0), slicer going through left side. Cb1 will not be added.
+            //case 5: vertical slicer (direction.x == 0), slicer going through middle. both will be added.
+            //case 6: vertical slicer (direction.x == 0), slicer going through right side. Cb2 will not be added.
+
+            //case 5 and 6 are identical (ignore)
+
+            //case 1-3: horizontal slicer
+            if (Direction.X != 0)
+            {
+                //case 1 slicer going through top side.
+                if (!cb1Added && cb2Added)
+                {
+                    //find out if our spikes are completely taken out (bottom of spikes is less than bottom of cut / top of cb2
+                    if (cb2.Top >= spikes.Bottom)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were untouched (top of spikes is greater than top of cut)
+                    if (spikes.Top >= cb2.Top)
+                    {
+                        //do nothing? reattachment needed at best
+                        ReattachStaticMover(cb2, mover, Orientation.Left);
+                        return;
+                    }
+                    //spikes were cut. spikes should be remade.
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopLeft, (int)(spikes.Bottom - cb2.Top), Orientation.Left);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
+                    Scene.Remove(spikes);
+                    return;
+                }
+
+                //case 2 slicer going through middle.
+                else if (cb1Added && cb2Added) //&& cb1Added is implied
+                {
+                    //find if the spikes were completely removed
+                    if (cb1.Bottom <= spikes.Top && cb2.Top >= spikes.Bottom)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were unharmed
+                    if (cb1.Bottom >= spikes.Bottom || cb2.Top <= spikes.Top)
+                    {
+                        ReattachStaticMover(cb1, mover, Orientation.Left);
+                        return;
+                    }
+                    //then they intersect the hole. up to two spikes can be added in this case
+                    if (cb1.Bottom > spikes.Top)
+                    {
+                        Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopRight, (int)(cb1.Bottom - spikes.Top), Orientation.Left);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
+                    }
+                    if (cb2.Top < spikes.Bottom)
+                    {
+                        Entity newSpikes =
+                        GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopLeft, (int)(spikes.Bottom - cb2.Top), Orientation.Left);
+
+                        if (newSpikes != null) Scene.Add(newSpikes);
+                    }
+                    Scene.Remove(spikes);
+                    return;
+                }
+                //case 3 slicer going through bottom.
+                else if (cb1Added && !cb2Added)
+                {
+                    //find out if our spikes are completely taken out (top of spikes is less than top of cut / bottom of cb1
+                    if (cb1.Bottom <= spikes.Top)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were untouched (bottom of spikes is greater than top of cut / bottom of cb1)
+                    if (spikes.Bottom <= cb1.Bottom)
+                    {
+                        //do nothing? reattachment needed at best
+                        ReattachStaticMover(cb1, mover, Orientation.Left);
+                        return;
+                    }
+                    //spikes were cut. spikes should be remade.
+                    Entity newSpikes = 
+                    GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopRight, (int)(cb1.Bottom - spikes.Top), Orientation.Left);
+
+                    if (newSpikes != null) Scene.Add(newSpikes);
+                    Scene.Remove(spikes);
+                    return;
+                }
+            } 
+
+            else
+            {
+                //case 4
+                if (!cb1Added)
+                {
+                    Scene.Remove(spikes);
+                    return;
+                }
+                //case 5 and 6 (ignore (reattach?))
+                else
+                {
+                    ReattachStaticMover(cb1, mover, Orientation.Left);
+                }
+            }
+
+        }
+
+        private static void HandleRightSideSpikes(
+            Scene Scene,
+            Vector2 Direction,
+            Solid cb1,
+            Solid cb2,
+            StaticMover mover)
+        {
+            Entity spikes = mover.Entity;
+            bool cb1Added = cb1 != null;
+            bool cb2Added = cb2 != null;
+
+
+            //figure out case type, split 
+            //case 1: horizontal slicer (direction.x != 0), slicer going through top side. Cb1 will not be added.
+            //case 2: horizontal slicer (direction.x != 0), slicer going through middle. both will be added.
+            //case 2: horizontal slicer (direction.x != 0), slicer going through bottom side. Cb2 will not be added.
+
+            //case 4: vertical slicer (direction.x == 0), slicer going through left side. Cb1 will not be added.
+            //case 5: vertical slicer (direction.x == 0), slicer going through middle. both will be added.
+            //case 6: vertical slicer (direction.x == 0), slicer going through right side. Cb2 will not be added.
+
+            //case 4 and 5 are identical (ignore)
+
+            //case 1-3: horizontal slicer
+            if (Direction.X != 0)
+            {
+                //case 1 slicer going through top side.
+                if (!cb1Added && cb2Added)
+                {
+                    //find out if our spikes are completely taken out (bottom of spikes is less than bottom of cut / top of cb2
+                    if (cb2.Top >= spikes.Bottom)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were untouched (top of spikes is greater than top of cut)
+                    if (spikes.Top >= cb2.Top)
+                    {
+                        //do nothing? reattachment needed at best
+                        ReattachStaticMover(cb2, mover, Orientation.Right);
+                        return;
+                    }
+                    //spikes were cut. spikes should be remade.
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopRight, (int)(spikes.Bottom - cb2.Top), Orientation.Right);
+
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
+                    Scene.Remove(spikes);
+                    return;
+                }
+
+                //case 2 slicer going through middle.
+                else if (cb1Added && cb2Added) //&& cb1Added is implied
+                {
+                    //find if the spikes were completely removed
+                    if (cb1.Bottom <= spikes.Top && cb2.Top >= spikes.Bottom)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were unharmed
+                    if (cb1.Bottom >= spikes.Bottom || cb2.Top <= spikes.Top)
+                    {
+                        ReattachStaticMover(cb1, mover, Orientation.Right);
+                        return;
+                    }
+                    //then they intersect the hole. up to two spikes can be added in this case
+                    if (cb1.Bottom >= spikes.Top)
+                    {
+                        Entity newSpikes =
+                        GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopLeft, (int)(cb1.Bottom - spikes.Top), Orientation.Right);
+                        if (newSpikes != null) Scene.Add(newSpikes);
+                    }
+                    if (cb2.Top < spikes.Bottom)
+                    {
+                        Entity newSpikes =
+                        GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopRight, (int)(spikes.Bottom - cb2.Top), Orientation.Right);
+                        if (newSpikes != null) Scene.Add(newSpikes);
+                    }
+                    Scene.Remove(spikes);
+                    return;
+                }
+                //case 3 slicer going through bottom.
+                else if (cb1Added && !cb2Added)
+                {
+                    //find out if our spikes are completely taken out (top of spikes is less than top of cut / bottom of cb1
+                    if (cb1.Bottom <= spikes.Top)
+                    {
+                        Scene.Remove(spikes);
+                        return;
+                    }
+                    //find out if spikes were untouched (bottom of spikes is greater than top of cut / bottom of cb1)
+                    if (spikes.Bottom <= cb1.Bottom)
+                    {
+                        //do nothing? reattachment needed at best
+                        ReattachStaticMover(cb1, mover, Orientation.Right);
+                        return;
+                    }
+                    //spikes were cut. spikes should be remade.
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopLeft, (int)(cb1.Bottom - spikes.Top), Orientation.Right);
+                    if (newSpikes != null) Scene.Add(newSpikes);
+                    Scene.Remove(spikes);
+                    return;
+                }
+            }
+
+            else
+            {
+                //case 6
+                if (!cb2Added)
+                {
+                    Scene.Remove(spikes);
+                    return;
+                }
+                //case 4 and 5 (ignore (reattach?))
+                else
+                {
+                    ReattachStaticMover(cb2, mover, Orientation.Right);
+                }
+            }
+
+        }
+
+        private static Entity GetNewStaticMoverEntity(Scene scene, Entity entity, Vector2 position, int length, Orientation orientation)
+        {
+            if (entity is KnifeSpikes ks)
+            {
+                Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
+                string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ks);
+                
+                switch (orientation)
+                {
+                    case Orientation.Right:
+
+                        return new KnifeSpikes(position, length, Spikes.Directions.Right, overrideType, ks.sliceOnImpact);
+
+                    case Orientation.Left:
+                        return new KnifeSpikes(position, length, Spikes.Directions.Left, overrideType, ks.sliceOnImpact);
+                    case Orientation.Up:
+                        return new KnifeSpikes(position, length, Spikes.Directions.Up, overrideType, ks.sliceOnImpact);
+                    case Orientation.Down:
+                        return new KnifeSpikes(position, length, Spikes.Directions.Down, overrideType, ks.sliceOnImpact);
+
+                }
+            } else if (entity is Spikes spikes)
+            {
+                Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
+                string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spikes);
+                switch (orientation)
+                {
+                    case Orientation.Right:
+                        return new Spikes(position, length, Spikes.Directions.Right, overrideType);
+
+                    case Orientation.Left:
+                        return new Spikes(position, length, Spikes.Directions.Left, overrideType);
+                    case Orientation.Up:
+                        return new Spikes(position, length, Spikes.Directions.Up, overrideType);
+                    case Orientation.Down:
+                        return new Spikes(position, length, Spikes.Directions.Down, overrideType);
+
+                }
+            } else if (entity is Spring spring)
+            {
+                if (length < 16) return null;
+                switch (orientation)
+                {
+                    case Orientation.Right:
+                        return new Spring(position, Spring.Orientations.WallRight, true);
+                    case Orientation.Left:
+                        return new Spring(position, Spring.Orientations.WallLeft, true);
+                    case Orientation.Up:
+                        return new Spring(position, Spring.Orientations.Floor, true);
+                    case Orientation.Down:
+                        return null;
+
+                }
+            }
+            return null;
+        }
+
+        private enum Orientation
+        {
+            Up, Down, Left, Right
+        }
+
+        private static void ReattachStaticMover(Solid block, StaticMover mover, Orientation smDirection)
+        {
+            Type cbType = block.GetType();
+            mover.Platform = block;
+            Entity moverEntity = mover.Entity;
+            List<StaticMover> staticMovers = (List<StaticMover>)cbType.GetField("staticMovers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(block);
+            staticMovers.Add(mover);
+            switch (smDirection)
+            {
+                case Orientation.Left:
+                    moverEntity.Position = new Vector2(block.Left, moverEntity.Y);
+                    break;
+                case Orientation.Right:
+                    moverEntity.Position = new Vector2(block.Right, moverEntity.Y);
+                    break;
+                case Orientation.Up:
+                    moverEntity.Position = new Vector2(moverEntity.X, block.Top);
+                    break;
+                case Orientation.Down:
+                    moverEntity.Position = new Vector2(moverEntity.X, block.Bottom);
+                    break;
+            }
+        }
+
+        //currently handles vanilla static movers (basically just spikes and springs). Welcome to hell.
+        private static void HandleStaticMover(Scene Scene, Vector2 Direction, Entity Entity, Entity parent, Solid cb1, Solid cb2, StaticMover mover, int minLength, DynamicData dynData = null)
+        {
+
+            bool cb1Added = cb1 != null;
+            bool cb2Added = cb2 != null;
+            if (cb1Added || cb2Added) { 
+                if (mover.Entity is Spikes)
+                {
+                    if ((mover.Entity as Spikes).Direction == Spikes.Directions.Left)
+                    {
+                        HandleLeftSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    }
+                    else if ((mover.Entity as Spikes).Direction == Spikes.Directions.Right)
+                    {
+                        HandleRightSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    }
+                    else if ((mover.Entity as Spikes).Direction == Spikes.Directions.Up)
+                    {
+                        HandleTopSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    }
+                    else if ((mover.Entity as Spikes).Direction == Spikes.Directions.Down)
+                    {
+                        HandleBottomSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    }
+                }
+                if (mover.Entity is Spring spring)
+                {
+                    if (spring.Orientation == Spring.Orientations.WallRight)
+                    {
+                        HandleLeftSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    }
+                    else if (spring.Orientation == Spring.Orientations.WallLeft)
+                    {
+                        HandleRightSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    }
+                    else if (spring.Orientation == Spring.Orientations.Floor)
+                    {
+                        HandleTopSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    } else
+                    {
+                        Scene.Remove(mover.Entity);
+                    }
+                }
+
+            } else
+            {
+                Scene.Remove(mover.Entity);
+            }
+
+            
         }
 
         private void AddParticles(Vector2 position, Vector2 range, Color color)
