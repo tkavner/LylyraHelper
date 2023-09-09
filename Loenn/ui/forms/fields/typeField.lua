@@ -83,6 +83,7 @@ local function fieldCallback(self, value, prev)
     local offset = -font:getWidth(button.text) - (2 * button.style.padding)
 
     self.button.x = -font:getWidth(text) + self.minWidth + offset
+    self.button.y = 20
 end
 
 function listOfTypeField.getElement(name, value, options)
@@ -103,11 +104,11 @@ function listOfTypeField.getElement(name, value, options)
 
     local formField = stringField.getElement(name, value, options)
 
-    local button = uiElements.button("Auto", buttonPressed(formField))
+    local button = uiElements.button("Set from Intersection", buttonPressed(formField))
 
     button.style.padding *= 0.36
     button.style.spacing = 0
-    button.tooltipText = "Placeholder Tooltip"-- tostring(language.ui.lylyrahelper.typeField.tooltip)
+    button.tooltipText = "*FrostHelper required*\nThis field will be set to the names of all entities overlapped by the Slicer Controller. This will overwrite any information currently there."-- tostring(language.ui.lylyrahelper.typeField.tooltip)
     formField.field:addChild(button)
     formField.field.button = button
 
