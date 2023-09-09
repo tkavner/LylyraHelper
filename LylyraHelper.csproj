@@ -66,6 +66,7 @@
     <Compile Include="Components\PaperComponent.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
     <Compile Include="Components\BreakbeamHitboxComponent.cs" />
+    <Compile Include="ModInterop\FrostHelperImports.cs" />
     <Compile Include="Other\PaperHitbox.cs" />
     <Compile Include="Trigger\AddSlicerTrigger.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />
@@ -96,12 +97,11 @@
     <None Include="Loenn\lang\en_gb.lang" />
     <None Include="Loenn\triggers\addSlicerTrigger.lua" />
     <None Include="Loenn\triggers\removeSlicerTrigger.lua" />
+    <None Include="Loenn\ui\forms\fields\typeField.lua" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="credits.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Loenn\ui\forms\fields\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

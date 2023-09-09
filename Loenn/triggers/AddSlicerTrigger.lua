@@ -1,7 +1,6 @@
 local addSlicerOnLoadTrigger = {}
 addSlicerOnLoadTrigger.name = "LylyraHelper/AddSlicerTrigger"
 addSlicerOnLoadTrigger.placements = {}
-
 local directions = {"Up", "Down", "Right", "Left", "All"}
 
 

@@ -25,7 +25,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private int particleEmitPoints;
         private static ParticleType paperSymbols;
         private int playerParticleEmitPoints;
-
+        private string sliceableEntityTypes;
 
         public DashPaper(EntityData data, Vector2 offset):
             base(data, offset,
@@ -35,6 +35,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             thisType = this.GetType();
             this.spawnScissors = data.Bool("spawnScissors", true);
             this.fragileScissors = data.Bool("fragileScissors", false);
+            this.sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
             noTrail = data.Bool("noTrail", false);
             noEffects = data.Bool("noEffects", false);
             Add(new Cuttable(this, Calc.HexToColor("cac7e3")));
@@ -142,11 +143,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scissors s;
                     if (direction.Y < 0)
                     {
-                        s = new Scissors(new Vector2[] { v1, v2 }, yOnly, fragileScissors);
+                        s = new Scissors(new Vector2[] { v1, v2 }, yOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
                     }
                     else
                     {
-                        s = new Scissors(new Vector2[] { v2, v1 }, yOnly, fragileScissors);
+                        s = new Scissors(new Vector2[] { v2, v1 }, yOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
                     }
                     base.Scene.Add(s);
                 }
@@ -157,11 +158,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scissors s;
                     if (direction.X < 0)
                     {
-                        s = new Scissors(new Vector2[] { v1, v2 }, xOnly, fragileScissors);
+                        s = new Scissors(new Vector2[] { v1, v2 }, xOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
                     }
                     else
                     {
-                        s = new Scissors(new Vector2[] { v2, v1 }, xOnly, fragileScissors);
+                        s = new Scissors(new Vector2[] { v2, v1 }, xOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
                     }
                     base.Scene.Add(s);
                 }

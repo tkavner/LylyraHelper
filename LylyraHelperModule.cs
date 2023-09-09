@@ -28,7 +28,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public override void Load()
         {
-            Logger.SetLogLevel("LylyraHelper", LogLevel.Verbose);
+            Logger.SetLogLevel("LylyraHelper", LogLevel.Info);
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
             Scissors.Load();
             PaperHitbox.Load();
@@ -49,6 +49,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void LoadContent(bool firstLoad)
         {
             base.LoadContent(firstLoad);
+            FrostHelperImports.Load();
             _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
         }
 

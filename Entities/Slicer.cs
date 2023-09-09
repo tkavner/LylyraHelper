@@ -22,13 +22,25 @@ namespace Celeste.Mod.LylyraHelper.Components
             public SlicerSettings(string settings)
             {
                 if (settings == null) settings = "";
-                string[] types = settings?.Split(',');
-                if (types == null || types.Length == 0)
+                Logger.Log("LylyraHelper", settings);
+                string[] typeNames = settings?.Split(',');
+                if (typeNames == null || typeNames.Length == 0)
                 {
                     SliceableList = new List<string>();
                     return;
                 }
-                SliceableList = types.ToList();
+                SliceableList = new List<string>();
+                if (FrostHelperImports.FrostHelperLoaded)
+                {
+                    Type[] typeArray = FrostHelperImports.GetTypesFH(settings);
+
+                    Logger.Log("LylyraHelper", "" + typeArray.Length);
+                    foreach (Type type in typeArray)
+                    {
+                        SliceableList.Add(type.FullName);
+                        Logger.Log("LylyraHelper", type.FullName);
+                    }
+                }
             }
 
             private static SlicerSettings _default = new SlicerSettings(default_string);
@@ -87,7 +99,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             Collider slicingCollider = null,
             bool active = true,
             bool sliceOnImpact = false,
-            bool fragile = false) : this(Direction, cutSize, level, directionalOffset, Vector2.Zero, slicingCollider, active, sliceOnImpact, fragile)
+            bool fragile = false,
+            string settings = "") : this(Direction, cutSize, level, directionalOffset, Vector2.Zero, slicingCollider, active, sliceOnImpact, fragile, settings)
         {
 
         }

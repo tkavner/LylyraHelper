@@ -4,3 +4,6 @@
   Dependencies:
     - Name: Everest
       Version: 1.0.0
+  OptionalDependencies:
+    - Name: FrostHelper
+      Version: 1.45.2
