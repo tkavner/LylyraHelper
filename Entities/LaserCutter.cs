@@ -32,11 +32,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
             private int LaserLength;
             private EventInstance beamAudioToken;
             private bool firePlayed;
+            private string sliceableEntityTypes;
 
-            public Laser(Vector2 Position, Vector2 direction, Level level, int cutSize, LaserCutter parent, string strdirection, Vector2 offset) : base()
+            public Laser(Vector2 Position, Vector2 direction, Level level, int cutSize, LaserCutter parent, string strdirection, Vector2 offset, string sliceableEntityTypes) : base()
             {
                 Collider = GetOrientedHitbox(2, strdirection, cutSize, 0);
-                Add(bbhc = new BreakbeamHitboxComponent(cutSize, strdirection, level, parent, new ColliderList(), offset, simple:true));
+                Add(bbhc = new BreakbeamHitboxComponent(cutSize, strdirection, level, parent, new ColliderList(), offset, simple: true));
                 TopCenter = Position;
                 Direction = direction;
                 this.Position = Position;
@@ -49,12 +50,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 sprite.Play(strdirection);
                 sprite.Visible = false;
                 Add(new PlayerCollider(OnPlayer));
+                this.sliceableEntityTypes = sliceableEntityTypes;
             }
 
             public override void Added(Scene scene)
             {
                 base.Added(scene);
-                Add(Slicer = new Slicer(Direction, cutSize, SceneAs<Level>(), 320, Direction, sliceOnImpact: true, slicingCollider: Collider));
+                Add(Slicer = new Slicer(Direction, cutSize, SceneAs<Level>(), 320, Direction, sliceOnImpact: true, slicingCollider: Collider, settings: sliceableEntityTypes));
             }
 
             private void OnPlayer(Player obj)
@@ -582,6 +584,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private float cooldownTime;
         private FiringMode mode;
         private string flagName;
+        private string sliceableEntityTypes;
         private float firingLength;
         private float firingTimer;
         internal Collider shortHitbox;
@@ -602,6 +605,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             cooldownTime = data.Float("cooldown", 2F);
             invert = data.Bool("invert", false);
             flagName = data.Attr("flag", "");
+            sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
             string strmode = data.Attr("mode", "breakbeam").ToLower();
             if (strmode == "breakbeam") mode = FiringMode.Breakbeam;
             else if (strmode == "in front") mode = FiringMode.InFront;
@@ -720,16 +724,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 switch (direction.ToLower())
                 {
                     case "up":
-                        laser = new Laser(Position, -Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction, new Vector2(Width / 2, 0));
+                        laser = new Laser(Position, -Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction, new Vector2(Width / 2, 0), sliceableEntityTypes);
                         break;
                     case "down":
-                        laser = new Laser(Position, Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction, new Vector2(Width / 2, 0));
+                        laser = new Laser(Position, Vector2.UnitY, SceneAs<Level>(), cutSize, this, direction, new Vector2(Width / 2, 0), sliceableEntityTypes);
                         break;
                     case "right":
-                        laser = new Laser(Position, Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction, new Vector2(0, Height / 2));
+                        laser = new Laser(Position, Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction, new Vector2(0, Height / 2), sliceableEntityTypes);
                         break;
                     case "left":
-                        laser = new Laser(Position, -Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction, new Vector2(0, Height / 2));
+                        laser = new Laser(Position, -Vector2.UnitX, SceneAs<Level>(), cutSize, this, direction, new Vector2(0, Height / 2), sliceableEntityTypes);
                         break;
                 }
                 Scene.Add(laser);

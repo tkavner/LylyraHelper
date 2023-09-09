@@ -99,7 +99,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             Collider slicingCollider = null,
             bool active = true,
             bool sliceOnImpact = false,
-            bool fragile = false) : this(Direction, cutSize, level, directionalOffset, Vector2.Zero, slicingCollider, active, sliceOnImpact, fragile)
+            bool fragile = false,
+            string settings = "") : this(Direction, cutSize, level, directionalOffset, Vector2.Zero, slicingCollider, active, sliceOnImpact, fragile, settings)
         {
 
         }

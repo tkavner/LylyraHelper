@@ -55,6 +55,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private bool firstFrame = true;
         private bool audioFlag2;
         private EventInstance audioToken;
+        private string sliceableEntityTypes;
 
         public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
         {
@@ -183,7 +184,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             base.Added(scene);
             level = SceneAs<Level>();
-            Add(slicer = new Slicer(CutDirection, cutSize, SceneAs<Level>(), 5, directionalCollider));
+            Add(slicer = new Slicer(CutDirection, cutSize, SceneAs<Level>(), 5, directionalCollider, settings:sliceableEntityTypes));
         }
 
         private void OnPlayer(Player player)
