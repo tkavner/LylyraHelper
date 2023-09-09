@@ -814,13 +814,9 @@ namespace Celeste.Mod.LylyraHelper.Components
     Solid cb2,
     StaticMover mover)
         {
-            Spikes spikes = mover.Entity as Spikes;
+            Entity spikes = mover.Entity;
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
-
-            Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
-            string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spikes);
-
 
             //figure out case type, split 
             //case 1: horizontal slicer (direction.x != 0), slicer going through top side. Cb1 will not be added. Solution: Reattach
@@ -868,8 +864,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //spikes were cut. spikes should be remade.
-                    Spikes newSpikes = new Spikes(cb2.BottomLeft, (int)(spikes.Right - cb2.Left), Spikes.Directions.Down, overrideType);
-                    Scene.Add(newSpikes);
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.BottomLeft, (int)(spikes.Right - cb2.Left), Orientation.Down);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
                     Scene.Remove(spikes);
                     return;
                 }
@@ -891,13 +888,15 @@ namespace Celeste.Mod.LylyraHelper.Components
                     //then they intersect the hole. up to two spikes can be added in this case
                     if (cb1.Right > spikes.Left)
                     {
-                        Spikes newSpikes = new Spikes(spikes.TopLeft, (int)(cb1.Right - spikes.Left), Spikes.Directions.Down, overrideType);
-                        Scene.Add(newSpikes);
+                        Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopLeft, (int)(cb1.Right - spikes.Left), Orientation.Down);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
                     }
                     if (cb2.Left < spikes.Right)
                     {
-                        Spikes newSpikes = new Spikes(cb2.BottomLeft, (int)(spikes.Right - cb2.Left), Spikes.Directions.Down, overrideType);
-                        Scene.Add(newSpikes);
+                        Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.BottomLeft, (int)(spikes.Right - cb2.Left), Orientation.Down);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
                     }
                     Scene.Remove(spikes);
                     return;
@@ -919,8 +918,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //spikes were cut. spikes should be remade.
-                    Spikes newSpikes = new Spikes(spikes.TopLeft, (int)(cb1.Right - spikes.Left), Spikes.Directions.Down, overrideType);
-                    Scene.Add(newSpikes);
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopLeft, (int)(cb1.Right - spikes.Left), Orientation.Down);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
                     Scene.Remove(spikes);
                     return;
                 }
@@ -934,12 +934,9 @@ namespace Celeste.Mod.LylyraHelper.Components
             Solid cb2,
             StaticMover mover)
         {
-            Spikes spikes = mover.Entity as Spikes;
+            Entity spikes = mover.Entity;
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
-
-            Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
-            string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spikes);
 
 
             //figure out case type, split 
@@ -987,8 +984,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //spikes were cut. spikes should be remade.
-                    Spikes newSpikes = new Spikes(cb2.TopLeft, (int)(spikes.Right - cb2.Left), Spikes.Directions.Up, overrideType);
-                    Scene.Add(newSpikes);
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopLeft, (int)(spikes.Right - cb2.Left), Orientation.Up);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
                     Scene.Remove(spikes);
                     return;
                 }
@@ -1010,13 +1008,16 @@ namespace Celeste.Mod.LylyraHelper.Components
                     //then they intersect the hole. up to two spikes can be added in this case
                     if (cb1.Right > spikes.Left)
                     {
-                        Spikes newSpikes = new Spikes(spikes.BottomLeft, (int)(cb1.Right - spikes.Left), Spikes.Directions.Up, overrideType);
-                        Scene.Add(newSpikes);
+                        Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.BottomLeft, (int)(cb1.Right - spikes.Left), Orientation.Up);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
                     }
                     if (cb2.Left < spikes.Right)
                     {
-                        Spikes newSpikes = new Spikes(cb2.TopLeft, (int)(spikes.Right - cb2.Left), Spikes.Directions.Up, overrideType);
-                        Scene.Add(newSpikes);
+                        Entity newSpikes = 
+                        GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopLeft, (int)(spikes.Right - cb2.Left), Orientation.Up);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
                     }
                     Scene.Remove(spikes);
                     return;
@@ -1038,8 +1039,10 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //spikes were cut. spikes should be remade.
-                    Spikes newSpikes = new Spikes(spikes.BottomLeft, (int)(cb1.Right - spikes.Left), Spikes.Directions.Up, overrideType);
-                    Scene.Add(newSpikes);
+                    Entity newSpikes =
+                    GetNewStaticMoverEntity(Scene, mover.Entity, spikes.BottomLeft, (int)(cb1.Right - spikes.Left), Orientation.Up);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
                     Scene.Remove(spikes);
                     return;
                 }
@@ -1053,12 +1056,9 @@ namespace Celeste.Mod.LylyraHelper.Components
             Solid cb2, 
             StaticMover mover)
         {
-            Spikes spikes = mover.Entity as Spikes;
+            Entity spikes = mover.Entity;
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
-
-            Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
-            string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spikes);
 
 
             //figure out case type, split 
@@ -1092,8 +1092,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //spikes were cut. spikes should be remade.
-                    Spikes newSpikes = new Spikes(cb2.TopLeft, (int)(spikes.Bottom - cb2.Top), Spikes.Directions.Left, overrideType);
-                    Scene.Add(newSpikes);
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopLeft, (int)(spikes.Bottom - cb2.Top), Orientation.Left);
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
                     Scene.Remove(spikes);
                     return;
                 }
@@ -1116,13 +1117,16 @@ namespace Celeste.Mod.LylyraHelper.Components
                     //then they intersect the hole. up to two spikes can be added in this case
                     if (cb1.Bottom > spikes.Top)
                     {
-                        Spikes newSpikes = new Spikes(spikes.TopRight, (int)(cb1.Bottom - spikes.Top), Spikes.Directions.Left, overrideType);
-                        Scene.Add(newSpikes);
+                        Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopRight, (int)(cb1.Bottom - spikes.Top), Orientation.Left);
+                        if (newSpikes != null)
+                            Scene.Add(newSpikes);
                     }
                     if (cb2.Top < spikes.Bottom)
                     {
-                        Spikes newSpikes = new Spikes(cb2.TopLeft, (int)(spikes.Bottom - cb2.Top), Spikes.Directions.Left, overrideType);
-                        Scene.Add(newSpikes);
+                        Entity newSpikes =
+                        GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopLeft, (int)(spikes.Bottom - cb2.Top), Orientation.Left);
+
+                        if (newSpikes != null) Scene.Add(newSpikes);
                     }
                     Scene.Remove(spikes);
                     return;
@@ -1144,8 +1148,10 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //spikes were cut. spikes should be remade.
-                    Spikes newSpikes = new Spikes(spikes.TopRight, (int)(cb1.Bottom - spikes.Top), Spikes.Directions.Left, overrideType);
-                    Scene.Add(newSpikes);
+                    Entity newSpikes = 
+                    GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopRight, (int)(cb1.Bottom - spikes.Top), Orientation.Left);
+
+                    if (newSpikes != null) Scene.Add(newSpikes);
                     Scene.Remove(spikes);
                     return;
                 }
@@ -1175,12 +1181,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             Solid cb2,
             StaticMover mover)
         {
-            Spikes spikes = mover.Entity as Spikes;
+            Entity spikes = mover.Entity;
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
 
-            Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
-            string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spikes);
 
             //figure out case type, split 
             //case 1: horizontal slicer (direction.x != 0), slicer going through top side. Cb1 will not be added.
@@ -1213,8 +1217,10 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //spikes were cut. spikes should be remade.
-                    Spikes newSpikes = new Spikes(cb2.TopRight, (int)(spikes.Bottom - cb2.Top), Spikes.Directions.Right, overrideType);
-                    Scene.Add(newSpikes);
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopRight, (int)(spikes.Bottom - cb2.Top), Orientation.Right);
+
+                    if (newSpikes != null)
+                        Scene.Add(newSpikes);
                     Scene.Remove(spikes);
                     return;
                 }
@@ -1237,13 +1243,15 @@ namespace Celeste.Mod.LylyraHelper.Components
                     //then they intersect the hole. up to two spikes can be added in this case
                     if (cb1.Bottom >= spikes.Top)
                     {
-                        Spikes newSpikes = new Spikes(spikes.TopLeft, (int)(cb1.Bottom - spikes.Top), Spikes.Directions.Right, overrideType);
-                        Scene.Add(newSpikes);
+                        Entity newSpikes =
+                        GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopLeft, (int)(cb1.Bottom - spikes.Top), Orientation.Right);
+                        if (newSpikes != null) Scene.Add(newSpikes);
                     }
                     if (cb2.Top < spikes.Bottom)
                     {
-                        Spikes newSpikes = new Spikes(cb2.TopRight, (int)(spikes.Bottom - cb2.Top), Spikes.Directions.Right, overrideType);
-                        Scene.Add(newSpikes);
+                        Entity newSpikes =
+                        GetNewStaticMoverEntity(Scene, mover.Entity, cb2.TopRight, (int)(spikes.Bottom - cb2.Top), Orientation.Right);
+                        if (newSpikes != null) Scene.Add(newSpikes);
                     }
                     Scene.Remove(spikes);
                     return;
@@ -1265,8 +1273,8 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //spikes were cut. spikes should be remade.
-                    Spikes newSpikes = new Spikes(spikes.TopLeft, (int)(cb1.Bottom - spikes.Top), Spikes.Directions.Right, overrideType);
-                    Scene.Add(newSpikes);
+                    Entity newSpikes = GetNewStaticMoverEntity(Scene, mover.Entity, spikes.TopLeft, (int)(cb1.Bottom - spikes.Top), Orientation.Right);
+                    if (newSpikes != null) Scene.Add(newSpikes);
                     Scene.Remove(spikes);
                     return;
                 }
@@ -1289,6 +1297,62 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         }
 
+        private static Entity GetNewStaticMoverEntity(Scene scene, Entity entity, Vector2 position, int length, Orientation orientation)
+        {
+            if (entity is KnifeSpikes ks)
+            {
+                Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
+                string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ks);
+                
+                switch (orientation)
+                {
+                    case Orientation.Right:
+
+                        return new KnifeSpikes(position, length, Spikes.Directions.Right, overrideType, ks.sliceOnImpact);
+
+                    case Orientation.Left:
+                        return new KnifeSpikes(position, length, Spikes.Directions.Left, overrideType, ks.sliceOnImpact);
+                    case Orientation.Up:
+                        return new KnifeSpikes(position, length, Spikes.Directions.Up, overrideType, ks.sliceOnImpact);
+                    case Orientation.Down:
+                        return new KnifeSpikes(position, length, Spikes.Directions.Down, overrideType, ks.sliceOnImpact);
+
+                }
+            } else if (entity is Spikes spikes)
+            {
+                Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
+                string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spikes);
+                switch (orientation)
+                {
+                    case Orientation.Right:
+                        return new Spikes(position, length, Spikes.Directions.Right, overrideType);
+
+                    case Orientation.Left:
+                        return new Spikes(position, length, Spikes.Directions.Left, overrideType);
+                    case Orientation.Up:
+                        return new Spikes(position, length, Spikes.Directions.Up, overrideType);
+                    case Orientation.Down:
+                        return new Spikes(position, length, Spikes.Directions.Down, overrideType);
+
+                }
+            } else if (entity is Spring spring)
+            {
+                switch (orientation)
+                {
+                    case Orientation.Right:
+                        return new Spring(position, Spring.Orientations.WallRight, true);
+                    case Orientation.Left:
+                        return new Spring(position, Spring.Orientations.WallLeft, true);
+                    case Orientation.Up:
+                        return new Spring(position, Spring.Orientations.Floor, true);
+                    case Orientation.Down:
+                        return null;
+
+                }
+            }
+            return null;
+        }
+
         private enum Orientation
         {
             Up, Down, Left, Right
@@ -1304,13 +1368,13 @@ namespace Celeste.Mod.LylyraHelper.Components
             switch (smDirection)
             {
                 case Orientation.Left:
-                    moverEntity.Position = new Vector2(block.X, moverEntity.Y);
+                    moverEntity.Position = new Vector2(block.Left, moverEntity.Y);
                     break;
                 case Orientation.Right:
-                    moverEntity.Position = new Vector2(block.X + block.Width, moverEntity.Y);
+                    moverEntity.Position = new Vector2(block.Right, moverEntity.Y);
                     break;
                 case Orientation.Up:
-                    moverEntity.Position = new Vector2(moverEntity.X, block.Y);
+                    moverEntity.Position = new Vector2(moverEntity.X, block.Top);
                     break;
                 case Orientation.Down:
                     moverEntity.Position = new Vector2(moverEntity.X, block.Bottom);
@@ -1344,6 +1408,25 @@ namespace Celeste.Mod.LylyraHelper.Components
                         HandleBottomSideSpikes(Scene, Direction, cb1, cb2, mover);
                     }
                 }
+                if (mover.Entity is Spring spring)
+                {
+                    if (spring.Orientation == Spring.Orientations.WallRight)
+                    {
+                        HandleLeftSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    }
+                    else if (spring.Orientation == Spring.Orientations.WallLeft)
+                    {
+                        HandleRightSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    }
+                    else if (spring.Orientation == Spring.Orientations.Floor)
+                    {
+                        HandleTopSideSpikes(Scene, Direction, cb1, cb2, mover);
+                    } else
+                    {
+                        Scene.Remove(mover.Entity);
+                    }
+                }
+
             } else
             {
                 Scene.Remove(mover.Entity);
