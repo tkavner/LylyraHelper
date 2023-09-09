@@ -38,7 +38,7 @@ local function getEntitiesInBox(room)
             local e2Height = entity.height or entity.Height or 8
             r2 = utils.rectangle(entity.x, entity.y, e2Width, e2Height)
             if utils.aabbCheck(r1, r2) then
-                if not utils.contains(entity["_name"], listofEntityNames) then
+                if not (utils.contains(entity["_name"], listofEntityNames) or entity["_name"] == "player") then
                     if theEntity["_name"] ~= entity["_name"] then
                         table.insert(listofEntityNames, entity["_name"])
                     end
