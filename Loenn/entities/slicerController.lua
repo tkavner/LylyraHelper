@@ -26,7 +26,9 @@ table.insert(slicerController.placements, {
 
 
 function slicerController.sprite(room, entity)
-	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/slicerController/slicerController", {x = entity.x + entity.width / 2, y = entity.y + entity.height / 2, atlas = atlas})
+	local width = entity.width or 48
+	local height = entity.height or 48
+	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/slicerController/slicerController", {x = entity.x + width / 2, y = entity.y + height / 2, atlas = atlas})
 	
 	return sprite
 end
