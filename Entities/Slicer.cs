@@ -1325,8 +1325,18 @@ namespace Celeste.Mod.LylyraHelper.Components
         }
         public override void DebugRender(Camera camera)
         {
-            base.DebugRender(camera);
-            if (slicingCollider != null) Draw.HollowRect(slicingCollider.TopLeft - new Vector2(1), slicingCollider.Width + 2, slicingCollider.Height + 2, Color.Yellow);
+
+            if (slicingCollider != null)
+            {
+                Vector2 positionHold = Entity.Position;
+                Entity.Position = Entity.Position + ColliderOffset;
+                Collider tempHold = Entity.Collider;
+                Entity.Collider = slicingCollider;
+                Draw.HollowRect(Entity.Collider, Color.Yellow);
+
+                Entity.Position = positionHold;
+                Entity.Collider = tempHold;
+            }
         }
     }
 }
