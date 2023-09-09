@@ -6,27 +6,12 @@ local uiElements = require("ui.elements")
 local listOfTypeField = {}
 listOfTypeField.fieldType = "LylyraHelper.TypeField"
 
-local function dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
-
 local function getEntitiesInBox(room)
     local theEntity = nil
     for _, entity in ipairs(room.entities) do
         if entity and entity["_name"] and (entity["_name"] == "LylyraHelper/SlicerController" or entity["_name"] == "Slicer Controller") then
             theEntity = entity
             break
-        else
-            print(dump(entity))
         end
     end
     if theEntity and theEntity.width and theEntity.height  then
@@ -50,13 +35,11 @@ local function getEntitiesInBox(room)
         for _, entityname in ipairs(listofEntityNames) do
             nameAsString = nameAsString..entityname..","
         end
-        print(nameAsString)
         if #nameAsString == 0 then
             return " "
         end
         return string.sub(nameAsString, 1, -2)
     else
-        print("SlicerControllerNotFound")
         return "SlicerControllerNotFound"
     end
 end
