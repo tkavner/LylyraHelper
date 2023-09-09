@@ -57,12 +57,12 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private EventInstance audioToken;
         private string sliceableEntityTypes;
 
-        public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false) : this(nodes[0], direction, fragile)
+        public Scissors(Vector2[] nodes, Vector2 direction, bool fragile = false, string sliceableEntityTypes = "") : this(nodes[0], direction, fragile, sliceableEntityTypes)
         {
 
         }
 
-        public Scissors(Vector2 Position, Vector2 direction, bool fragile = false) : base(Position)
+        public Scissors(Vector2 Position, Vector2 direction, bool fragile = false, string sliceableEntityTypes = "") : base(Position)
         {
             //janky hackfix but I'm not really sure how to load particles
             if (scissorShards == null)
@@ -90,6 +90,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 };
             }
             this.CutDirection = direction;
+            this.sliceableEntityTypes = sliceableEntityTypes;
             if (direction.X > 0)
             {
                 directionPath = "right";
