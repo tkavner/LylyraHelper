@@ -20,6 +20,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private bool oneUse;
         private bool fragile;
         private string[] entityTypes;
+        private bool allTypes;
         private bool roomwide;
         private int slicerLength;
         private int cutSize;
@@ -27,6 +28,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private bool used;
         private bool invert;
         private string sliceableEntityTypes;
+        private string typesString;
         private string flag;
 
         public AddSlicerTrigger(EntityData data, Vector2 offset) : base(data, offset)
@@ -35,7 +37,6 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             sliceOnImpact = data.Bool("sliceOnImpact", false);
             oneUse = data.Bool("singleUse", false);
             fragile = data.Bool("fragileSlicer", false);
-            entityTypes = data.Attr("entityTypes", "").Split(',');
             roomwide = data.Bool("roomwide", false);
             slicerLength = data.Int("slicerLength", 8);
             cutSize = data.Int("cutSize", 16);
@@ -43,6 +44,16 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             flag = data.Attr("flag", "");
             invert = data.Bool("invert", false);
             sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
+
+            typesString = data.Attr("entityTypes", "");
+            if (allTypes = typesString == "")
+            {
+                entityTypes = new string[0];
+            } 
+            else
+            {
+                entityTypes = typesString.Split(',');
+            }
         }
 
 
@@ -84,7 +95,9 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                 if (trigger.used) continue;
                 if (trigger.CheckFlag())
                 {
-                    if (entity.Collider == null || (entity.Collider != null && entity.CollideCheck(trigger)))
+                    if (entity.Collider == null) continue;
+                    if (entity.Get<Slicer>() != null) continue;
+                    if ((entity.Collider != null && entity.CollideCheck(trigger)))
                         trigger.TryAddSlicer(entity);
                 }
             }
@@ -93,9 +106,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private void TryAddSlicer(Entity entity)
         {
             string entityName = entity.GetType().FullName;
-            bool flag0 = entityTypes.Length == 0;
-            flag0 = flag0 || entityTypes.Contains(entityName);
-            if (flag0)
+            if (allTypes || entityTypes.Contains(entityName))
             {
                 bool tempCollide = this.Collidable;
                 this.Collidable = true;
@@ -104,20 +115,17 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                 if (collide || roomwide)
                 {
                     used = oneUse;
-                    Collider cUp = new Hitbox(entity.Collider.Width, entity.Collider.Height, -entity.Collider.Width / 2, -entity.Collider.Height / 2);
-                    cUp.Height = cUp.Height + slicerLength;
-                    cUp.Top -= slicerLength;
+                    Collider cUp = new Hitbox(entity.Collider.Width, slicerLength, 0, 0);
+                    cUp.BottomCenter = entity.Collider.TopCenter;
 
-                    Collider cDown = new Hitbox(entity.Collider.Width, entity.Collider.Height, -entity.Collider.Width / 2, -entity.Collider.Height / 2);
-                    cDown.Height = cDown.Height + slicerLength;
+                    Collider cDown = new Hitbox(entity.Collider.Width, slicerLength, 0, 0);
+                    cDown.TopCenter = entity.Collider.BottomCenter;
 
-                    Collider cRight = new Hitbox(entity.Collider.Width, entity.Collider.Height, -entity.Collider.Width / 2, -entity.Collider.Height / 2);
-                    cRight.Width = cRight.Width + slicerLength;
+                    Collider cRight = new Hitbox(slicerLength, entity.Collider.Height, 0, 0);
+                    cRight.CenterLeft = entity.Collider.CenterRight;
 
-                    Collider cLeft = new Hitbox(entity.Collider.Width, entity.Collider.Height, -entity.Collider.Width / 2, -entity.Collider.Height / 2);
-                    cLeft.Width = cLeft.Width + slicerLength;
-
-                    cLeft.Left -= slicerLength;
+                    Collider cLeft = new Hitbox(slicerLength, entity.Collider.Height, 0, 0);
+                    cLeft.CenterRight = entity.Collider.CenterLeft;
                     if (direction == "All")
                     {
                         entity.Add(new Slicer(-Vector2.UnitY, cutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings:sliceableEntityTypes));
