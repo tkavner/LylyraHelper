@@ -68,6 +68,7 @@
     <Compile Include="Components\BreakbeamHitboxComponent.cs" />
     <Compile Include="ModInterop\FrostHelperImports.cs" />
     <Compile Include="Other\PaperHitbox.cs" />
+    <Compile Include="Other\LyraUtils.cs" />
     <Compile Include="Trigger\AddSlicerTrigger.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />
     <Compile Include="Entities\Slicer.cs" />
