@@ -12,11 +12,13 @@ namespace Celeste.Mod.LylyraHelper
     {
         public bool playerCursed = false;
         public bool ignoreDash = false;
+        public bool killPlayerWhenSafe = false;
 
         public void ResetCurse()
         {
             playerCursed = false;
             ignoreDash = false;
+            killPlayerWhenSafe = false;
         }
 
         public void SetCurse(Entity e, bool ignoreDashNew)

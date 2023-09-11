@@ -78,6 +78,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             On.Celeste.Player.DashEnd += Player_DashEnd;
             On.Celeste.Player.Update += Player_Update;
+            On.Celeste.Player.Die += Player_Die;
         }
 
         private static void Scene_End(On.Monocle.Scene.orig_End orig, Scene self)
@@ -94,13 +95,24 @@ namespace Celeste.Mod.LylyraHelper.Entities
             //add smoke particles
             orig.Invoke(self);
             if (session.playerCursed) self.SceneAs<Level>().ParticlesFG.Emit(ParticleTypes.Chimney, 1, self.Center, self.Collider.HalfSize, Color.White);
+            if (session.killPlayerWhenSafe && PlayerCanSafelyDie(self))
+            {
+                self.Die(Vector2.UnitY, true);
+            }
         }
+
+        private static bool PlayerCanSafelyDie(Player player)
+        {
+            return player.StateMachine.State != Player.StPickup;
+        }
+
 
         private static void Player_DashEnd(On.Celeste.Player.orig_DashEnd orig, Player self)
         {
             if (session.playerCursed)
             {
-                self.Die(Vector2.Normalize(self.Center));
+                session.killPlayerWhenSafe = true;
+                
             }
             else if (session.ignoreDash)
             {
@@ -113,7 +125,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             On.Celeste.Player.DashEnd -= Player_DashEnd;
             On.Celeste.Player.Update -= Player_Update;
-            On.Monocle.Scene.End -= Scene_End;
             On.Celeste.Player.Die -= Player_Die;
         }
 
