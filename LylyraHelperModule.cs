@@ -24,7 +24,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public static SpriteBank SpriteBank => Instance._CustomEntitySpriteBank;
         private SpriteBank _CustomEntitySpriteBank;
         public  static LylyraHelperModule Instance;
-
+        public override Type SessionType => typeof(LylyraHelperSession);
+        public static LylyraHelperSession Session => (LylyraHelperSession)Instance._Session;
 
         public override void Load()
         {
@@ -33,6 +34,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors.Load();
             PaperHitbox.Load();
             AddSlicerTrigger.Load();
+            CursedRefill.Load();
+
+
             typeof(ModExports).ModInterop();
 
             Everest.Events.Level.OnLoadBackdrop += OnLoadBackdrop;
@@ -43,6 +47,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors.Unload();
             PaperHitbox.Unload();
             AddSlicerTrigger.Unload();
+            CursedRefill.Unload();
             Everest.Events.Level.OnLoadBackdrop -= OnLoadBackdrop;
         }
 
