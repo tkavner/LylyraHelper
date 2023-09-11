@@ -75,5 +75,9 @@
         <Loop id="idle" path="bubble" delay="0.1" frames="0"/>
     </bubbledscissors>
 
+	<smwkey path="objects/LylyraHelper/smwKey/" start="idle">
+		<Loop id="idle" path="smwKey" delay="0.1" frames="0"/>
+	</smwkey>
+
 
 </Sprites>

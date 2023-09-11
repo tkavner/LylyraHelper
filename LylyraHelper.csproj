@@ -66,6 +66,7 @@
     <Compile Include="Components\PaperComponent.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
     <Compile Include="Components\BreakbeamHitboxComponent.cs" />
+    <Compile Include="Entities\SMWKey.cs" />
     <Compile Include="ModInterop\FrostHelperImports.cs" />
     <Compile Include="Other\PaperHitbox.cs" />
     <Compile Include="Trigger\AddSlicerTrigger.cs" />
@@ -94,6 +95,7 @@
     <None Include="Loenn\entities\knifeSpikes.lua" />
     <None Include="Loenn\entities\laserCutter.lua" />
     <None Include="Loenn\entities\slicerController.lua" />
+    <None Include="Loenn\entities\smwKey.lua" />
     <None Include="Loenn\lang\en_gb.lang" />
     <None Include="Loenn\triggers\addSlicerTrigger.lua" />
     <None Include="Loenn\triggers\removeSlicerTrigger.lua" />
