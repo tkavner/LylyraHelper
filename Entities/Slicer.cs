@@ -2,6 +2,9 @@
 using Celeste.Mod.Helpers;
 using Celeste.Mod.LylyraHelper.Entities;
 using Celeste.Mod.LylyraHelper.Intefaces;
+using Celeste.Mod.LylyraHelper.Other;
+using FMOD.Studio;
+using LylyraHelper.Other;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.Cil;
@@ -23,26 +26,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         public class SlicerSettings {
             public SlicerSettings(string settings)
             {
-                if (settings == null) settings = "";
-                Logger.Log("LylyraHelper", settings);
-                string[] typeNames = settings?.Split(',');
-                if (typeNames == null || typeNames.Length == 0)
-                {
-                    SliceableList = new List<string>();
-                    return;
-                }
-                SliceableList = new List<string>();
-                if (FrostHelperImports.FrostHelperLoaded)
-                {
-                    Type[] typeArray = FrostHelperImports.GetTypesFH(settings);
-
-                    Logger.Log("LylyraHelper", "" + typeArray.Length);
-                    foreach (Type type in typeArray)
-                    {
-                        SliceableList.Add(type.FullName);
-                        Logger.Log("LylyraHelper", type.FullName);
-                    }
-                }
+                SliceableList = LyraUtils.GetFullNames(settings);
             }
 
             private static SlicerSettings _default = new SlicerSettings(default_string);

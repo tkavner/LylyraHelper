@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Celeste.Mod.Entities;
 using Celeste.Mod.LylyraHelper.Components;
+using Celeste.Mod.LylyraHelper.Other;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -19,7 +20,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private bool sliceOnImpact;
         private bool oneUse;
         private bool fragile;
-        private string[] entityTypes;
+        private List<string> entityTypes;
         private bool allTypes;
         private bool roomwide;
         private int slicerLength;
@@ -28,7 +29,6 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private bool used;
         private bool invert;
         private string sliceableEntityTypes;
-        private string typesString;
         private string flag;
 
         public AddSlicerTrigger(EntityData data, Vector2 offset) : base(data, offset)
@@ -44,16 +44,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             flag = data.Attr("flag", "");
             invert = data.Bool("invert", false);
             sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
-
-            typesString = data.Attr("entityTypes", "");
-            if (allTypes = typesString == "")
-            {
-                entityTypes = new string[0];
-            } 
-            else
-            {
-                entityTypes = typesString.Split(',');
-            }
+            entityTypes = LyraUtils.GetFullNames(data.Attr("entityTypes", ""));
         }
 
 
