@@ -52,6 +52,7 @@ namespace LylyraHelper.Entities
         private Vector2 scissorSpawnDirection;
         private Vector2 JUMPTHROUGH_OFFSET = new Vector2(-10,-8);
 
+
         public SMWKey(Vector2 position)
             : base(position)
         {
@@ -121,11 +122,6 @@ namespace LylyraHelper.Entities
                 swatTimer -= Engine.DeltaTime;
             }
             hardVerticalHitSoundCooldown -= Engine.DeltaTime;
-            if (OnPedestal)
-            {
-                base.Depth = 8999;
-                return;
-            }
             base.Depth = 100;
             if (Hold.IsHeld)
             {
@@ -163,7 +159,7 @@ namespace LylyraHelper.Entities
                 }
                 else if (Hold.ShouldHaveGravity)
                 {
-                    float num = 800f;
+                    float num = 400f;
                     if (Math.Abs(Speed.Y) <= 30f)
                     {
                         num *= 0.5f;
@@ -180,7 +176,7 @@ namespace LylyraHelper.Entities
                     }
                     else
                     {
-                        Speed.Y = Calc.Approach(Speed.Y, 200f, num * Engine.DeltaTime);
+                        Speed.Y = Calc.Approach(Speed.Y, 150f, num * Engine.DeltaTime);
                     }
                 }
                 previousPosition = base.ExactPosition;
@@ -319,7 +315,7 @@ namespace LylyraHelper.Entities
                 if (spring.Orientation == Spring.Orientations.Floor && Speed.Y >= 0f)
                 {
                     Speed.X *= 0.5f;
-                    Speed.Y = -160f;
+                    Speed.Y = -200f;
                     noGravityTimer = 0.15f;
                     return true;
                 }
@@ -327,7 +323,7 @@ namespace LylyraHelper.Entities
                 {
                     MoveTowardsY(spring.CenterY + 5f, 4f);
                     Speed.X = 220f;
-                    Speed.Y = -80f;
+                    Speed.Y = -100f;
                     noGravityTimer = 0.1f;
                     return true;
                 }
@@ -335,7 +331,7 @@ namespace LylyraHelper.Entities
                 {
                     MoveTowardsY(spring.CenterY + 5f, 4f);
                     Speed.X = -220f;
-                    Speed.Y = -80f;
+                    Speed.Y = -100f;
                     noGravityTimer = 0.1f;
                     return true;
                 }
