@@ -10,7 +10,7 @@ smwKey.placements = {
 
 -- Offset is from sprites.xml, not justifications
 local offsetY = -10
-local texture = "objects/LylyraHelper/smwKey/smwKey"
+local texture = "objects/LylyraHelper/smwKey/smwKey00"
 
 function smwKey.sprite(room, entity)
     local sprite = drawableSprite.fromTexture(texture, entity)

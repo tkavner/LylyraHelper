@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace LylyraHelper.Entities
 {
+    [Tracked]
     [CustomEntity("LylyraHelper/SMWKey")]
     public class SMWKey : Actor
     {
@@ -49,7 +50,7 @@ namespace LylyraHelper.Entities
 
         private float tutorialTimer;
         private Vector2 scissorSpawnDirection;
-        private Vector2 JUMPTHROUGH_OFFSET = new Vector2(-10,-12);
+        private Vector2 JUMPTHROUGH_OFFSET = new Vector2(-10,-8);
 
         public SMWKey(Vector2 position)
             : base(position)
@@ -100,8 +101,21 @@ namespace LylyraHelper.Entities
         public override void Update()
         {
             base.Update();
+            Collider tempHolder = Collider;
+            Collider = Hold.PickupCollider;
+            List<Entity> doors = CollideAll<SMWDoor>();
+            if (doors.Count > 0)
+            {
+                Scene.Remove(doors[0]);
+                Scene.Remove(this);
+                Collider = tempHolder;
+
+                Audio.Play("event:/game/04_cliffside/greenbooster_reappear", Level.Camera.Position + new Vector2(160f, 90f));
+                return;
+            }
+            Collider = tempHolder;
             keyPlatform.Position = Position + JUMPTHROUGH_OFFSET;
-            keyPlatform.Collidable = !Input.GrabCheck;
+            keyPlatform.Collidable = !Hold.IsHeld;
             if (swatTimer > 0f)
             {
                 swatTimer -= Engine.DeltaTime;
@@ -267,6 +281,12 @@ namespace LylyraHelper.Entities
                 return hitSeeker != holdableCollider;
             }
             return false;
+        }
+
+        public override void Removed(Scene scene)
+        {
+            base.Removed(scene);
+            if(keyPlatform != null) scene.Remove(keyPlatform);
         }
 
         public void HitSeeker(Seeker seeker)
