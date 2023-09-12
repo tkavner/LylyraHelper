@@ -21,7 +21,7 @@ namespace Celeste.Mod.LylyraHelper
             killPlayerWhenSafe = false;
         }
 
-        public void SetCurse(Entity e, bool ignoreDashNew)
+        public void SetCurse(bool ignoreDashNew)
         {
             this.ignoreDash = ignoreDashNew;
             this.playerCursed = playerCursed || !ignoreDashNew;

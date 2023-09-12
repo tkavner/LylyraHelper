@@ -17,18 +17,38 @@ namespace Celeste.Mod.LylyraHelper.Entities
     public class CursedRefill : Refill
     {
         private Sprite sprite;
+        private Sprite flash;
         private bool oneUse;
         private FieldInfo respawnTimerField;
+        private Image outline;
+        private float respawnTimer;
 
         private static LylyraHelperSession session => LylyraHelperModule.Session;
 
-        public CursedRefill(EntityData data, Vector2 offset) : base(data.Position, false, false)
+        public CursedRefill(EntityData data, Vector2 offset) : base(data.Position+ offset, false, false)
         {
 
             PlayerCollider origCollider = Get<PlayerCollider>();
             Remove(origCollider);
             Add(new PlayerCollider(OnPlayer));
             sprite = Get<Sprite>();
+            Remove(sprite);
+            sprite.Reset(GFX.Game, "objects/lylyrahelper/curseddash/idle"); 
+            sprite.AddLoop("idle", "", 0.1f);
+            sprite.Play("idle");
+            flash = Get<Sprite>();
+            Remove(flash);
+            flash.Reset(GFX.Game, "objects/lylyrahelper/curseddash/flash");
+            Remove(Get<Image>());
+            Add(sprite);
+            Add(flash); 
+                flash.Add("flash", "", 0.05f);
+            flash.OnFinish = delegate {
+                flash.Visible = false;
+            };
+            Add(outline = new Image(GFX.Game["objects/lylyrahelper/curseddash/outline"]));
+            outline.CenterOrigin();
+            outline.Visible = false;
             oneUse = data.Bool("oneUse", false);
             respawnTimerField = typeof(Refill).GetField("respawnTimer", BindingFlags.Instance | BindingFlags.NonPublic);
         }
@@ -38,17 +58,32 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base.Added(scene);
         }
 
+        public override void Update()
+        {
+            base.Update();
+            if (respawnTimer > 0f)
+            {
+                respawnTimer -= Engine.DeltaTime;
+                if (respawnTimer <= 0f)
+                {
+                    outline.Visible = false;
+                }
+            }
+        }
+
 
         private void OnPlayer(Player player)
         {
-            session.SetCurse(this, IsPlayerDashing(player));
+            session.SetCurse(IsPlayerDashing(player));
             Audio.Play("event:/game/general/diamond_touch", Position);
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
             Collidable = false;
             Add(new Coroutine(RefillRoutine(player)));
             respawnTimerField?.SetValue(this, 2.5F);
+            respawnTimer = 2.5F;
             player.RefillDash();
             sprite.Visible = false;
+            outline.Visible = !oneUse;
         }
 
         private IEnumerator RefillRoutine(Player player)
@@ -63,6 +98,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             SceneAs<Level>().ParticlesFG.Emit(Refill.P_Shatter, 5, Position, Vector2.One * 4f, num - (float)Math.PI / 2f);
             SceneAs<Level>().ParticlesFG.Emit(Refill.P_Shatter, 5, Position, Vector2.One * 4f, num + (float)Math.PI / 2f);
             SlashFx.Burst(Position, num);
+
             if (oneUse)
             {
                 RemoveSelf();
@@ -94,7 +130,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             //add smoke particles
             orig.Invoke(self);
-            if (session.playerCursed) self.SceneAs<Level>().ParticlesFG.Emit(ParticleTypes.Chimney, 1, self.Center, self.Collider.HalfSize, Color.White);
+            if (session.playerCursed) self.SceneAs<Level>().ParticlesFG.Emit(ParticleTypes.Steam, 1, self.Center, self.Collider.HalfSize, Color.White);
             if (session.killPlayerWhenSafe && PlayerCanSafelyDie(self))
             {
                 self.Die(Vector2.UnitY, true);
@@ -116,7 +152,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
             else if (session.ignoreDash)
             {
-                session.SetCurse(null, false);
+                session.SetCurse(false);
             }
         }
 

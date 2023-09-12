@@ -12,7 +12,7 @@ refill.placements = {
 }
 
 function refill.texture(room, entity)
-    return "objects/refill/idle00"
+    return "objects/LylyraHelper/uncurseddash/idle00"
 end
 
 return refill
