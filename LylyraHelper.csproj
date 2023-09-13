@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\Cuttable.cs" />
+    <Compile Include="Effects\ASHWind.cs" />
     <Compile Include="Effects\HexagonalGodray.cs" />
     <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\SlicerController.cs" />
@@ -87,6 +88,7 @@
     <None Include="Ahorn\entities\deathNote.jl" />
     <None Include="Ahorn\entities\dashPaper.jl" />
     <None Include="Ahorn\entities\bigCloud.jl" />
+    <None Include="Loenn\effects\ashWind.lua" />
     <None Include="Loenn\effects\hexagonalGodray.lua" />
     <None Include="Loenn\entities\bigCloud.lua" />
     <None Include="Loenn\entities\bubbledScissors.lua" />

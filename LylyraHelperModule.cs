@@ -3,6 +3,7 @@ using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Effects;
 using Celeste.Mod.LylyraHelper.Triggers;
+using LylyraHelper.Effects;
 using LylyraHelper.Entities;
 using LylyraHelper.Other;
 using Monocle;
@@ -58,6 +59,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (child.Name.Equals("LylyraHelper/HexagonalGodray", StringComparison.OrdinalIgnoreCase))
             {
                 return new HexagonalGodray(child.Attr("color"), child.Attr("fadeColor"), child.AttrInt("numberOfRays"), child.AttrFloat("speedX"), child.AttrFloat("speedY"), child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.Attr("blendingMode", "HSV"));
+            }
+            if (child.Name.Equals("LylyraHelper/ASHWind", StringComparison.OrdinalIgnoreCase))
+            {
+                return new ASHWind(child.AttrInt("numWinds"), child.AttrFloat("initAngle"), child.AttrFloat("speed"), child.AttrFloat("twist"), child.AttrFloat("bend"));
             }
             return null;
         }
