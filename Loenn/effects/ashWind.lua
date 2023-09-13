@@ -16,6 +16,8 @@ ashWind.fieldInformation = {
 }
 
 ashWind.defaultData = {
+    x = 0.0,
+    y = 0.0,
     numWinds = 5,
     initAngle = 0.0,
     speed = 10.0,

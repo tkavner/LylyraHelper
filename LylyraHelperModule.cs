@@ -6,6 +6,7 @@ using Celeste.Mod.LylyraHelper.Triggers;
 using LylyraHelper.Effects;
 using LylyraHelper.Entities;
 using LylyraHelper.Other;
+using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.ModInterop;
 using MonoMod.Utils;
@@ -62,7 +63,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
             if (child.Name.Equals("LylyraHelper/ASHWind", StringComparison.OrdinalIgnoreCase))
             {
-                return new ASHWind(child.AttrInt("numWinds"), child.AttrFloat("initAngle"), child.AttrFloat("speed"), child.AttrFloat("twist"), child.AttrFloat("bend"));
+                return new ASHWind(new Vector2(child.AttrFloat("x"), child.AttrFloat("y")), child.AttrInt("numWinds"), child.AttrFloat("initAngle"), child.AttrFloat("speed"), child.AttrFloat("twist"), child.AttrFloat("bend"), child.AttrFloat("frequency", 3F));
             }
             return null;
         }
