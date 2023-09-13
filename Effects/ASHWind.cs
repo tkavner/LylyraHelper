@@ -18,7 +18,7 @@ namespace LylyraHelper.Effects
         {
             internal static int Points = 150;
             private static Vector2 endPoint;
-            private static float thicc;
+            private float thicc;
             public Vector2[] curve;
             public float percent;
             public Vector2 startingPoint;
@@ -29,16 +29,18 @@ namespace LylyraHelper.Effects
                 Vector2[] curve = wind.curve = new Vector2[Points];
                 Vector2 nextPoint = wind.startingPoint = startingPoint;
                 float nextAngle = initAngle;
+                List<Vector2> points = new List<Vector2>();
                 for (int i = 0; i < Points; i++)
                 {
-                    curve[i] = new Vector2(nextPoint.X, nextPoint.Y); 
-                    if (nextPoint.Y < 0 || nextPoint.X < 0 || (nextPoint.Y > 220 && nextPoint.X < 180)) break;
+                    points.Add(nextPoint);
                     nextPoint += new Vector2((float)Math.Cos(nextAngle), (float)Math.Sin(nextAngle)) * speed;
                     nextAngle += bend;
                     bend += rand.NextFloat() * twist - twist / 2;
-                    thicc = rand.NextFloat() + 1F;
 
                 }
+                wind.curve = points.ToArray();
+
+                wind.thicc = rand.Next(10) == 0 ? 2 : 1;
                 endPoint = nextPoint;
 
 
@@ -47,35 +49,42 @@ namespace LylyraHelper.Effects
 
             internal float GetHeight(int v)
             {
-
-                if (percent - 100 + 50 * (Points - v) / Points > 100)
+                int indexWeight = 100;
+                //percents are out of a 200 point system right?! this actually occurs at 150% progress on our 200 point system
+                if (percent - indexWeight + indexWeight * (Points - v) / Points > 100)
                 {
-                    var num1 = Calc.Clamp(150 - percent + (50 + 50 * v / Points), 0, 100) / 100;
+                    var num1 = Calc.Clamp(200 - percent + (indexWeight * v / Points), 0, 100) / 100;
                     num1 = num1 < 0.3 ? 0 : num1;
                     num1 = num1 > 0.5 ? 0.5F : num1;
-                    return num1 * 1;
+                    return num1 * thicc;
                 } 
                 else
                 {
-                    var num1 = Calc.Clamp(percent - 100 + 50 * (Points - v) / Points, 0, 100) / 100;
+                    var num1 = Calc.Clamp(percent - indexWeight + indexWeight * (Points - v) / Points, 0, 100) / 100;
                     num1 = num1 < 0.3 ? 0 : num1;
                     num1 = num1 > 0.5 ? 0.5F : num1;
-                    return num1 * 1;
+                    return num1 * thicc;
                 }
+            }
+
+            public float GetPercent()
+            {
+                return (percent) / 250;
             }
         }
 
         //twist = jerk / acceleration change, bend = starting acceleration
-        public ASHWind(Vector2 startingPoint, int numWinds, float initAngle, float speed, float twist, float bend, float frequency)
+        public ASHWind(Vector2 startingPoint, int numWinds, float initAngle, float angleVarience, float speed, float speedVarience, float twist, float bend, float frequency, float lifespan)
         {
             rand = new Random();
             this.numWinds = numWinds;
-            this.initAngle = initAngle;
+            this.initAngle = initAngle + rand.NextFloat() * angleVarience - angleVarience / 2F;
             this.speed = speed;
             this.twist = twist;
             this.bend = bend;
             this.frequency = frequency;
-
+            this.speedVarience = speedVarience;
+            this.windLifespan = lifespan;
             int vertecies = GetVertecies();
             vertices = new VertexPositionColor[vertecies];
         }
@@ -86,11 +95,7 @@ namespace LylyraHelper.Effects
 
         private int GetVertecies()
         {
-            if (winds.Count == 0)
-            {
-                return 0;
-            }
-            return (int) (Math.Ceiling(frequency * windLifespan) * 3 * (Wind.Points * 2 - 2));
+            return (int) (Math.Ceiling(frequency) * Math.Ceiling(windLifespan) * 3 * (Wind.Points * 2 - 2));
         }
 
         private List<Wind> winds = new List<Wind>();
@@ -104,8 +109,10 @@ namespace LylyraHelper.Effects
         private float speed;
         private float frequency;
 
-        private float windLifespan;
-        private float MAXPERCENT = 500; //percents are out of 500 now
+        private float windLifespan = 7.5F;
+        private float MAXPERCENT = 250; //percents are out of 500 now
+        private float angleVarience = 0.3F;
+        private float speedVarience;
 
         public override void Update(Scene scene)
         {
@@ -119,11 +126,11 @@ namespace LylyraHelper.Effects
             List<Wind> oldWinds = new List<Wind>();
             foreach (Wind wind in winds)
             {
-                wind.percent += Engine.DeltaTime * 75;
+                wind.percent += Engine.DeltaTime * 75 * 6.5F / windLifespan;
                 Vector2 startingPoint = wind.startingPoint;
                 float xRenderPosBase = -32f + Mod(startingPoint.X - level.Camera.X * 0.9f, 384f); //this gun need to change
                 float yRenderPosBase = -32f + Mod(startingPoint.Y - level.Camera.Y * 0.9f, 244f);
-                Vector2 vector3 = new Vector2((int)xRenderPosBase, (int)yRenderPosBase);
+                Vector2 vector3 = new Vector2();
 
 
                 Vector2 prevPoint = wind.curve[0];
@@ -136,11 +143,16 @@ namespace LylyraHelper.Effects
                     Vector2 nextTangentPoint = wind.curve[i] - wind.curve[i  - 1];
                     Vector2 nextV1 = nextPoint + wind.GetHeight(i) * nextTangentPoint.Perpendicular().SafeNormalize();
                     Vector2 nextV2 = nextPoint - wind.GetHeight(i) * nextTangentPoint.Perpendicular().SafeNormalize();
-
-                    VertexPositionColor vertexPositionColor = new VertexPositionColor(new Vector3(prevV1, 0f), Color.White * 0.5F);
-                    VertexPositionColor vertexPositionColor2 = new VertexPositionColor(new Vector3(prevV2, 0f), Color.White * 0.5F);
-                    VertexPositionColor vertexPositionColor3 = new VertexPositionColor(new Vector3(nextV1, 0f), Color.White * 0.5F);
-                    VertexPositionColor vertexPositionColor4 = new VertexPositionColor(new Vector3(nextV2, 0f), Color.White * 0.5F);
+                    float transparency = 0.3F;
+                    if (wind.GetPercent() > 0.5F)
+                    {
+                        transparency = transparency - (wind.GetPercent() - 0.5F) * transparency / (1 - 0.5F);
+                    }
+                    
+                    VertexPositionColor vertexPositionColor = new VertexPositionColor(new Vector3(prevV1 + vector3, 0f), Color.White * transparency);
+                    VertexPositionColor vertexPositionColor2 = new VertexPositionColor(new Vector3(prevV2 + vector3, 0f), Color.White * transparency);
+                    VertexPositionColor vertexPositionColor3 = new VertexPositionColor(new Vector3(nextV1 + vector3, 0f), Color.White * transparency);
+                    VertexPositionColor vertexPositionColor4 = new VertexPositionColor(new Vector3(nextV2 + vector3, 0f), Color.White * transparency);
 
                     vertices[vertexCounter++] = vertexPositionColor;
                     vertices[vertexCounter++] = vertexPositionColor2;
@@ -167,7 +179,7 @@ namespace LylyraHelper.Effects
             if (windCounter > 1 / frequency)
             {
                 windCounter = 0;
-                winds.Add(Wind.MakeWind(new Vector2(380, rand.NextFloat() * 250), rand, initAngle, speed, twist, bend));
+                winds.Add(Wind.MakeWind(new Vector2(380 + level.Camera.Y, rand.NextFloat() * 250 + level.Camera.X), rand, initAngle, speed + rand.NextFloat() * speedVarience - speedVarience / 2, twist, bend));
             }
             vertexCount = vertexCounter;
 

@@ -63,7 +63,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
             if (child.Name.Equals("LylyraHelper/ASHWind", StringComparison.OrdinalIgnoreCase))
             {
-                return new ASHWind(new Vector2(child.AttrFloat("x"), child.AttrFloat("y")), child.AttrInt("numWinds"), child.AttrFloat("initAngle"), child.AttrFloat("speed"), child.AttrFloat("twist"), child.AttrFloat("bend"), child.AttrFloat("frequency", 3F));
+                return new ASHWind(new Vector2(child.AttrFloat("x"), child.AttrFloat("y")), child.AttrInt("numWinds"), child.AttrFloat("initAngle"), child.AttrFloat("angleVarience"), child.AttrFloat("speed"), child.AttrFloat("speedVarience"), child.AttrFloat("twist"), child.AttrFloat("bend"), child.AttrFloat("frequency", 3F), child.AttrFloat("lifespan", 7.5F));
             }
             return null;
         }
