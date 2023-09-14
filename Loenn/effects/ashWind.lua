@@ -1,7 +1,7 @@
 local ashWind = {}
 
 ashWind.name = "LylyraHelper/ASHWind"
-ashWind.canBackground = false
+ashWind.canBackground = true
 ashWind.canForeground = true
 
 blendingModes = {"HSV", "RGB"}
@@ -20,11 +20,11 @@ ashWind.defaultData = {
     y = 0.0,
     numWinds = 5,
     initAngle = 3.4,
-    initAngleVarience = 0.1,
+    initAngleVariance = 0.1,
     speed = 10.0,
     twist = 1.0,
     bend = 1.0,
     frequency = 2,
-    speedVarience = 0.1
+    speedVariance = 0.1
 }
 return ashWind

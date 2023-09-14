@@ -16,7 +16,7 @@ namespace LylyraHelper.Effects
     {
         private class Wind
         {
-            internal static int Points = 150;
+            internal static int Points = 300;
             private static Vector2 endPoint;
             private float thicc;
             public Vector2[] curve;
@@ -25,6 +25,7 @@ namespace LylyraHelper.Effects
 
             public static Wind MakeWind(Vector2 startingPoint, Random rand, float initAngle, float speed, float twist, float bend)
             {
+                initAngle *= (float)Math.PI / 180;
                 Wind wind = new Wind();
                 Vector2[] curve = wind.curve = new Vector2[Points];
                 Vector2 nextPoint = wind.startingPoint = startingPoint;
@@ -74,16 +75,17 @@ namespace LylyraHelper.Effects
         }
 
         //twist = jerk / acceleration change, bend = starting acceleration
-        public ASHWind(Vector2 startingPoint, int numWinds, float initAngle, float angleVarience, float speed, float speedVarience, float twist, float bend, float frequency, float lifespan)
+        public ASHWind(Vector2 startingPoint, int numWinds, float initAngle, float angleVariance, float speed, float speedVariance, float twist, float bend, float frequency, float lifespan)
         {
             rand = new Random();
             this.numWinds = numWinds;
-            this.initAngle = initAngle + rand.NextFloat() * angleVarience - angleVarience / 2F;
+            this.initAngle = initAngle;
+            this.angleVarience = angleVariance;
             this.speed = speed;
             this.twist = twist;
             this.bend = bend;
             this.frequency = frequency;
-            this.speedVarience = speedVarience;
+            this.speedVarience = speedVariance;
             this.windLifespan = lifespan;
             int vertecies = GetVertecies();
             vertices = new VertexPositionColor[vertecies];
@@ -113,6 +115,7 @@ namespace LylyraHelper.Effects
         private float MAXPERCENT = 250; //percents are out of 500 now
         private float angleVarience = 0.3F;
         private float speedVarience;
+        private Vector2 screenDimensions = new Vector2(384, 244);
 
         public override void Update(Scene scene)
         {
@@ -128,9 +131,9 @@ namespace LylyraHelper.Effects
             {
                 wind.percent += Engine.DeltaTime * 75 * 6.5F / windLifespan;
                 Vector2 startingPoint = wind.startingPoint;
-                float xRenderPosBase = -32f + Mod(startingPoint.X - level.Camera.X * 0.9f, 384f); //this gun need to change
-                float yRenderPosBase = -32f + Mod(startingPoint.Y - level.Camera.Y * 0.9f, 244f);
-                Vector2 vector3 = new Vector2();
+                float xRenderPosBase = level.Camera.X; //this gun need to change
+                float yRenderPosBase = level.Camera.Y;
+                Vector2 vector3 = new Vector2(0, 0);
 
 
                 Vector2 prevPoint = wind.curve[0];
@@ -179,11 +182,16 @@ namespace LylyraHelper.Effects
             if (windCounter > 1 / frequency)
             {
                 windCounter = 0;
-                winds.Add(Wind.MakeWind(new Vector2(380 + level.Camera.Y, rand.NextFloat() * 250 + level.Camera.X), rand, initAngle, speed + rand.NextFloat() * speedVarience - speedVarience / 2, twist, bend));
+                float angle = initAngle + rand.NextFloat() * angleVarience - angleVarience / 2F;
+                var num1 = PointOnEllipseFromAngle(screenDimensions, angle);
+                var num2 = TangentToEllipseAtPoint(screenDimensions, angle) * (rand.NextFloat() * 180 - 90);
+                Vector2 startPoint = screenDimensions / 2+ num1 + num2;
+                winds.Add(Wind.MakeWind(startPoint, rand, angle + 180F, speed + rand.NextFloat() * speedVarience - speedVarience / 2, twist, bend));
             }
             vertexCount = vertexCounter;
 
         }
+
 
 
         private static float Mod(float x, float m)
@@ -197,6 +205,27 @@ namespace LylyraHelper.Effects
             {
                 GFX.DrawVertices(Matrix.Identity, vertices, vertexCount);
             }
+        }
+
+        //tangent of the tangent, technically
+        //angle degrees
+        public static Vector2 TangentToEllipseAtPoint(Vector2 ellipseDims, float angle)
+        {
+            if (Math.Abs(Mod(angle, 180) - 90) < float.Epsilon)
+            {
+                return new Vector2(1, 0);
+            } 
+            else
+            {
+                angle *= (float) Math.PI / 180;
+                return (new Vector2((float)Math.Tan(angle) * ellipseDims.X, -1 * ellipseDims.Y)).SafeNormalize();
+            }
+        }
+
+        public static Vector2 PointOnEllipseFromAngle(Vector2 ellipseDims, float angle)
+        {
+            angle *= (float)Math.PI / 180;
+            return new Vector2(ellipseDims.X * (float)Math.Cos(angle),  ellipseDims.Y * (float) Math.Sin(angle));
         }
     }
 }
