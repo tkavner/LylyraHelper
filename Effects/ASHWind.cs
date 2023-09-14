@@ -206,13 +206,14 @@ namespace LylyraHelper.Effects
                 var num4 = -normal * (rand.NextFloat() * screenDimensions.X / 2);
                 var num3 = level.Camera.Position;
                 Vector2 startPoint = screenDimensions / 2 + num1 + num2 + num3 + num4;
-                Vector2 playerSpeed = scene.Tracker.GetEntity<Player>().Speed;
+                Player player = scene.Tracker.GetEntity<Player>();
+                Vector2 playerSpeed = player == null ? Vector2.Zero : player.Speed;
 
-                float cosineInBase = (playerSpeed.X * normal.X + playerSpeed.Y * normal.Y) / playerSpeed.Length();//normal.Length() = 1, guarenteed.
-
-                float playerSpeedAdjustment = (float)scene.Tracker.GetEntity<Player>().Speed.Length() * cosineInBase;
+                float cosineInBase = (playerSpeed.X * normal.X + playerSpeed.Y * normal.Y);//normal.Length() = 1, guarenteed.
+                
+                float playerSpeedAdjustment = -cosineInBase;
                 if (playerSpeedAdjustment < 0) { playerSpeedAdjustment = 0; }
-                winds.Add(Wind.MakeWind(startPoint, rand, angle + 180F, speed + rand.NextFloat() * speedVarience - speedVarience / 2 + playerSpeedAdjustment, twist, bend, pointsPointWind, maxBend));
+                winds.Add(Wind.MakeWind(startPoint, rand, angle + 180F, speed + rand.NextFloat() * speedVarience - speedVarience / 2 + playerSpeedAdjustment / 60, twist, bend, pointsPointWind, maxBend));
             }
             vertexCount = vertexCounter;
 
