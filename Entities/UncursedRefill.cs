@@ -26,6 +26,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Image outline;
         private float respawnTimer;
 
+        private Color particleColor1 = Calc.HexToColor("ba3e48");
+        private Color particleColor2 = Calc.HexToColor("a66096");
+
         private static LylyraHelperSession session => LylyraHelperModule.Session;
 
         public UncursedRefill(EntityData data, Vector2 offset) : base(data.Position + offset, false, false)
@@ -99,8 +102,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Depth = 8999;
             yield return 0.05f;
             float num = player.Speed.Angle();
-            SceneAs<Level>().ParticlesFG.Emit(Refill.P_Shatter, 5, Position, Vector2.One * 4f, num - (float)Math.PI / 2f);
-            SceneAs<Level>().ParticlesFG.Emit(Refill.P_Shatter, 5, Position, Vector2.One * 4f, num + (float)Math.PI / 2f);
+            SceneAs<Level>().ParticlesFG.Emit(Refill.P_Shatter, 5, Position, Vector2.One * 4f, particleColor1, num - (float)Math.PI / 2f);
+            SceneAs<Level>().ParticlesFG.Emit(Refill.P_Shatter, 5, Position, Vector2.One * 4f, particleColor2, num + (float)Math.PI / 2f);
             SlashFx.Burst(Position, num);
             if (oneUse)
             {
