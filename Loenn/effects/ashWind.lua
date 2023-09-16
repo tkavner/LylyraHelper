@@ -7,6 +7,12 @@ ashWind.canForeground = true
 blendingModes = {"HSV", "RGB"}
 
 ashWind.fieldInformation = {
+    color = {
+        fieldType = "color"
+    },
+    fadeColor = {
+        fieldType = "color"
+    },
     initAngle = {
         fieldType = "number"
     },
@@ -25,6 +31,10 @@ ashWind.defaultData = {
     speedVariance = 0.1,
     pointsPointWind = 600,
     windLifespan = 15,
-    maxBend = 0.02
+    maxBend = 0.02,
+    color = "FFFFFF",
+    fadeColor = "FFFFFF",
+    transparency = 0.3,
+    hsvBlending = true
 }
 return ashWind

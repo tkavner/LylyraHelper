@@ -1,4 +1,5 @@
 ﻿using Celeste;
+using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
@@ -102,21 +103,44 @@ namespace LylyraHelper.Effects
             this.speedVarience = speedVariance;
             this.windLifespan = lifespan;
             this.maxBend = maxBend;
-            this.pointsPointWind = pointsPointWind;
+            this.pointsPerWind = pointsPointWind;
             int vertecies = GetVertecies();
             vertices = new VertexPositionColor[vertecies];
         }
 
-
+        public ASHWind(BinaryPacker.Element child)
+        {
+            rand = Calc.Random;
+            initAngle = child.AttrFloat("initAngle");
+            angleVarience = child.AttrFloat("angleVariance");
+            speed = child.AttrFloat("speed");
+            speedVarience = child.AttrFloat("speedVariance");
+            twist = child.AttrFloat("twist");
+            bend = child.AttrFloat("bend");
+            frequency = child.AttrFloat("frequency", 3F);
+            windLifespan = child.AttrFloat("windLifespan", 7.5F);
+            maxBend = child.AttrFloat("maxBend", 0.01F);
+            pointsPerWind = child.AttrInt("pointsPerWind", 600);
+            color = Calc.HexToColor(child.Attr("color", "FFFFFF"));
+            fadeColor = Calc.HexToColor(child.Attr("fadeColor", "FFFFFF"));
+            transparency = child.AttrFloat("transparency", 0.3F);
+            
+            hsvBlending = child.AttrBool("hsvBlending", false);
+            int vertecies = GetVertecies();
+            vertices = new VertexPositionColor[vertecies];
+        }
 
         private VertexPositionColor[] vertices;
 
         private int GetVertecies()
         {
-            return (int) (Math.Ceiling(frequency) * Math.Ceiling(windLifespan) * 3 * (pointsPointWind * 2 - 2));
+            return (int) (Math.Ceiling(frequency) * Math.Ceiling(windLifespan) * 3 * (pointsPerWind * 2 - 2));
         }
 
-        internal int pointsPointWind = 300;
+        internal int pointsPerWind = 300;
+        private Color color;
+        private Color fadeColor;
+        private float transparency;
         private List<Wind> winds = new List<Wind>();
         private int vertexCount;
         private float windCounter;
@@ -133,6 +157,7 @@ namespace LylyraHelper.Effects
         private float angleVarience = 0.0F;
         private float speedVarience;
         private Vector2 screenDimensions = new Vector2(384, 244);
+        private bool hsvBlending;
 
         public override void Update(Scene scene)
         {
@@ -163,16 +188,26 @@ namespace LylyraHelper.Effects
                     Vector2 nextTangentPoint = wind.curve[i] - wind.curve[i  - 1];
                     Vector2 nextV1 = nextPoint + wind.GetHeight(i) * nextTangentPoint.Perpendicular().SafeNormalize();
                     Vector2 nextV2 = nextPoint - wind.GetHeight(i) * nextTangentPoint.Perpendicular().SafeNormalize();
-                    float transparency = 0.3F;
-                    if (wind.GetPercent() > 0.5F)
+                    float transparency = this.transparency;
+                    if (wind.GetPercent() / MAXPERCENT > 0.5F)
                     {
-                        transparency = transparency - (wind.GetPercent() - 0.5F) * transparency / (1 - 0.5F);
+                        transparency = transparency - (wind.GetPercent() / MAXPERCENT - 0.5F) * transparency / (1 - 0.5F);
                     }
-                    
-                    VertexPositionColor vertexPositionColor = new VertexPositionColor(new Vector3(prevV1 + vector3, 0f), Color.White * transparency);
-                    VertexPositionColor vertexPositionColor2 = new VertexPositionColor(new Vector3(prevV2 + vector3, 0f), Color.White * transparency);
-                    VertexPositionColor vertexPositionColor3 = new VertexPositionColor(new Vector3(nextV1 + vector3, 0f), Color.White * transparency);
-                    VertexPositionColor vertexPositionColor4 = new VertexPositionColor(new Vector3(nextV2 + vector3, 0f), Color.White * transparency);
+
+                    Color windColor = Color.White;
+                    if (hsvBlending)
+                    {
+                        windColor = HSVLerp(color, fadeColor, wind.percent / MAXPERCENT) * Ease.CubeInOut(Calc.Clamp(((wind.percent / MAXPERCENT < 0.5f) ? wind.percent / MAXPERCENT : (1f - wind.percent / MAXPERCENT)) * 2f, 0f, 1f));
+                    }
+                    else
+                    {
+                        windColor = Color.Lerp(color, fadeColor, wind.percent / MAXPERCENT) * Ease.CubeInOut(Calc.Clamp(((wind.percent / MAXPERCENT < 0.5f) ? wind.percent / MAXPERCENT : (1f - wind.percent / MAXPERCENT)) * 2f, 0f, 1f));
+                    }
+
+                    VertexPositionColor vertexPositionColor = new VertexPositionColor(new Vector3(prevV1 + vector3, 0f), windColor * transparency);
+                    VertexPositionColor vertexPositionColor2 = new VertexPositionColor(new Vector3(prevV2 + vector3, 0f), windColor * transparency);
+                    VertexPositionColor vertexPositionColor3 = new VertexPositionColor(new Vector3(nextV1 + vector3, 0f), windColor * transparency);
+                    VertexPositionColor vertexPositionColor4 = new VertexPositionColor(new Vector3(nextV2 + vector3, 0f), windColor * transparency);
 
                     vertices[vertexCounter++] = vertexPositionColor;
                     vertices[vertexCounter++] = vertexPositionColor2;
@@ -213,7 +248,7 @@ namespace LylyraHelper.Effects
                 
                 float playerSpeedAdjustment = -cosineInBase;
                 if (playerSpeedAdjustment < 0) { playerSpeedAdjustment = 0; }
-                winds.Add(Wind.MakeWind(startPoint, rand, angle + 180F, speed + rand.NextFloat() * speedVarience - speedVarience / 2 + playerSpeedAdjustment / 60, twist, bend, pointsPointWind, maxBend));
+                winds.Add(Wind.MakeWind(startPoint, rand, angle + 180F, speed + rand.NextFloat() * speedVarience - speedVarience / 2 + playerSpeedAdjustment / 60, twist, bend, pointsPerWind, maxBend));
             }
             vertexCount = vertexCounter;
 
@@ -266,6 +301,93 @@ namespace LylyraHelper.Effects
         {
             angle *= (float)Math.PI / 180;
             return new Vector2(ellipseDims.X * (float)Math.Cos(angle),  ellipseDims.Y * (float) Math.Sin(angle));
+        }
+
+        private static Color HSVLerp(Color c1, Color c2, float amount)
+        {
+            amount = MathHelper.Clamp(amount, 0f, 1f);
+            Vector3 hsv1 = ColortoHSV(c1);
+            Vector3 hsv2 = ColortoHSV(c2);
+            if (Math.Abs(hsv2.X - hsv1.X) > 3)
+            {
+                if (hsv2.X > hsv1.X)
+                {
+                    hsv1.X += 6;
+                }
+                else
+                {
+                    hsv2.X += 6;
+                }
+            }
+            Vector3 lerped = new Vector3(
+                hsv1.X * amount + (1 - amount) * hsv2.X,
+                hsv1.Y * amount + (1 - amount) * hsv2.Y,
+                hsv1.Z * amount + (1 - amount) * hsv2.Z);
+            Vector3 vector3 = HSVToRGB(lerped);
+            vector3.X = Mod(vector3.X, 6);
+            return new Color(vector3.X, vector3.Y, vector3.Z, 0.5F);
+        }
+
+        private static Vector3 HSVToRGB(Vector3 vector)
+        {
+            return HSVToRGB(vector.X, vector.Y, vector.Z);
+        }
+
+        //adapted from https://mattlockyer.github.io/iat455/documents/rgb-hsv.pdf
+        private static Vector3 HSVToRGB(float h, float s, float v)
+        {
+            if (h > 6) h -= 6; if (s > 1) s = 1; if (v > 1) v = 1;
+            if (h < 0) h += 6;
+            float alpha = v * (1 - s);
+            float beta = v * (1 - (Mod(h, 1) * s));
+            float gamma = v * (1 - (1 - Mod(h, 1)) * s);
+            if (0 <= h && h < 1) return new Vector3(v, gamma, alpha);
+            else if (1 <= h && h < 2) return new Vector3(beta, v, alpha);
+            else if (2 <= h && h < 3) return new Vector3(alpha, v, gamma);
+            else if (3 <= h && h < 4) return new Vector3(alpha, beta, v);
+            else if (4 <= h && h < 5) return new Vector3(gamma, alpha, v);
+            else if (5 <= h && h < 6) return new Vector3(v, alpha, beta);
+            return new Vector3(v, v, v);
+        }
+        private static Vector3 ColortoHSV(Color color)
+        {
+            return RGBToHSV(color.R, color.G, color.B, 256);
+        }
+
+        //returns h: value between 0 and 6, s (value between 0 and 1, and v 
+        private static Vector3 RGBToHSV(float r, float g, float b, float valueRange = 1)
+        {
+            r /= valueRange;
+            g /= valueRange;
+            b /= valueRange;
+            float max = Math.Max(r, Math.Max(g, b));
+            float min = Math.Min(r, Math.Min(g, b));
+            float h = 0;
+            float delta = max - min;
+            if (Math.Abs(delta) < float.Epsilon)
+            {
+
+            }
+            else if (r == max)
+            {
+                h = Mod((g - b) / delta, 6F);
+            }
+            else if (g == max)
+            {
+                h = Mod((b - r) / delta + 2, 6F);
+            }
+            else if (b == max)
+            {
+                h = Mod((r - g) / delta + 4, 6F);
+            }
+            float v = max;
+            float s = 0;
+            if (v != 0)
+            {
+                s = delta / v;
+            }
+
+            return new Vector3(h, s, v);
         }
     }
 }
