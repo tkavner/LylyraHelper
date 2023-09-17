@@ -156,6 +156,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 session.SetCurse(false);
             }
+            orig.Invoke(self);
         }
 
 
