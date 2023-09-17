@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Components\Cuttable.cs" />
     <Compile Include="Effects\HexagonalGodray.cs" />
+    <Compile Include="Effects\StarGodray.cs" />
     <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\SlicerController.cs" />
     <Compile Include="Entities\KnifeSpikes.cs" />
@@ -84,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Ahorn\effects\hexagonalGodray.jl" />
+    <None Include="Loenn\effects\starGodray.lua" />
     <None Include="Ahorn\entities\bubbledScsissors.jl" />
     <None Include="Ahorn\entities\deathNote.jl" />
     <None Include="Ahorn\entities\dashPaper.jl" />
