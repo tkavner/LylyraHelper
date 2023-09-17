@@ -35,7 +35,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             cloudData = new DynData<Cloud>(this);
             // replace sprite-
             Remove(cloudData.Get<Sprite>("sprite"));
-            sprite = LylyraHelperModule.SpriteBank.Create(fragile ? "fragileBigCloud" : "bigCloud");
+            sprite = LylyraHelperModule.SpriteBank.Create(fragile ? "fragilebigcloud" : "bigcloud");
             sprite.Play("idle", restart: false, randomizeFrame: false);
             sprite.CenterOrigin();
             cloudData["sprite"] = sprite;
