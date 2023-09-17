@@ -95,3 +95,6 @@ triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.onLoadOnly=If c
 triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.flag=The session flag that needs to be active for the trigger to activate. If left blank, the Slicer will always be ready to slice.
 triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.invert=If checked, the trigger will be off when the Session Flag is set to true, and on when the Session Flag is set to false.
 triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.entityTypes=(Optional) The full name of the type of entity(s) to remove Slicers from.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.SolidTiles,Celeste.CrushBlock).\nIf list is empty, Slicers will be removed from all Entities in range of the Trigger.
+
+#Big Cloud
+style.effects.LylyraHelper/BigCloud.description.fragile=If cloud should despawn after being used.

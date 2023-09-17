@@ -10,14 +10,28 @@ table.insert(bigCloud.placements, {
 		data = {
 				width = 64,
 				xOffset = 32,
-				yOffset = 5
+				yOffset = 5,
+				fragile = false
+			}
+		})
+table.insert(bigCloud.placements, {
+		name = "Big Cloud (Fragile)",
+		data = {
+				width = 64,
+				xOffset = 32,
+				yOffset = 5,
+				fragile = true
 			}
 		})
 
 
 
 function bigCloud.sprite(room, entity)
-	local sprite = drawableSprite.fromTexture("objects/LylyraHelper/bigCloud/bigcloud00", {x = entity.x, y = entity.y, atlas = atlas})
+
+	local fragile = entity.fragile
+	local filepath = "objects/LylyraHelper/bigCloud/normalbigcloud00"
+	if fragile then filepath = "objects/LylyraHelper/bigCloud/fragilebigcloud00" end
+	local sprite = drawableSprite.fromTexture(filepath, {x = entity.x, y = entity.y, atlas = atlas})
 	
 	sprite:setJustification(0.5, 0.5)
 	
