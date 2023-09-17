@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 // Adapted from Celeste.Godrays, most base code taken from said file
 namespace Celeste.Mod.LylyraHelper.Effects
 {
-    [CustomBackdrop("LylyraHelper/HexagonalGodray")]
-    public class HexagonalGodray : Backdrop
+    [CustomBackdrop("LylyraHelper/StarGodray")]
+    public class StarGodray : Backdrop
     {
-        private struct HexRay
+        private struct StarRay
         {
             public float X;
 
@@ -24,7 +24,9 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
             public float Duration;
 
-            public float angle;
+            public float angle0;
+
+            public float angle1;
 
             public int length;
 
@@ -37,15 +39,19 @@ namespace Celeste.Mod.LylyraHelper.Effects
                 Y = Calc.Random.NextFloat(244f);
                 Duration = 4f + Calc.Random.NextFloat() * 8f;
                 float randRotate = minRotation - maxRotation + (Calc.Random.NextFloat() * maxRotation) * 2;
-                angle = (float)(Math.PI / 180F * (randRotate));
+                angle0 = (float)(Math.PI / 180F * (randRotate));
+                angle1 = (float)(Math.PI / 180F * (randRotate + 360 / 10));
                 length = Calc.Random.Next(15, 22);
 
                 if (points == null)
-                    points = new Vector2[3];
+                    points = new Vector2[10];
 
-                points[0] = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
-                points[1] = new Vector2((float)Math.Cos(angle + Math.PI / 3), (float)Math.Sin(angle + Math.PI / 3));
-                points[2] = new Vector2((float)Math.Cos(angle + 2 * Math.PI / 3), (float)Math.Sin(angle + 2 * Math.PI / 3));
+                for (int i = 0; i < 5; i++)
+                {
+                    float num = 2 * i * (float) Math.PI / 5F;
+                    points[0 + 2 * i] = new Vector2((float)Math.Cos(angle0 + num), (float)Math.Sin(angle0 + num));
+                    points[1 + 2 * i] = 0.4F * new Vector2((float)Math.Cos(angle1 + num), (float)Math.Sin(angle1 + num));
+                }
             }
         }
 
@@ -55,7 +61,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
         private int vertexCount;
 
         private Color rayColor = Calc.HexToColor("f52b63") * 0.5f;
-        private HexRay[] rays;
+        private StarRay[] rays;
 
         private float fade;
 
@@ -67,11 +73,10 @@ namespace Celeste.Mod.LylyraHelper.Effects
         private float minRotation;
         private float maxRotation;
 
-        public HexagonalGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, string blendingMode)
+        public StarGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, string blendingMode)
         {
-            vertices = new VertexPositionColor[12 * numRays];
-            rays = new HexRay[numRays];
-
+            vertices = new VertexPositionColor[3 * 10 * numRays];
+            rays = new StarRay[numRays];
 
             if (string.IsNullOrEmpty(fadeToColor))
             { //we could add an exception case for optimization.
@@ -89,7 +94,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
             for (int i = 0; i < rays.Length; i++)
             {
-                rays[i] = new HexRay();
+                rays[i] = new StarRay();
                 rays[i].Reset(minRotation, maxRotation);
                 rays[i].Percent = Calc.Random.NextFloat();
             }
@@ -115,14 +120,16 @@ namespace Celeste.Mod.LylyraHelper.Effects
                 {
                     rays[i].Reset(minRotation, maxRotation);
                 }
+
+
                 rays[i].Percent += Engine.DeltaTime / rays[i].Duration;
 
                 rays[i].X += speedX * Engine.DeltaTime;
                 rays[i].Y += speedY * Engine.DeltaTime;
+
                 float percent = rays[i].Percent;
                 float num2 = -32f + Mod(rays[i].X - level.Camera.X * 0.9f, 384f);
                 float num3 = -32f + Mod(rays[i].Y - level.Camera.Y * 0.9f, 244f);
-                float angle = rays[i].angle;
                 int length = rays[i].length;
                 Vector2 vector3 = new Vector2((int)num2, (int)num3);
 
@@ -130,7 +137,8 @@ namespace Celeste.Mod.LylyraHelper.Effects
                 if (hsvBlending)
                 {
                     color = ColorHelper.HSVLerp(rayColor, fadeColor, percent) * Ease.CubeInOut(Calc.Clamp(((percent < 0.5f) ? percent : (1f - percent)) * 2f, 0f, 1f)) * fade;
-                } else
+                }
+                else
                 {
                     color = Color.Lerp(rayColor, fadeColor, percent) * Ease.CubeInOut(Calc.Clamp(((percent < 0.5f) ? percent : (1f - percent)) * 2f, 0f, 1f)) * fade;
                 }
@@ -142,34 +150,28 @@ namespace Celeste.Mod.LylyraHelper.Effects
                         color *= 0.25f + 0.75f * (num4 / 64f);
                     }
                 }
+                for (int j = 0; j < 5; j++)
+                {
+                    Vector2 center = new Vector2(0);
+                    Vector2 v1 = rays[i].points[(0 + 2 * j) % 10];
+                    Vector2 v2 = rays[i].points[(1 + 2 * j) % 10];
+                    Vector2 v3 = rays[i].points[(2 + 2 * j) % 10];
 
-                //points of the vertecies of the hexagon
-                Vector2 v0 = rays[i].points[0];
-                Vector2 v1 = rays[i].points[1];
-                Vector2 v2 = rays[i].points[2];
+                    //points of the vertecies of the star, in fifths
+                    VertexPositionColor vertexPositionColor0 = new VertexPositionColor(new Vector3(vector3 + center * length, 0f), color);
+                    VertexPositionColor vertexPositionColor1 = new VertexPositionColor(new Vector3(vector3 + v1 * length, 0f), color);
+                    VertexPositionColor vertexPositionColor2 = new VertexPositionColor(new Vector3(vector3 + v2 * length, 0f), color);
+                    VertexPositionColor vertexPositionColor3 = new VertexPositionColor(new Vector3(vector3 + v3 * length, 0f), color);
 
-                VertexPositionColor vertexPositionColor = new VertexPositionColor(new Vector3(vector3 + v0 * length, 0f), color);
-                VertexPositionColor vertexPositionColor2 = new VertexPositionColor(new Vector3(vector3 + v1 * length, 0f), color);
-                VertexPositionColor vertexPositionColor3 = new VertexPositionColor(new Vector3(vector3 + v2 * length, 0f), color);
-                VertexPositionColor vertexPositionColor4 = new VertexPositionColor(new Vector3(vector3 - v0 * length, 0f), color);
-                VertexPositionColor vertexPositionColor5 = new VertexPositionColor(new Vector3(vector3 - v1 * length, 0f), color);
-                VertexPositionColor vertexPositionColor6 = new VertexPositionColor(new Vector3(vector3 - v2 * length, 0f), color);
 
-                vertices[num++] = vertexPositionColor;
-                vertices[num++] = vertexPositionColor2;
-                vertices[num++] = vertexPositionColor3;
+                    vertices[num++] = vertexPositionColor0;
+                    vertices[num++] = vertexPositionColor1;
+                    vertices[num++] = vertexPositionColor2;
 
-                vertices[num++] = vertexPositionColor;
-                vertices[num++] = vertexPositionColor3;
-                vertices[num++] = vertexPositionColor4;
-
-                vertices[num++] = vertexPositionColor;
-                vertices[num++] = vertexPositionColor4;
-                vertices[num++] = vertexPositionColor5;
-
-                vertices[num++] = vertexPositionColor;
-                vertices[num++] = vertexPositionColor5;
-                vertices[num++] = vertexPositionColor6;
+                    vertices[num++] = vertexPositionColor0;
+                    vertices[num++] = vertexPositionColor2;
+                    vertices[num++] = vertexPositionColor3;
+                }
             }
             vertexCount = num;
         }

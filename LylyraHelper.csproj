@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Components\Cuttable.cs" />
     <Compile Include="Effects\HexagonalGodray.cs" />
+    <Compile Include="Effects\StarGodray.cs" />
     <Compile Include="Entities\BigCloud.cs" />
     <Compile Include="Entities\SlicerController.cs" />
     <Compile Include="Entities\KnifeSpikes.cs" />
@@ -69,7 +70,9 @@
     <Compile Include="Entities\SMWDoor.cs" />
     <Compile Include="Entities\SMWKey.cs" />
     <Compile Include="ModInterop\FrostHelperImports.cs" />
+    <Compile Include="Other\Helpers\ColorHelper.cs" />
     <Compile Include="Other\PaperHitbox.cs" />
+    <Compile Include="Other\LyraUtils.cs" />
     <Compile Include="Trigger\AddSlicerTrigger.cs" />
     <Compile Include="Entities\BubbledScissors.cs" />
     <Compile Include="Entities\Slicer.cs" />
@@ -84,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Ahorn\effects\hexagonalGodray.jl" />
+    <None Include="Loenn\effects\starGodray.lua" />
     <None Include="Ahorn\entities\bubbledScsissors.jl" />
     <None Include="Ahorn\entities\deathNote.jl" />
     <None Include="Ahorn\entities\dashPaper.jl" />
