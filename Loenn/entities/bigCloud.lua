@@ -29,8 +29,8 @@ table.insert(bigCloud.placements, {
 function bigCloud.sprite(room, entity)
 
 	local fragile = entity.fragile
-	local filepath = "objects/LylyraHelper/bigCloud/bigcloud00"
-	if fragile then filepath = "objects/LylyraHelper/fragileBigCloud/bigcloud00" end
+	local filepath = "objects/LylyraHelper/bigCloud/normalbigcloud00"
+	if fragile then filepath = "objects/LylyraHelper/bigCloud/fragilebigcloud00" end
 	local sprite = drawableSprite.fromTexture(filepath, {x = entity.x, y = entity.y, atlas = atlas})
 	
 	sprite:setJustification(0.5, 0.5)
