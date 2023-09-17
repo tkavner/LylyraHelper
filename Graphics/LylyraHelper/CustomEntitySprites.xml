@@ -71,6 +71,13 @@
         <Anim id="fade" path="bigcloud" delay="0.1" frames="1-5"/>
     </bigcloud>
 
+
+	<fragilebigcloud path="objects/LylyraHelper/fragileBigCloud/" start="idle">
+		<Anim id="spawn" path="bigcloud" delay="0.1" frames="6-10" goto="idle"/>
+		<Loop id="idle" path="bigcloud" delay="0.1" frames="0"/>
+		<Anim id="fade" path="bigcloud" delay="0.1" frames="1-5"/>
+	</fragilebigcloud>
+
     <bubbledscissors path="objects/LylyraHelper/bubbledScissors/" start="idle">
         <Loop id="idle" path="bubble" delay="0.1" frames="0"/>
     </bubbledscissors>
