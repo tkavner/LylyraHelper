@@ -64,6 +64,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (child.Name.Equals("LylyraHelper/ASHWind", StringComparison.OrdinalIgnoreCase))
             {
                 return new ASHWind(child);
+            if (child.Name.Equals("LylyraHelper/StarGodray", StringComparison.OrdinalIgnoreCase))
+            {
+                return new StarGodray(child.Attr("color"), child.Attr("fadeColor"), child.AttrInt("numberOfRays"), child.AttrFloat("speedX"), child.AttrFloat("speedY"), child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.Attr("blendingMode", "HSV"));
             }
             return null;
         }
