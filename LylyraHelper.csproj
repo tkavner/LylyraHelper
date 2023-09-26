@@ -67,6 +67,7 @@
     <Compile Include="Components\PaperComponent.cs" />
     <Compile Include="Entities\LaserCutter.cs" />
     <Compile Include="Components\BreakbeamHitboxComponent.cs" />
+    <Compile Include="LylyraHelperSession.cs" />
     <Compile Include="ModInterop\FrostHelperImports.cs" />
     <Compile Include="Other\Helpers\ColorHelper.cs" />
     <Compile Include="Other\PaperHitbox.cs" />

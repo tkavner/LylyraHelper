@@ -3,6 +3,7 @@ using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Effects;
 using Celeste.Mod.LylyraHelper.Triggers;
+using LylyraHelper;
 using LylyraHelper.Entities;
 using LylyraHelper.Other;
 using Monocle;
@@ -23,8 +24,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public static SpriteBank SpriteBank => Instance._CustomEntitySpriteBank;
         private SpriteBank _CustomEntitySpriteBank;
-        public  static LylyraHelperModule Instance;
-
+        public static LylyraHelperModule Instance;
+        public override Type SessionType => typeof(LylyraHelperSession);
+        public static LylyraHelperSession Session => Instance._Session as LylyraHelperSession;
 
         public override void Load()
         {
