@@ -4,6 +4,7 @@ using Celeste.Mod.LylyraHelper.Entities;
 using Celeste.Mod.LylyraHelper.Intefaces;
 using Celeste.Mod.LylyraHelper.Other;
 using FMOD.Studio;
+using LylyraHelper;
 using LylyraHelper.Other;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -29,18 +30,26 @@ namespace Celeste.Mod.LylyraHelper.Components
                 SliceableList = LyraUtils.GetFullNames(settings);
             }
 
+            public SlicerSettings(string[] settings)
+            {
+                SliceableList = settings.ToList();
+            }
+
             private static SlicerSettings _default = new SlicerSettings(default_string);
-            private static string default_string = "";
+            private static string default_string = "nothing";
             private List<string> SliceableList;
+            private static SlicerSettings globalSettings;
+            public static LylyraHelperSession Session => LylyraHelperModule.Session;
 
             public static SlicerSettings DefaultSettings { 
                 get 
                 { 
-                    return _default;
+                    return globalSettings ?? (Session.defaultSlicerSettings != null ? new SlicerSettings(Session.defaultSlicerSettings) : _default);
                 } 
                 set 
-                { 
-                    _default = value; 
+                {
+                    Session.defaultSlicerSettings = value.SliceableList.ToArray();
+                    globalSettings = value;
                 }
             }
 
@@ -51,7 +60,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             private bool CanSlice(string name)
             {
-                return SliceableList.Contains(name);
+                return SliceableList != null ? SliceableList.Contains(name) : false;
             }
         }
 
