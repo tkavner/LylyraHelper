@@ -178,7 +178,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             Vector2 Position = Entity.Position;
             //get dash paper, check if colliding, if so add to list (we need to check each type of DashPaper manually apparently for speed)
 
-            if (settings.CanSlice(typeof(DashPaper))) foreach (Paper d in Scene.Tracker.GetEntities<DashPaper>())
+            /*if (settings.CanSlice(typeof(DashPaper))) foreach (Paper d in Scene.Tracker.GetEntities<DashPaper>())
             {
                 if (d == Entity) continue;
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
@@ -206,12 +206,13 @@ namespace Celeste.Mod.LylyraHelper.Components
                         sliceStartPositions.Add(d, Position);
                     }
                 }
-            }
+            }*/
+
             foreach (Entity d in Scene.Entities)
             {
-                if (d == Entity) continue;
-                if (masterCuttingList.Contains(d)) continue;
                 if (!settings.CanSlice(d.GetType())) continue;
+                if (masterCuttingList.Contains(d)) continue;
+                if (d == Entity) continue;
 
                 if (sm != null && sm.Entity != null && sm.Entity == d) continue;
                 //custom entities from other mods
@@ -224,9 +225,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                         continue;
                     }
                 }
-                else if (d is ICuttable icut)
+                else if (d is ICuttable)
                 {
-                    if (!slicingEntities.Contains(d) && Entity.CollideCheck(d))
+                    if (!slicingEntities.Contains(d) && settings.CanSlice(d.GetType()) && Entity.CollideCheck(d))
                     {
                         slicingEntities.Add(d);
                         sliceStartPositions.Add(d, Position);
@@ -312,9 +313,13 @@ namespace Celeste.Mod.LylyraHelper.Components
                 return true;
             });
 
-            entitiesCut += slicingEntities.RemoveAll(d =>
-            {
-                if (!Scene.Contains(d))
+            entitiesCut += slicingEntities.RemoveAll(d => { return FinishedCutting(d, collisionOverride); }
+            );
+        }
+
+        private bool FinishedCutting(Entity d, bool collisionOverride)
+        {
+            if (!Scene.Contains(d))
                 {
                     sliceStartPositions.Remove(d);
                     return true;
@@ -326,7 +331,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
                 if (d is ICuttable icut)
                 {
-                    if ((!d.CollideCheck(Entity)) || collisionOverride || sliceOnImpact)
+                    if (collisionOverride || sliceOnImpact || (!d.CollideCheck(Entity)))
                     {
                         sliceStartPositions.TryGetValue(d, out Vector2 startPosition);
                         bool toReturn = icut.Cut(GetDirectionalPosition(), Direction, cutSize, startPosition);
@@ -335,7 +340,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                     }
                     return false;
                 }
-                else if (((!d.CollideCheck(Entity)) || collisionOverride || sliceOnImpact) && Scene.Contains(d))
+                else if ((collisionOverride || sliceOnImpact || (!d.CollideCheck(Entity))))
                 {
                     if (d is Solid)
                     {
@@ -401,7 +406,6 @@ namespace Celeste.Mod.LylyraHelper.Components
                 //else this item should not be in the list because cutting it is not supported. Warn and have it removed.
 
                 return false;
-            });
         }
 
         private void SliceFloatySpaceBlock(FloatySpaceBlock original)

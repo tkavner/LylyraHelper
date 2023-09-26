@@ -275,7 +275,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             bool flag1 = false;
             Slicer.SlicerSettings settings = slicer.settings;
             foreach (Entity entity in list1) {
-                flag1 = flag1 || !settings.CanSlice(entity.GetType());
+                if (flag1 = flag1 || !settings.CanSlice(entity.GetType())) break;
             }
 
             Collider = directionalColliderHalf2;
@@ -284,7 +284,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             bool flag2 = false;
             foreach (Entity entity in list2)
             {
-                flag2 = flag2 || !settings.CanSlice(entity.GetType());
+                if (flag2 = flag2 || !settings.CanSlice(entity.GetType())) break;
             }
 
             Collider = tempHold;
