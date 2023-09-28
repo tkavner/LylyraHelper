@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Components\Cuttable.cs" />
     <Compile Include="Effects\ASHWind.cs" />
+    <Compile Include="Effects\ASHWindV2.cs" />
     <Compile Include="Effects\HexagonalGodray.cs" />
     <Compile Include="Effects\StarGodray.cs" />
     <Compile Include="Entities\BigCloud.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Components\BreakbeamHitboxComponent.cs" />
     <Compile Include="ModInterop\FrostHelperImports.cs" />
     <Compile Include="Other\Helpers\ColorHelper.cs" />
+    <Compile Include="Other\Helpers\CurveHelper.cs" />
     <Compile Include="Other\PaperHitbox.cs" />
     <Compile Include="Other\LyraUtils.cs" />
     <Compile Include="Trigger\AddSlicerTrigger.cs" />
@@ -86,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Ahorn\effects\hexagonalGodray.jl" />
+    <None Include="Loenn\effects\ashWindv2.lua" />
     <None Include="Loenn\effects\starGodray.lua" />
     <None Include="Ahorn\entities\bubbledScsissors.jl" />
     <None Include="Ahorn\entities\deathNote.jl" />
