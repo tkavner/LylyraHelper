@@ -6,6 +6,7 @@ using Celeste.Mod.LylyraHelper.Triggers;
 using LylyraHelper;
 using LylyraHelper.Entities;
 using LylyraHelper.Other;
+using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.ModInterop;
 using MonoMod.Utils;
@@ -69,7 +70,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         }
 
 
-        [ModExportName("LylyraHelper.Slicer")]
+        [ModExportName("LylyraHelper")]
         private static class ModExports
         {
 
@@ -92,7 +93,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Slicer.UnregisterSlicerAction(type);
             }
 
-            public static void RegisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
+            public static void RegisterSlicerStaticHandler(Type type, Action<Entity, Vector2, int, string> action)
             {
                 Slicer.RegisterSlicerStaticHandler(type, action);
             }
@@ -103,9 +104,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
             //this method handles attached static movers (like spikes) for Solids. Convenience Method.
-            public static void HandleStaticMover(DynamicData dynData, Solid original, Solid cb1, Solid cb2, StaticMover mover, int minLength)
+            public static void HandleStaticMover(DynamicData dynData, Solid block1, Solid block2, StaticMover mover, int minLength)
             {
-                Slicer.ModinteropHandleStaticMover(dynData, original, cb1, cb2, mover, minLength);
+                Slicer.ModinteropHandleStaticMover(dynData, block1, block2, mover, minLength);
             }
 
             public static DynamicData GetSlicer(Entity entity)

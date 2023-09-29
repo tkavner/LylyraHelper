@@ -80,6 +80,9 @@ namespace Celeste.Mod.LylyraHelper.Components
         private Vector2 ColliderOffset;
         private Action entityCallback;
 
+        //TODO: Rename "master cutting list"
+        //master cutting list is a static list entities are added to after they are cut in the event by multiple slicers on the same frame. Realistically this list should never see more than
+        //4 or 5 entities at a time
         private static List<Entity> masterCuttingList = new List<Entity>();
         private static ulong lastPurge;
         public SlicerSettings settings;
@@ -316,7 +319,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             entitiesCut += slicingEntities.RemoveAll(d => { return FinishedCutting(d, collisionOverride); }
             );
         }
-
+        //TODO: rename this method, its poorly named
+        //this method activates the actual slicing of an entity into two pieces.
         private bool FinishedCutting(Entity d, bool collisionOverride)
         {
             if (!Scene.Contains(d))
@@ -479,7 +483,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, Entity, original, b1, b2, mover, 8);
+                HandleStaticMover(Scene, Direction, b1, b2, mover, 8);
             }
 
             AddParticles(
@@ -593,7 +597,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 GetValue(original);
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, Entity, original, d1, d2, mover, 8);
+                HandleStaticMover(Scene, Direction, d1, d2, mover, 8);
             }
             masterCuttingList.Add(original);
             Scene.Remove(original);
@@ -660,7 +664,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, Entity, original, cb1, cb2, mover, 8);
+                HandleStaticMover(Scene, Direction, cb1, cb2, mover, 8);
             }
             masterCuttingList.Add(original);
             Scene.Remove(original);
@@ -740,7 +744,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, Entity, original, mb1, mb2, mover, 8);
+                HandleStaticMover(Scene, Direction, mb1, mb2, mover, 8);
             }
         }
 
@@ -793,7 +797,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, Entity, original, fb1, fb2, mover, 8);
+                HandleStaticMover(Scene, Direction, fb1, fb2, mover, 8);
             }
             AddParticles(
                 original.Position,
@@ -1296,7 +1300,12 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static Entity GetNewStaticMoverEntity(Scene scene, Entity entity, Vector2 position, int length, Orientation orientation)
         {
-            if (entity is KnifeSpikes ks)
+            if (CustomStaticHandlerActions.TryGetValue(entity.GetType(), out Func<Vector2, int, string, Entity> customAction))
+            {
+                return customAction.Invoke(entity, position, length, orientation.ToString());
+            }
+            //vanilla entity handling
+            else if (entity is KnifeSpikes ks)
             {
                 Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
                 string overrideType = (string)spikesType?.GetField("overrideType", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ks);
@@ -1381,12 +1390,21 @@ namespace Celeste.Mod.LylyraHelper.Components
         }
 
         //currently handles vanilla static movers (basically just spikes and springs). Welcome to hell.
-        private static void HandleStaticMover(Scene Scene, Vector2 Direction, Entity Entity, Entity parent, Solid cb1, Solid cb2, StaticMover mover, int minLength, DynamicData dynData = null)
+        //scene = current map
+        //direction = direction of the cut
+        //cb1/cb2 = child blocks spawned
+        //mover = static mover attempting to be handled
+        private static void HandleStaticMover(Scene Scene, Vector2 Direction, Solid cb1, Solid cb2, StaticMover mover, int minLength, DynamicData dynData = null)
         {
 
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
             if (cb1Added || cb2Added) { 
+                if (CustomStaticHandlerActions.ContainsKey(mover.Entity.GetType()))
+                {
+
+                }
+                //vanilla entity handling
                 if (mover.Entity is Spikes)
                 {
                     if ((mover.Entity as Spikes).Direction == Spikes.Directions.Left)
@@ -1406,7 +1424,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                         HandleBottomSideSpikes(Scene, Direction, cb1, cb2, mover);
                     }
                 }
-                if (mover.Entity is Spring spring)
+                else if (mover.Entity is Spring spring)
                 {
                     if (spring.Orientation == Spring.Orientations.WallRight)
                     {
@@ -1510,8 +1528,8 @@ namespace Celeste.Mod.LylyraHelper.Components
         }
 
         private static Dictionary<Type, Func<Entity, DynamicData, bool>> CustomSlicingActions = new Dictionary<Type, Func<Entity, DynamicData, bool>>();
-        private static Dictionary<Type, Action<Entity, DynamicData>> CustomStaticHandlerActions = new Dictionary<Type, Action<Entity, DynamicData>>();
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomSecondFrameActions = new Dictionary<Type, Action<Entity, DynamicData>>();
+        private static Dictionary<Type, Func<Vector2, int, string, Entity>> CustomStaticHandlerActions = new Dictionary<Type, Func<Vector2, int, string, Entity>>();
         public static void UnregisterSlicerAction(Type type)
         {
             CustomSlicingActions.Remove(type);
@@ -1538,17 +1556,16 @@ namespace Celeste.Mod.LylyraHelper.Components
             CustomStaticHandlerActions.Remove(type);
         }
 
-        public static void RegisterSlicerStaticHandler(Type type, Action<Entity, DynamicData> action)
+        public static void RegisterSlicerStaticHandler(Type type, Action<Vector2, int, string, Entity> action)
         {
             CustomStaticHandlerActions.Add(type, action);
         }
 
-        public static void ModinteropHandleStaticMover(DynamicData dynData, Solid original, Solid cb1, Solid cb2, StaticMover mover, int minLength) 
+        public static void ModinteropHandleStaticMover(DynamicData dynData, Solid cb1, Solid cb2, StaticMover mover, int minLength) 
         {
             Scene Scene = dynData.Get("Scene") as Scene;
             Vector2 Direction = (Vector2)dynData.Get("Direction");
-            Entity Entity = dynData.Get("Entity") as Entity;
-            HandleStaticMover(Scene, Direction, Entity, original, cb1, cb2, mover, minLength);
+            HandleStaticMover(Scene, Direction, cb1, cb2, mover, minLength);
         }
         public override void DebugRender(Camera camera)
         {
