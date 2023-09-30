@@ -483,7 +483,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, b1, b2, mover, 8);
+                HandleStaticMover(Scene, Direction, b1, b2, mover);
             }
 
             AddParticles(
@@ -597,7 +597,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 GetValue(original);
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, d1, d2, mover, 8);
+                HandleStaticMover(Scene, Direction, d1, d2, mover);
             }
             masterCuttingList.Add(original);
             Scene.Remove(original);
@@ -664,7 +664,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, cb1, cb2, mover, 8);
+                HandleStaticMover(Scene, Direction, cb1, cb2, mover);
             }
             masterCuttingList.Add(original);
             Scene.Remove(original);
@@ -744,7 +744,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, mb1, mb2, mover, 8);
+                HandleStaticMover(Scene, Direction, mb1, mb2, mover);
             }
         }
 
@@ -797,7 +797,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             foreach (StaticMover mover in staticMovers)
             {
-                HandleStaticMover(Scene, Direction, fb1, fb2, mover, 8);
+                HandleStaticMover(Scene, Direction, fb1, fb2, mover);
             }
             AddParticles(
                 original.Position,
@@ -1300,9 +1300,9 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static Entity GetNewStaticMoverEntity(Scene scene, Entity entity, Vector2 position, int length, Orientation orientation)
         {
-            if (CustomStaticHandlerActions.TryGetValue(entity.GetType(), out Func<Vector2, int, string, Entity> customAction))
+            if (CustomStaticHandlerNewEntityActions.TryGetValue(entity.GetType(), out Func<Scene, Entity, Vector2, int, string, Entity> customAction))
             {
-                return customAction.Invoke(entity, position, length, orientation.ToString());
+                return customAction.Invoke(scene, entity, position, length, orientation.ToString());
             }
             //vanilla entity handling
             else if (entity is KnifeSpikes ks)
@@ -1394,18 +1394,44 @@ namespace Celeste.Mod.LylyraHelper.Components
         //direction = direction of the cut
         //cb1/cb2 = child blocks spawned
         //mover = static mover attempting to be handled
-        private static void HandleStaticMover(Scene Scene, Vector2 Direction, Solid cb1, Solid cb2, StaticMover mover, int minLength, DynamicData dynData = null)
+
+        //orientation = orientation of the static mover's Entity, only used with custom slicing actions on
+        private static void HandleStaticMover(Scene Scene, Vector2 Direction, Solid cb1, Solid cb2, StaticMover mover)
         {
 
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
             if (cb1Added || cb2Added) { 
-                if (CustomStaticHandlerActions.ContainsKey(mover.Entity.GetType()))
+                //modded entity handling
+                if (StaticHandlerOrientationFunctions.TryGetValue(mover.Entity.GetType(), out Func<StaticMover, Solid, Solid, string> orientationFunc))
                 {
-
+                    string orientation = orientationFunc(mover, cb1, cb2);
+                    switch (orientation.ToLower())
+                    {
+                        case "left":
+                            HandleLeftSideSpikes(Scene, Direction, cb1, cb2, mover);
+                            break;
+                        case "right":
+                            HandleRightSideSpikes(Scene, Direction, cb1, cb2, mover);
+                            break;
+                        case "top":
+                        case "up":
+                            HandleTopSideSpikes(Scene, Direction, cb1, cb2, mover);
+                            break;
+                        case "bottom":
+                        case "down":
+                            HandleBottomSideSpikes(Scene, Direction, cb1, cb2, mover);
+                            break;
+                        default:
+                            break;
+                    }
+                } 
+                else if (CustomNonorientableStaticHandlerActions.TryGetValue(mover.Entity.GetType(), out Action<Scene, StaticMover, Vector2, Solid, Solid> nonoriFunc)) {
+                    nonoriFunc(Scene, mover, Direction, cb1, cb2);
                 }
+                //END: modded static mover handling
                 //vanilla entity handling
-                if (mover.Entity is Spikes)
+                else if (mover.Entity is Spikes)
                 {
                     if ((mover.Entity as Spikes).Direction == Spikes.Directions.Left)
                     {
@@ -1478,6 +1504,11 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
+        public static Vector2[] CalcCuts(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth, int cutsize = 8)
+        {
+            return CalcCuts(blockToBeCut.Position, new Vector2(blockToBeCut.Width, blockToBeCut.Height), cutPosition, cutDir, gapWidth, cutsize);
+        }
+
         public static Vector2[] CalcCuts(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int cutSize = 8)
         {
             Vector2 pos1, pos2, size1, size2;
@@ -1527,9 +1558,19 @@ namespace Celeste.Mod.LylyraHelper.Components
             return (x % m + m) % m;
         }
 
+        //dictionary of functions on how to slice various types of entities. should return whether or not slicing is complete. The entity to be sliced and slicer in the form of DynamicData are provided.
         private static Dictionary<Type, Func<Entity, DynamicData, bool>> CustomSlicingActions = new Dictionary<Type, Func<Entity, DynamicData, bool>>();
+        //dictionary of actions on how to activate various entities on their second frame (if needed)
         private static Dictionary<Type, Action<Entity, DynamicData>> CustomSecondFrameActions = new Dictionary<Type, Action<Entity, DynamicData>>();
-        private static Dictionary<Type, Func<Vector2, int, string, Entity>> CustomStaticHandlerActions = new Dictionary<Type, Func<Vector2, int, string, Entity>>();
+        //dictionary of functions describing how to spawn a new static mover entity of a given Type for a specific position and required length and orientation. The old entity's static mover will be provided for convenience.
+        private static Dictionary<Type, Func<Scene, Entity, Vector2, int, string, Entity>> CustomStaticHandlerNewEntityActions = new Dictionary<Type, Func<Scene, Entity, Vector2, int, string, Entity>>();
+        //dictionary of functions describing which way a type of orientable entity is facing. The entity to be sliced, the sub solids it is attached to are provided
+        //return value should be a string describing which way it is facing ("left", "right, "up", "down")
+        private static Dictionary<Type, Func<StaticMover, Solid, Solid, string>> StaticHandlerOrientationFunctions = new Dictionary<Type, Func<StaticMover, Solid, Solid, string>>();
+        //dictionary for static movable entities actions that don't fit the standard orientable criterion. 
+        //the original static mover entity, the cut direction, the child solids and current scene are given. No return value, just do the job for me in this case.
+        //have fun. this is basically the "other" catagory of static movers
+        private static Dictionary<Type, Action<Scene, StaticMover, Vector2, Solid, Solid>> CustomNonorientableStaticHandlerActions = new Dictionary<Type, Action<Scene, StaticMover, Vector2, Solid, Solid>>();
         public static void UnregisterSlicerAction(Type type)
         {
             CustomSlicingActions.Remove(type);
@@ -1542,30 +1583,37 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         public static void UnregisterSecondFrameSlicerAction(Type type)
         {
-            CustomSecondFrameActions.Remove(type);
+            CustomStaticHandlerNewEntityActions.Remove(type);
         }
-
 
         public static void RegisterSecondFrameSlicerAction(Type type, Action<Entity, DynamicData> action)
         {
             CustomSecondFrameActions.Add(type, action);
         }
 
-        public static void UnregisterSlicerStaticHandler(Type type)
+        public static void UnregisterSlicerSMEntityFunction(Type type)
         {
-            CustomStaticHandlerActions.Remove(type);
+            CustomStaticHandlerNewEntityActions.Remove(type);
+            StaticHandlerOrientationFunctions.Remove(type);
         }
 
-        public static void RegisterSlicerStaticHandler(Type type, Action<Vector2, int, string, Entity> action)
+        public static void RegisterSlicerSMEntityFunction(
+            Type type, 
+            Func<StaticMover, Solid, Solid, string> orientationFunction,
+            Func<Scene, Entity, Vector2, int, string, Entity> newEntityFunction)
         {
-            CustomStaticHandlerActions.Add(type, action);
+            StaticHandlerOrientationFunctions.Add(type, orientationFunction);
+            CustomStaticHandlerNewEntityActions.Add(type, newEntityFunction);
         }
 
-        public static void ModinteropHandleStaticMover(DynamicData dynData, Solid cb1, Solid cb2, StaticMover mover, int minLength) 
+        public static void ModinteropHandleStaticMover(Scene scene, Vector2 Direction, Solid cb1, Solid cb2, StaticMover mover) 
         {
-            Scene Scene = dynData.Get("Scene") as Scene;
-            Vector2 Direction = (Vector2)dynData.Get("Direction");
-            HandleStaticMover(Scene, Direction, cb1, cb2, mover, minLength);
+            HandleStaticMover(scene, Direction, cb1, cb2, mover);
+        }
+
+        public static void ModinteropHandleStaticMovers(Scene scene, Vector2 Direction, Solid cb1, Solid cb2, List<StaticMover> staticMovers)
+        {
+            foreach (StaticMover mover in staticMovers) ModinteropHandleStaticMover(scene, Direction, cb1, cb2, mover);
         }
         public override void DebugRender(Camera camera)
         {

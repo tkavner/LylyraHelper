@@ -12,6 +12,7 @@ using MonoMod.ModInterop;
 using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
+using static Celeste.GaussianBlur;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
@@ -74,7 +75,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private static class ModExports
         {
 
-            public static void RegisterSecondSlicerAction(Type type, Action<Entity, DynamicData> action)
+            public static void RegisterActivationSlicerAction(Type type, Action<Entity, DynamicData> action)
             {
                 Slicer.RegisterSecondFrameSlicerAction(type, action);
             }
@@ -93,20 +94,31 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 Slicer.UnregisterSlicerAction(type);
             }
 
-            public static void RegisterSlicerStaticHandler(Type type, Action<Entity, Vector2, int, string> action)
+            //entity = the entity being cut
+            //vector2 = the position the new entity should be spawned
+            //int = minimum length 
+            public static void RegisterSlicerStaticHandler(Type type,
+            Func<StaticMover, Solid, Solid, string> orientationFunction,
+            Func<Scene, Entity, Vector2, int, string, Entity> newEntityFunction)
             {
-                Slicer.RegisterSlicerStaticHandler(type, action);
+                Slicer.RegisterSlicerSMEntityFunction(type, orientationFunction, newEntityFunction);
             }
 
-            public static void UnregisterSlicerStaticHandler(Type type)
+            public static void UnregisterSlicerSMEntityFunction(Type type)
             {
-                Slicer.UnregisterSlicerStaticHandler(type);
+                Slicer.UnregisterSlicerSMEntityFunction(type);
             }
 
             //this method handles attached static movers (like spikes) for Solids. Convenience Method.
-            public static void HandleStaticMover(DynamicData dynData, Solid block1, Solid block2, StaticMover mover, int minLength)
+            public static void HandleStaticMover(Scene scene, Vector2 direction, Solid block1, Solid block2, StaticMover mover)
             {
-                Slicer.ModinteropHandleStaticMover(dynData, block1, block2, mover, minLength);
+                Slicer.ModinteropHandleStaticMover(scene, direction, block1, block2, mover);
+            }
+
+            //this method handles attached static movers (like spikes) for Solids. Convenience Method.
+            public static void HandleStaticMovers(Scene scene, Vector2 Direction, Solid cb1, Solid cb2, List<StaticMover> staticMovers)
+            {
+                Slicer.ModinteropHandleStaticMovers(scene, Direction, cb1, cb2, staticMovers);
             }
 
             public static DynamicData GetSlicer(Entity entity)
