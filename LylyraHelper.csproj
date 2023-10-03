@@ -58,31 +58,31 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\Cuttable.cs" />
-    <Compile Include="Effects\HexagonalGodray.cs" />
-    <Compile Include="Effects\StarGodray.cs" />
-    <Compile Include="Entities\BigCloud.cs" />
-    <Compile Include="Entities\SlicerController.cs" />
-    <Compile Include="Entities\KnifeSpikes.cs" />
-    <Compile Include="Components\PaperComponent.cs" />
-    <Compile Include="Entities\LaserCutter.cs" />
-    <Compile Include="Components\BreakbeamHitboxComponent.cs" />
+    <Compile Include="Code\Components\Cuttable.cs" />
+    <Compile Include="Code\Effects\HexagonalGodray.cs" />
+    <Compile Include="Code\Effects\StarGodray.cs" />
+    <Compile Include="Code\Entities\BigCloud.cs" />
+    <Compile Include="Code\Entities\SlicerController.cs" />
+    <Compile Include="Code\Entities\KnifeSpikes.cs" />
+    <Compile Include="Code\Components\PaperComponent.cs" />
+    <Compile Include="Code\Entities\LaserCutter.cs" />
+    <Compile Include="Code\Components\BreakbeamHitboxComponent.cs" />
     <Compile Include="LylyraHelperSession.cs" />
-    <Compile Include="ModInterop\FrostHelperImports.cs" />
-    <Compile Include="Other\Helpers\ColorHelper.cs" />
-    <Compile Include="Other\PaperHitbox.cs" />
-    <Compile Include="Other\LyraUtils.cs" />
-    <Compile Include="Trigger\AddSlicerTrigger.cs" />
-    <Compile Include="Entities\BubbledScissors.cs" />
-    <Compile Include="Entities\Slicer.cs" />
-    <Compile Include="Interfaces\ICuttable.cs" />
-    <Compile Include="Entities\Scissors.cs" />
-    <Compile Include="Entities\DeathNote.cs" />
-    <Compile Include="Entities\DashPaper.cs" />
-    <Compile Include="Entities\Paper.cs" />
+    <Compile Include="Code\ModInterop\FrostHelperImports.cs" />
+    <Compile Include="Code\Other\Helpers\ColorHelper.cs" />
+    <Compile Include="Code\Other\PaperHitbox.cs" />
+    <Compile Include="Code\Other\LyraUtils.cs" />
+    <Compile Include="Code\Trigger\AddSlicerTrigger.cs" />
+    <Compile Include="Code\Entities\BubbledScissors.cs" />
+    <Compile Include="Code\Entities\Slicer.cs" />
+    <Compile Include="Code\Interfaces\ICuttable.cs" />
+    <Compile Include="Code\Entities\Scissors.cs" />
+    <Compile Include="Code\Entities\DeathNote.cs" />
+    <Compile Include="Code\Entities\DashPaper.cs" />
+    <Compile Include="Code\Entities\Paper.cs" />
     <Compile Include="LylyraHelperModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Trigger\RemoveSlicerTrigger.cs" />
+    <Compile Include="Code\Trigger\RemoveSlicerTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Ahorn\effects\hexagonalGodray.jl" />
