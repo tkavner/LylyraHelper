@@ -1,6 +1,6 @@
 - Name: LylyraHelper
   Version: 1.2.0
-  DLL: bin/Debug/LylyraHelper.dll
+  DLL: bin/LylyraHelper.dll
   Dependencies:
     - Name: Everest
       Version: 1.0.0
