@@ -1,5 +1,6 @@
 ﻿using Celeste;
 using Celeste.Mod.Entities;
+using Celeste.Mod.LylyraHelper.Code.Components;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Other;
 using Microsoft.Xna.Framework;
