@@ -633,10 +633,15 @@ namespace Celeste.Mod.LylyraHelper.Components
             bool cb1Added;
             if (cb1Added = (cb1Width >= 24 && cb1Height >= 24 && original.CollideRect(new Rectangle((int)cb1Pos.X, (int)cb1Pos.Y, cb1Width, cb1Height))))
             {
-                List<CrushBlock.MoveState> newReturnStack1 = new(returnStack);
+                Vector2 offset = cb1Pos - original.Position;
+                List<CrushBlock.MoveState> newReturnStack = new();
+                foreach(CrushBlock.MoveState state in returnStack)
+                {
+                    newReturnStack.Add(new CrushBlock.MoveState(state.From + offset, state.Direction));
+                }
                 cb1 = new CrushBlock(cb1Pos, cb1Width, cb1Height, axii, chillOut)
                 {
-                    returnStack = newReturnStack1
+                    returnStack = newReturnStack
                 };
                 Scene.Add(cb1);
                 intermediateFrameActivation.Add(cb1);
@@ -646,10 +651,15 @@ namespace Celeste.Mod.LylyraHelper.Components
             bool cb2Added;
             if (cb2Added = (cb2Width >= 24 && cb2Height >= 24 && original.CollideRect(new Rectangle((int) cb2Pos.X, (int) cb2Pos.Y, cb2Width, cb2Height))))
             {
-                List<CrushBlock.MoveState> newReturnStack2 = new(returnStack);
+                Vector2 offset = cb2Pos - original.Position;
+                List<CrushBlock.MoveState> newReturnStack = new();
+                foreach (CrushBlock.MoveState state in returnStack)
+                {
+                    newReturnStack.Add(new CrushBlock.MoveState(state.From + offset, state.Direction));
+                }
                 cb2 = new CrushBlock(cb2Pos, cb2Width, cb2Height, axii, chillOut)
                 {
-                    returnStack = newReturnStack2
+                    returnStack = newReturnStack
                 };
                 Scene.Add(cb2);
                 intermediateFrameActivation.Add(cb2);
