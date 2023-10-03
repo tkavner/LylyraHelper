@@ -178,7 +178,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 }
             }
             int i = 0;
-            MethodInfo mi = this.GetType().GetMethod(nameof(Paper.CheckForSame)).MakeGenericMethod(new Type[] { thisType });
+            MethodInfo mi = this.GetType().GetMethod(nameof(CheckForSame)).MakeGenericMethod(new Type[] { thisType });
             for (float num5 = base.Left; num5 < base.Right; num5 += 8f)
             {
                 int j = 0;

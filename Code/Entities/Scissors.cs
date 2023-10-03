@@ -331,21 +331,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (self == null) return;
             self.CollideDo<Scissors>(
                 scissors => {
-                    Type bumperType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Bumper", true, true);
 
-                    float respawnTimer = (float) bumperType.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
-                    bool fireMode = (bool)bumperType?.GetField("fireMode", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                    float respawnTimer = self.respawnTimer;
+                    bool fireMode = self.fireMode;
 
                     if (fireMode)
                     {
 
-                        Wiggler wiggler = (Wiggler)bumperType?.GetField("wiggler", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
-                        Vector2 hitDir = (Vector2)bumperType?.GetField("hitDir", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+                        Wiggler wiggler = self.hitWiggler;
+                        Vector2 hitDir = self.hitDir;
                         Vector2 vector = (scissors.Center - self.Center).SafeNormalize();
-                        bumperType?.GetField("hitDir", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, vector);
+                        self.hitDir = vector;
                         wiggler.Start();
                         Audio.Play("event:/game/09_core/hotpinball_activate", self.Position);
-                        bumperType?.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, 0.6F);
+                        self.respawnTimer = 0.6F;
                         self.SceneAs<Level>().Particles.Emit(Bumper.P_FireHit, 12, self.Center + vector * 12f, Vector2.One * 3f, vector.Angle());
                         
                     }
@@ -361,12 +360,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
                         }
 
                         scissors.OnExplosion();
-                        VertexLight light = (VertexLight)bumperType?.GetField("light", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
-                        BloomPoint bloom = (BloomPoint)bumperType?.GetField("bloom", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
-                        Sprite sprite = (Sprite)bumperType?.GetField("sprite", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
-                        Sprite spriteEvil = (Sprite)bumperType?.GetField("spriteEvil", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
                         Vector2 vector = (scissors.Center - self.Center).SafeNormalize();
-                        bumperType.GetField("respawnTimer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, 0.6F);
+                        self.respawnTimer = 0.6F;
+
+                        VertexLight light = self.light;
+                        BloomPoint bloom = self.bloom;
+                        Sprite sprite = self.sprite;
+                        Sprite spriteEvil = self.spriteEvil;
                         sprite.Play("hit", restart: true);
                         spriteEvil.Play("hit", restart: true);
                         light.Visible = false;
