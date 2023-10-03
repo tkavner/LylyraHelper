@@ -54,7 +54,7 @@ namespace LylyraHelper.Mod.LylyraHelper.Entities
 
         private void OnPlayer(Player obj)
         {
-            if (sprite.visible)
+            if (sprite.Visible)
             {
 
             }

@@ -1,112 +1,109 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7BCBCC53-E6B1-48A4-A830-936FE74741FC}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LylyraHelper</RootNamespace>
-    <AssemblyName>LylyraHelper</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Celeste">
-      <HintPath>..\..\Celeste.exe</HintPath>
-    </Reference>
-    <Reference Include="FNA">
-      <HintPath>..\..\FNA.dll</HintPath>
-    </Reference>
-    <Reference Include="MMHOOK_Celeste">
-      <HintPath>..\..\MMHOOK_Celeste.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil, Version=0.11.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e" />
-    <Reference Include="MonoMod.Utils, Version=21.8.19.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MonoMod.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="YamlDotNet">
-      <HintPath>..\..\YamlDotNet.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Code\Components\Cuttable.cs" />
-    <Compile Include="Code\Effects\HexagonalGodray.cs" />
-    <Compile Include="Code\Effects\StarGodray.cs" />
-    <Compile Include="Code\Entities\BigCloud.cs" />
-    <Compile Include="Code\Entities\SlicerController.cs" />
-    <Compile Include="Code\Entities\KnifeSpikes.cs" />
-    <Compile Include="Code\Components\PaperComponent.cs" />
-    <Compile Include="Code\Entities\LaserCutter.cs" />
-    <Compile Include="Code\Components\BreakbeamHitboxComponent.cs" />
-    <Compile Include="LylyraHelperSession.cs" />
-    <Compile Include="Code\ModInterop\FrostHelperImports.cs" />
-    <Compile Include="Code\Other\Helpers\ColorHelper.cs" />
-    <Compile Include="Code\Other\PaperHitbox.cs" />
-    <Compile Include="Code\Other\LyraUtils.cs" />
-    <Compile Include="Code\Trigger\AddSlicerTrigger.cs" />
-    <Compile Include="Code\Entities\BubbledScissors.cs" />
-    <Compile Include="Code\Entities\Slicer.cs" />
-    <Compile Include="Code\Interfaces\ICuttable.cs" />
-    <Compile Include="Code\Entities\Scissors.cs" />
-    <Compile Include="Code\Entities\DeathNote.cs" />
-    <Compile Include="Code\Entities\DashPaper.cs" />
-    <Compile Include="Code\Entities\Paper.cs" />
-    <Compile Include="LylyraHelperModule.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Code\Trigger\RemoveSlicerTrigger.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Ahorn\effects\hexagonalGodray.jl" />
-    <None Include="Loenn\effects\starGodray.lua" />
-    <None Include="Ahorn\entities\bubbledScsissors.jl" />
-    <None Include="Ahorn\entities\deathNote.jl" />
-    <None Include="Ahorn\entities\dashPaper.jl" />
-    <None Include="Ahorn\entities\bigCloud.jl" />
-    <None Include="Loenn\effects\hexagonalGodray.lua" />
-    <None Include="Loenn\entities\bigCloud.lua" />
-    <None Include="Loenn\entities\bubbledScissors.lua" />
-    <None Include="Loenn\entities\dashPaper.lua" />
-    <None Include="Loenn\entities\deathnote.lua" />
-    <None Include="Loenn\entities\knifeSpikes.lua" />
-    <None Include="Loenn\entities\laserCutter.lua" />
-    <None Include="Loenn\entities\slicerController.lua" />
-    <None Include="Loenn\lang\en_gb.lang" />
-    <None Include="Loenn\triggers\addSlicerTrigger.lua" />
-    <None Include="Loenn\triggers\removeSlicerTrigger.lua" />
-    <None Include="Loenn\ui\forms\fields\typeField.lua" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="credits.txt" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net452</TargetFramework>
+        <AssemblyName>LylyraHelper</AssemblyName>
+        <RootNamespace>Celeste.Mod.LylyraHelper</RootNamespace>
+        <LangVersion>latest</LangVersion>
+        <CelestePrefix Condition="'$(CelestePrefix)' == '' And (Exists('..\..\Celeste.exe') Or Exists('..\..\Celeste.dll'))">..\..</CelestePrefix>
+        <CelestePrefix Condition="'$(CelestePrefix)' == '' And (Exists('..\..\..\Celeste.exe') Or Exists('..\..\..\Celeste.dll'))">..\..\..</CelestePrefix>
+        <CelestePrefix Condition="'$(CelestePrefix)' == ''">lib-stripped</CelestePrefix>
+
+        <!-- Use the legacy reference dir for Core installs -->
+        <CelesteIsCore>false</CelesteIsCore>
+        <CelesteIsCore Condition="Exists('$(CelestePrefix)\Celeste.dll')">true</CelesteIsCore>
+        <CelestePrefix Condition="$(CelesteIsCore)">$(CelestePrefix)\legacyRef</CelestePrefix>
+
+        <CelesteType Condition="'$(CelesteType)' == '' And Exists('$(CelestePrefix)\BuildIsXNA.txt')">XNA</CelesteType>
+        <CelesteType Condition="'$(CelesteType)' == ''">FNA</CelesteType>
+        <XNAPath Condition="'$(XNAPath)' == ''">$(WINDIR)\Microsoft.NET\assembly\GAC_32\{0}\v4.0_4.0.0.0__842cf8be1de50553\{0}.dll</XNAPath>
+    </PropertyGroup>
+
+    <Target Name="CheckCoreInstall" BeforeTargets="PrepareForBuild" Condition="$(CelesteIsCore)">
+        <Error Condition="!Exists('$(CelestePrefix)')" Text="Detected a .NET Core Everest install without the required legacyRef install needed to build .NET Framework mods - see the Everest wiki (https://github.com/EverestAPI/Resources/wiki/Code-Mod-Core-Migration-Guide) for info on how to set it up" />
+        <Message Text="Building against .NET Core Everest legacyRef install" Importance="high" />
+    </Target>
+
+    <!--Disable "Copy Local" for all references-->
+    <ItemDefinitionGroup>
+        <PackageReference PrivateAssets="all" ExcludeAssets="runtime" />
+        <Reference Private="false" />
+    </ItemDefinitionGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="22.01.04.03" PrivateAssets="all" ExcludeAssets="runtime" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="$(CelestePrefix)\Celeste.exe" Publicize="true">
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="$(CelestePrefix)\MMHOOK_Celeste.dll">
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Ahorn\entities\" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Properties\Settings.Designer.cs">
+        <DesignTimeSharedInput>True</DesignTimeSharedInput>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Settings.settings</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Properties\Settings.settings">
+        <Generator>SettingsSingleFileGenerator</Generator>
+        <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+
+    <Choose>
+        <When Condition="'$(CelesteType)' == 'FNA'">
+            <ItemGroup>
+                <Reference Include="$(CelestePrefix)\FNA.dll">
+                    <Private>false</Private>
+                </Reference>
+            </ItemGroup>
+        </When>
+
+        <When Condition="'$(CelesteType)' == 'XNA'">
+            <ItemGroup>
+                <Reference Include="$([System.String]::Format('$(XNAPath)', 'Microsoft.Xna.Framework'))">
+                    <Private>false</Private>
+                </Reference>
+                <Reference Include="$([System.String]::Format('$(XNAPath)', 'Microsoft.Xna.Framework.Game'))">
+                    <Private>false</Private>
+                </Reference>
+                <Reference Include="$([System.String]::Format('$(XNAPath)', 'Microsoft.Xna.Framework.Graphics'))">
+                    <Private>false</Private>
+                </Reference>
+            </ItemGroup>
+        </When>
+    </Choose>
+
+    <Target Name="CopyFiles" AfterTargets="Build">
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="bin" />
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="bin" />
+    </Target>
+    
+    <PropertyGroup>
+        <PathMap>$(MSBuildProjectDirectory)=LylyraHelper/</PathMap>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Optimize>False</Optimize>
+    </PropertyGroup>
+
 </Project>

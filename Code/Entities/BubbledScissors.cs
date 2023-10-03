@@ -411,7 +411,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return false;
         }
 
-        protected override void OnSquish(CollisionData data)
+        public override void OnSquish(CollisionData data)
         {
             if (!TrySquishWiggle(data, 3, 3) && !SaveData.Instance.Assists.Invincible)
             {

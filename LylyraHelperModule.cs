@@ -12,8 +12,10 @@ using MonoMod.ModInterop;
 using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using static Celeste.GaussianBlur;
 
+[assembly: IgnoresAccessChecksTo("Celeste")]
 namespace Celeste.Mod.LylyraHelper.Entities
 {
     public class LylyraHelperModule : EverestModule
