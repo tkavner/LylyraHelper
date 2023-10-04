@@ -972,33 +972,6 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         }
 
-        private void AddParticles(Vector2 position, Vector2 range, Color color)
-        {
-            int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            level.ParticlesFG.Emit(Cuttable.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
-        }
-
-        //directional position is used with instant slicing because normally slicers depend on movement to slice
-        private Vector2 GetDirectionalPosition()
-        {
-            if (Direction.X > 0)
-            {
-                return Entity.CenterLeft + new Vector2(directionalOffset, 0);
-            }
-            else if (Direction.X < 0)
-            {
-                return Entity.CenterRight + new Vector2(-directionalOffset, 0);
-            }
-            else if (Direction.Y > 0)
-            {
-                return Entity.TopCenter + new Vector2(0, directionalOffset);
-            }
-            else
-            {
-                return Entity.BottomCenter + new Vector2(0, -directionalOffset);
-            }
-        }
-
         public static Vector2[] CalcCuts(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth, int cutsize = 8)
         {
             return CalcCuts(blockToBeCut.Position, new Vector2(blockToBeCut.Width, blockToBeCut.Height), cutPosition, cutDir, gapWidth, cutsize);
@@ -1058,6 +1031,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             public Func<Entity, DynamicData, Entity[]> firstFrameSlice;
             public Action<Entity, DynamicData> secondFrameSlice;
             public Action<Entity, DynamicData> onSliceStart;
+
         }
 
         //dictionary of functions on how to slice various types of entities. should return whether or not slicing is complete. The entity to be sliced and slicer in the form of DynamicData are provided.
