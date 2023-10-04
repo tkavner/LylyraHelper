@@ -28,7 +28,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
         public override Entity[] Slice(Slicer slicer)
         {
             DreamBlock original = Entity as DreamBlock;
-            Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, slicer.Direction, slicer.CutSize);
+            Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), slicer.Entity.Center, slicer.Direction, slicer.CutSize);
 
             Vector2 db1Pos = resultArray[0];
             Vector2 db2Pos = resultArray[1];

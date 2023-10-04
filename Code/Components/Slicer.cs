@@ -1060,7 +1060,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             public Action<Entity, DynamicData> onSliceStart;
         }
 
-        private static List<Type> CustomAttachedSlicingTypes = new List<Type>();
         //dictionary of functions on how to slice various types of entities. should return whether or not slicing is complete. The entity to be sliced and slicer in the form of DynamicData are provided.
         private static Dictionary<Type, CustomSlicingActionHolder> CustomSlicingActions = new Dictionary<Type, CustomSlicingActionHolder>();
         //dictionary of functions describing how to spawn a new static mover entity of a given Type for a specific position and required length and orientation. The old entity's static mover will be provided for convenience.
