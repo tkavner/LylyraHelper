@@ -1059,13 +1059,13 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new AttachedSpikesSliceable());
             }
-            else if (entity is KnifeSpikes)
-            {
-                entity.Add(new AttachedKnifeSpikes());
-            }
             else if (entity is Spring)
             {
                 entity.Add(new AttachedSpringSliceable());
+            }
+            else if (entity is KnifeSpikes)
+            {
+                entity.Add(new AttachedKnifeSpikesSliceable());
             }
             //modded entity handling
             else if (CustomAttachedSlicingActions.TryGetValue(entity.GetType(), out var action))

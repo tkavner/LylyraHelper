@@ -102,7 +102,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
             Scene.Remove(original);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("62222b"));
 
-            return new Entity[] { cb1, cb2};
+            return new Entity[] {cb1, cb2};
         }
 
         public override void Activate(Slicer slicer)
