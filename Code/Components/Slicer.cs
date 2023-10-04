@@ -1,5 +1,6 @@
 ﻿using Celeste.Mod.Entities;
 using Celeste.Mod.Helpers;
+using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Components.Sliceables;
@@ -296,7 +297,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
-        private static void HandleBottomSideSpikes(
+        private static void HandleBottomSideMover(
             Scene Scene,
             Vector2 Direction,
             Solid cb1,
@@ -416,7 +417,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
-        private static void HandleTopSideSpikes(
+        private static void HandleTopSideMover(
             Scene Scene,
             Vector2 Direction,
             Solid cb1,
@@ -539,7 +540,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
-        private static void HandleLeftSideSpikes(
+        private static void HandleLeftSideMover(
             Scene Scene,
             Vector2 Direction,
             Solid cb1,
@@ -664,7 +665,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         }
 
-        private static void HandleRightSideSpikes(
+        private static void HandleRightSideMover(
             Scene Scene,
             Vector2 Direction,
             Solid cb1,
@@ -789,64 +790,11 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static Entity GetNewStaticMoverEntity(Scene scene, Entity entity, Vector2 position, int length, Orientation orientation)
         {
-            if (CustomStaticHandlerNewEntityActions.TryGetValue(entity.GetType(), out Func<Scene, Entity, Vector2, int, string, Entity> customAction))
+            AttachedSliceableComponent comp = entity.Get<AttachedSliceableComponent>();
+
+            if (comp != null)
             {
-                return customAction.Invoke(scene, entity, position, length, orientation.ToString());
-            }
-            //vanilla entity handling
-            else if (entity is KnifeSpikes ks)
-            {
-                Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
-                string overrideType = ks.overrideType;
-
-                switch (orientation)
-                {
-                    case Orientation.Right:
-
-                        return new KnifeSpikes(position, length, Spikes.Directions.Right, overrideType, ks.sliceOnImpact);
-
-                    case Orientation.Left:
-                        return new KnifeSpikes(position, length, Spikes.Directions.Left, overrideType, ks.sliceOnImpact);
-                    case Orientation.Up:
-                        return new KnifeSpikes(position, length, Spikes.Directions.Up, overrideType, ks.sliceOnImpact);
-                    case Orientation.Down:
-                        return new KnifeSpikes(position, length, Spikes.Directions.Down, overrideType, ks.sliceOnImpact);
-
-                }
-            }
-            else if (entity is Spikes spikes)
-            {
-                Type spikesType = FakeAssembly.GetFakeEntryAssembly().GetType("Celeste.Spikes", true, true);
-                string overrideType = spikes.overrideType;
-                switch (orientation)
-                {
-                    case Orientation.Right:
-                        return new Spikes(position, length, Spikes.Directions.Right, overrideType);
-
-                    case Orientation.Left:
-                        return new Spikes(position, length, Spikes.Directions.Left, overrideType);
-                    case Orientation.Up:
-                        return new Spikes(position, length, Spikes.Directions.Up, overrideType);
-                    case Orientation.Down:
-                        return new Spikes(position, length, Spikes.Directions.Down, overrideType);
-
-                }
-            }
-            else if (entity is Spring spring)
-            {
-                if (length < 16) return null;
-                switch (orientation)
-                {
-                    case Orientation.Right:
-                        return new Spring(position, Spring.Orientations.WallRight, true);
-                    case Orientation.Left:
-                        return new Spring(position, Spring.Orientations.WallLeft, true);
-                    case Orientation.Up:
-                        return new Spring(position, Spring.Orientations.Floor, true);
-                    case Orientation.Down:
-                        return null;
-
-                }
+                return comp.GetNewEntity(scene, entity, position, length);
             }
             return null;
         }
@@ -887,89 +835,50 @@ namespace Celeste.Mod.LylyraHelper.Components
         //mover = static mover attempting to be handled
 
         //orientation = orientation of the static mover's Entity, only used with custom slicing actions on
-        public static void HandleStaticMover(Scene Scene, Vector2 Direction, Solid cb1, Solid cb2, StaticMover mover)
+        public static void HandleStaticMover(Scene scene, Vector2 direction, Solid cb1, Solid cb2, StaticMover mover)
         {
 
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
             if (cb1Added || cb2Added)
             {
-                //modded entity handling
-                if (StaticHandlerOrientationFunctions.TryGetValue(mover.Entity.GetType(), out Func<StaticMover, Solid, Solid, string> orientationFunc))
+
+                AttachedSliceableComponent comp = mover.Entity.Get<AttachedSliceableComponent>();
+                if (comp != null)
                 {
-                    string orientation = orientationFunc(mover, cb1, cb2);
-                    switch (orientation.ToLower())
-                    {
-                        case "left":
-                            HandleLeftSideSpikes(Scene, Direction, cb1, cb2, mover);
-                            break;
-                        case "right":
-                            HandleRightSideSpikes(Scene, Direction, cb1, cb2, mover);
-                            break;
-                        case "top":
-                        case "up":
-                            HandleTopSideSpikes(Scene, Direction, cb1, cb2, mover);
-                            break;
-                        case "bottom":
-                        case "down":
-                            HandleBottomSideSpikes(Scene, Direction, cb1, cb2, mover);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else if (CustomNonorientableStaticHandlerActions.TryGetValue(mover.Entity.GetType(), out Action<Scene, StaticMover, Vector2, Solid, Solid> nonoriFunc))
-                {
-                    nonoriFunc(Scene, mover, Direction, cb1, cb2);
-                }
-                //END: modded static mover handling
-                //vanilla entity handling
-                else if (mover.Entity is Spikes)
-                {
-                    if ((mover.Entity as Spikes).Direction == Spikes.Directions.Left)
-                    {
-                        HandleLeftSideSpikes(Scene, Direction, cb1, cb2, mover);
-                    }
-                    else if ((mover.Entity as Spikes).Direction == Spikes.Directions.Right)
-                    {
-                        HandleRightSideSpikes(Scene, Direction, cb1, cb2, mover);
-                    }
-                    else if ((mover.Entity as Spikes).Direction == Spikes.Directions.Up)
-                    {
-                        HandleTopSideSpikes(Scene, Direction, cb1, cb2, mover);
-                    }
-                    else if ((mover.Entity as Spikes).Direction == Spikes.Directions.Down)
-                    {
-                        HandleBottomSideSpikes(Scene, Direction, cb1, cb2, mover);
-                    }
-                }
-                else if (mover.Entity is Spring spring)
-                {
-                    if (spring.Orientation == Spring.Orientations.WallRight)
-                    {
-                        HandleLeftSideSpikes(Scene, Direction, cb1, cb2, mover);
-                    }
-                    else if (spring.Orientation == Spring.Orientations.WallLeft)
-                    {
-                        HandleRightSideSpikes(Scene, Direction, cb1, cb2, mover);
-                    }
-                    else if (spring.Orientation == Spring.Orientations.Floor)
-                    {
-                        HandleTopSideSpikes(Scene, Direction, cb1, cb2, mover);
-                    }
+                    if (comp.isDIY()) comp.DIY(scene, mover, direction, cb1, cb2);
                     else
                     {
-                        Scene.Remove(mover.Entity);
+                        switch (comp.GetOrientation(mover.Entity).ToLower())
+                        {
+                            case "left":
+                                HandleLeftSideMover(scene, direction, cb1, cb2, mover);
+                                break;
+                            case "right":
+                                HandleRightSideMover(scene, direction, cb1, cb2, mover);
+                                break;
+                            case "top":
+                            case "up":
+                                HandleTopSideMover(scene, direction, cb1, cb2, mover);
+                                break;
+                            case "bottom":
+                            case "down":
+                                HandleBottomSideMover(scene, direction, cb1, cb2, mover);
+                                break;
+                            default:
+                                break;
+                        }
                     }
+                } 
+                else
+                {
+                    scene.Remove(mover.Entity);
                 }
 
-            }
-            else
+            } else
             {
-                Scene.Remove(mover.Entity);
+                scene.Remove(mover.Entity);
             }
-
-
         }
 
         public static Vector2[] CalcCuts(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth, int cutsize = 8)
@@ -1031,20 +940,19 @@ namespace Celeste.Mod.LylyraHelper.Components
             public Func<Entity, DynamicData, Entity[]> firstFrameSlice;
             public Action<Entity, DynamicData> secondFrameSlice;
             public Action<Entity, DynamicData> onSliceStart;
-
         }
 
+        public class CustomAttachedSlicingActionHolder
+        {
+            public Func<Entity, string> getOrientation;
+            public Func<Scene, Entity, Vector2, int, Entity> getNewEntity;
+            public Action<Scene, StaticMover, Vector2, Solid, Solid> diy; //scene, mover in question, slicer direction, block1, block2
+
+        }
         //dictionary of functions on how to slice various types of entities. should return whether or not slicing is complete. The entity to be sliced and slicer in the form of DynamicData are provided.
         private static Dictionary<Type, CustomSlicingActionHolder> CustomSlicingActions = new Dictionary<Type, CustomSlicingActionHolder>();
-        //dictionary of functions describing how to spawn a new static mover entity of a given Type for a specific position and required length and orientation. The old entity's static mover will be provided for convenience.
-        private static Dictionary<Type, Func<Scene, Entity, Vector2, int, string, Entity>> CustomStaticHandlerNewEntityActions = new Dictionary<Type, Func<Scene, Entity, Vector2, int, string, Entity>>();
-        //dictionary of functions describing which way a type of orientable entity is facing. The entity to be sliced, the sub solids it is attached to are provided
-        //return value should be a string describing which way it is facing ("left", "right, "up", "down")
-        private static Dictionary<Type, Func<StaticMover, Solid, Solid, string>> StaticHandlerOrientationFunctions = new Dictionary<Type, Func<StaticMover, Solid, Solid, string>>();
-        //dictionary for static movable entities actions that don't fit the standard orientable criterion. 
-        //the original static mover entity, the cut direction, the child solids and current scene are given. No return value, just do the job for me in this case.
-        //have fun. this is basically the "other" catagory of static movers
-        private static Dictionary<Type, Action<Scene, StaticMover, Vector2, Solid, Solid>> CustomNonorientableStaticHandlerActions = new Dictionary<Type, Action<Scene, StaticMover, Vector2, Solid, Solid>>();
+
+        private static Dictionary<Type, CustomSlicingActionHolder> CustomAttachedSlicingActions = new Dictionary<Type, CustomSlicingActionHolder>();
         public static void UnregisterSlicerAction(Type type)
         {
             CustomSlicingActions.Remove(type);
@@ -1057,7 +965,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         public static void UnregisterSecondFrameSlicerAction(Type type)
         {
-            CustomStaticHandlerNewEntityActions.Remove(type);
+            //CustomStaticHandlerNewEntityActions.Remove(type);
         }
 
         public static void RegisterSecondFrameSlicerAction(Type type, Action<Entity, DynamicData> action)
@@ -1067,8 +975,8 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         public static void UnregisterSlicerSMEntityFunction(Type type)
         {
-            CustomStaticHandlerNewEntityActions.Remove(type);
-            StaticHandlerOrientationFunctions.Remove(type);
+            //CustomStaticHandlerNewEntityActions.Remove(type);
+            //StaticHandlerOrientationFunctions.Remove(type);
         }
 
         public static void RegisterSlicerSMEntityFunction(
@@ -1076,8 +984,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             Func<StaticMover, Solid, Solid, string> orientationFunction,
             Func<Scene, Entity, Vector2, int, string, Entity> newEntityFunction)
         {
-            StaticHandlerOrientationFunctions.Add(type, orientationFunction);
-            CustomStaticHandlerNewEntityActions.Add(type, newEntityFunction);
+            //StaticHandlerOrientationFunctions.Add(type, orientationFunction);
+            //CustomStaticHandlerNewEntityActions.Add(type, newEntityFunction);
         }
 
         public static void ModinteropHandleStaticMover(Scene scene, Vector2 Direction, Solid cb1, Solid cb2, StaticMover mover)
@@ -1102,8 +1010,13 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static void Entity_Awake(On.Monocle.Entity.orig_Awake orig, Entity entity, Scene self)
         {
+            //standard item handling
             //vanilla entity handling
-            if (entity is BounceBlock)
+            if (entity is Booster)
+            {
+                entity.Add(new BoosterSliceableComponent(true, true));
+            }
+            else if (entity is BounceBlock)
             {
                 entity.Add(new BounceBlockSliceableComponent(true, true));
             }
@@ -1137,6 +1050,25 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             //modded entity handling
             else if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
+            {
+                entity.Add(new ModItemSliceableComponent(action));
+            }
+
+            //attached entity handling. seperate from normal entity handling. Items can be both.
+            if (entity is Spikes)
+            {
+                entity.Add(new AttachedSpikesSliceable());
+            }
+            else if (entity is KnifeSpikes)
+            {
+                entity.Add(new AttachedKnifeSpikes());
+            }
+            else if (entity is Spring)
+            {
+                entity.Add(new AttachedSpringSliceable());
+            }
+            //modded entity handling
+            else if (CustomAttachedSlicingActions.TryGetValue(entity.GetType(), out var action))
             {
                 entity.Add(new ModItemSliceableComponent(action));
             }

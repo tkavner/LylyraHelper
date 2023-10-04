@@ -81,7 +81,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
             bool cb2Added;
             if (cb2Added = cb2Width >= 24 && cb2Height >= 24 && original.CollideRect(new Rectangle((int)cb2Pos.X, (int)cb2Pos.Y, cb2Width, cb2Height)))
             {
-                Vector2 offset = cb1Pos - original.Position;
+                Vector2 offset = cb2Pos - original.Position;
                 List<CrushBlock.MoveState> newReturnStack = new();
                 foreach (CrushBlock.MoveState state in returnStack)
                 {
