@@ -59,16 +59,17 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
             }
             FallingBlock fb1 = null;
             FallingBlock fb2 = null;
+            Scene.Remove(Entity);
             if (cb1Width >= 8 && cb1Height >= 8)
             {
-                fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, false, false, true);
+                fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, original.finalBoss, false, true);
                 Scene.Add(fb1);
                 fb1.Triggered = true;
                 fb1.FallDelay = 0;
             }
             if (cb2Width >= 8 && cb2Height >= 8)
             {
-                fb2 = new FallingBlock(cb2Pos, tileTypeChar, cb2Width, cb2Height, false, false, true);
+                fb2 = new FallingBlock(cb2Pos, tileTypeChar, cb2Width, cb2Height, original.finalBoss, false, true);
                 Scene.Add(fb2);
                 fb2.Triggered = true;
                 fb2.FallDelay = 0;
@@ -81,7 +82,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
                 original.Position,
                 new Vector2(original.Width, original.Height),
                 Calc.HexToColor("444444"));
-            Scene.Remove(original);
 
             return null;
         }

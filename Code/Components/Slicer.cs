@@ -226,6 +226,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 if (FinishedCutting(d, collisionOverride))
                 {
+                    masterRemovedList.Add(d.Entity);
                     return true;
                 }
                 return false; 
@@ -1128,7 +1129,6 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static void Entity_Awake(On.Monocle.Entity.orig_Awake orig, Entity entity, Scene self)
         {
-            orig(entity, self);
             //vanilla entity handling
             if (entity is BounceBlock)
             {
@@ -1167,6 +1167,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new ModItemSliceableComponent(action));
             }
+            orig(entity, self);
         }
 
 
