@@ -283,7 +283,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             if (collisionOverride || sliceOnImpact || !sliceableEntity.CollideCheck(Entity))
             {
-                return Entity.Get<SliceableComponent>()?.Slice(this) ?? true;
+                Entity[] children = Entity.Get<SliceableComponent>()?.Slice(this);
+                return true;
             }
 
 
@@ -292,77 +293,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             return false;
         }
 
-
-        private void SliceBounceBlock(BounceBlock original)
-        {
-            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, CutSize);
-
-            Vector2 b1Pos = resultArray[0];
-            Vector2 b2Pos = resultArray[1];
-            int b1Width = (int)resultArray[2].X;
-            int b1Height = (int)resultArray[2].Y;
-
-            int b2Width = (int)resultArray[3].X;
-            int b2Height = (int)resultArray[3].Y;
-
-            BounceBlock sjb1 = null;
-            BounceBlock sjb2 = null;
-
-            float respawnTimer = original.respawnTimer;
-            BounceBlock.States state = original.state;
-
-            masterRemovedList.Add(original);
-            Scene.Remove(original);
-            if (respawnTimer > 0 || state == BounceBlock.States.Broken)
-            {
-                return;
-            }
-            if (b1Width >= 16 && b1Height >= 16 && original.CollideRect(new Rectangle((int)b1Pos.X, (int)b1Pos.Y, b1Width, b1Height))) Scene.Add(sjb1 = new BounceBlock(b1Pos, b1Width, b1Height));
-            if (b2Width >= 16 && b2Height >= 16 && original.CollideRect(new Rectangle((int)b2Pos.X, (int)b2Pos.Y, b2Width, b2Height))) Scene.Add(sjb2 = new BounceBlock(b2Pos, b2Width, b2Height));
-
-            if (Session.CoreModes.Cold == SceneAs<Level>().CoreMode)
-            {
-                AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("53cee6"));
-            }
-            else
-            {
-                Vector2 range = new Vector2(original.Width, original.Height);
-                int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-                level.ParticlesFG.Emit(Cuttable.paperScraps, numParticles / 4, original.Position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), Calc.HexToColor("f3570e"));
-                level.ParticlesFG.Emit(Cuttable.paperScraps, 3 * numParticles / 4, original.Position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), Calc.HexToColor("16152b"));
-            }
-        }
-
-        private void SliceDashBlock(DashBlock dashBlock)
-        {
-            dashBlock.Break(Entity.Position, Direction, true);
-            masterRemovedList.Add(dashBlock);
-        }
-
-        private void SliceStarJumpBlock(StarJumpBlock original)
-        {
-            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, CutSize);
-
-            Vector2 b1Pos = resultArray[0];
-            Vector2 b2Pos = resultArray[1];
-            int b1Width = (int)resultArray[2].X;
-            int b1Height = (int)resultArray[2].Y;
-
-            int b2Width = (int)resultArray[3].X;
-            int b2Height = (int)resultArray[3].Y;
-
-            StarJumpBlock sjb1 = null;
-            StarJumpBlock sjb2 = null;
-
-            bool sinks = original.sinks;
-
-            masterRemovedList.Add(original);
-            Scene.Remove(original);
-
-            AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("FFFFFF"));
-            if (b1Width >= 8 && b1Height >= 8 && original.CollideRect(new Rectangle((int)b1Pos.X, (int)b1Pos.Y, b1Width, b1Height))) Scene.Add(sjb1 = new StarJumpBlock(b1Pos, b1Width, b1Height, sinks));
-            if (b2Width >= 8 && b2Height >= 8 && original.CollideRect(new Rectangle((int)b2Pos.X, (int)b2Pos.Y, b2Width, b2Height))) Scene.Add(sjb2 = new StarJumpBlock(b2Pos, b2Width, b2Height, sinks));
-        }
 
         private void SliceDreamBlock(DreamBlock original)
         {
@@ -403,120 +333,6 @@ namespace Celeste.Mod.LylyraHelper.Components
         public static Vector2 Vector2Int(Vector2 vector2)
         {
             return new Vector2((int)Math.Round(vector2.X), (int)Math.Round(vector2.Y));
-        }
-
-        private void SliceMoveBlock(MoveBlock original)
-        {
-
-            if (original.state == MoveBlock.MovementState.Breaking)
-            {
-                return;
-            }
-
-            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, CutSize);
-            Vector2 b1Pos = resultArray[0];
-            Vector2 b2Pos = resultArray[1];
-            int b1Width = (int)resultArray[2].X;
-            int b1Height = (int)resultArray[2].Y;
-
-            int b2Width = (int)resultArray[3].X;
-            int b2Height = (int)resultArray[3].Y;
-
-            MoveBlock mb1 = null;
-            MoveBlock mb2 = null;
-            List<StaticMover> staticMovers = original.staticMovers;
-            AddParticles(
-            original.Position,
-                new Vector2(original.Width, original.Height),
-                Calc.HexToColor("111111"));
-            Audio.Play("event:/game/general/wall_break_stone", original.Position);
-            MoveBlock.Directions direction = original.direction;
-            bool canSteer = original.canSteer;
-            bool fast = original.fast;
-            Vector2 startPosition = original.startPosition;
-
-            bool vertical = direction == MoveBlock.Directions.Up || direction == MoveBlock.Directions.Down;
-
-            masterRemovedList.Add(original);
-            Scene.Remove(original);
-
-            if (b1Width >= 16 && b1Height >= 16)
-            {
-                mb1 = new MoveBlock(b1Pos, b1Width, b1Height, direction, canSteer, fast);
-                Scene.Add(mb1);
-                intermediateFrameActivation.Add(mb1);
-                mb1.startPosition = vertical ? new Vector2(b1Pos.X, startPosition.Y) : new Vector2(startPosition.X, b1Pos.Y);
-            }
-            if (b2Width >= 16 && b2Height >= 16)
-            {
-                mb2 = new MoveBlock(b2Pos, b2Width, b2Height, direction, canSteer, fast);
-                Scene.Add(mb2);
-                intermediateFrameActivation.Add(mb2);
-                mb2.startPosition = vertical ? new Vector2(b2Pos.X, startPosition.Y) : new Vector2(startPosition.X, b2Pos.Y);
-            }
-
-            foreach (StaticMover mover in staticMovers)
-            {
-                HandleStaticMover(Scene, Direction, mb1, mb2, mover);
-            }
-        }
-
-        private void SliceFallingBlock(FallingBlock original)
-        {
-            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, CutSize);
-            Vector2 cb1Pos = resultArray[0];
-            Vector2 cb2Pos = resultArray[1];
-            int cb1Width = (int)resultArray[2].X;
-            int cb1Height = (int)resultArray[2].Y;
-
-            int cb2Width = (int)resultArray[3].X;
-            int cb2Height = (int)resultArray[3].Y;
-
-            List<StaticMover> staticMovers = original.staticMovers;
-            char tileTypeChar = original.TileType;
-
-            if (tileTypeChar == '1')
-            {
-                Audio.Play("event:/game/general/wall_break_dirt", Entity.Position);
-            }
-            else if (tileTypeChar == '3')
-            {
-                Audio.Play("event:/game/general/wall_break_ice", Entity.Position);
-            }
-            else if (tileTypeChar == '9')
-            {
-                Audio.Play("event:/game/general/wall_break_wood", Entity.Position);
-            }
-            else
-            {
-                Audio.Play("event:/game/general/wall_break_stone", Entity.Position);
-            }
-            FallingBlock fb1 = null;
-            FallingBlock fb2 = null;
-            if (cb1Width >= 8 && cb1Height >= 8)
-            {
-                fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, false, false, true);
-                Scene.Add(fb1);
-                fb1.Triggered = true;
-                fb1.FallDelay = 0;
-            }
-            if (cb2Width >= 8 && cb2Height >= 8)
-            {
-                fb2 = new FallingBlock(cb2Pos, tileTypeChar, cb2Width, cb2Height, false, false, true);
-                Scene.Add(fb2);
-                fb2.Triggered = true;
-                fb2.FallDelay = 0;
-            }
-            foreach (StaticMover mover in staticMovers)
-            {
-                HandleStaticMover(Scene, Direction, fb1, fb2, mover);
-            }
-            AddParticles(
-                original.Position,
-                new Vector2(original.Width, original.Height),
-                Calc.HexToColor("444444"));
-            masterRemovedList.Add(original);
-            Scene.Remove(original);
         }
 
         private static void HandleBottomSideSpikes(

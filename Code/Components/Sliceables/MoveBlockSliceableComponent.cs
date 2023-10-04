@@ -24,7 +24,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
                 return null;
             }
 
-            Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, CutSize);
+            Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, slicer.Direction, slicer.CutSize);
             Vector2 b1Pos = resultArray[0];
             Vector2 b2Pos = resultArray[1];
             int b1Width = (int)resultArray[2].X;
@@ -49,7 +49,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
             bool vertical = direction == MoveBlock.Directions.Up || direction == MoveBlock.Directions.Down;
 
             Scene.Remove(original);
-
+            
             if (b1Width >= 16 && b1Height >= 16)
             {
                 mb1 = new MoveBlock(b1Pos, b1Width, b1Height, direction, canSteer, fast);
