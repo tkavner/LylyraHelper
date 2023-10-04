@@ -39,6 +39,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors.Load();
             PaperHitbox.Load();
             AddSlicerTrigger.Load();
+            Slicer.Load();
             typeof(ModExports).ModInterop();
 
             Everest.Events.Level.OnLoadBackdrop += OnLoadBackdrop;
@@ -49,6 +50,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Scissors.Unload();
             PaperHitbox.Unload();
             AddSlicerTrigger.Unload();
+            Slicer.Unload();
             Everest.Events.Level.OnLoadBackdrop -= OnLoadBackdrop;
         }
 

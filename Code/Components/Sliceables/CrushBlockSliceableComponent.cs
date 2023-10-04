@@ -40,14 +40,13 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
 
             moveLoopSound?.Stop();
 
-
             SoundSource grumbleSound = original.returnLoopSfx;
 
             grumbleSound?.Stop();
 
             //Process private fields
             CrushBlock.Axes axii = canMoveVertically && canMoveHorizontally ? CrushBlock.Axes.Both : canMoveVertically ? CrushBlock.Axes.Vertical : CrushBlock.Axes.Horizontal;
-            Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, slicer.Direction, slicer.CutSize);
+            Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), slicer.Entity.Center, slicer.Direction, slicer.CutSize);
             Vector2 cb1Pos = Slicer.Vector2Int(resultArray[0]);
             Vector2 cb2Pos = Slicer.Vector2Int(resultArray[1]);
             int cb1Width = (int)resultArray[2].X;

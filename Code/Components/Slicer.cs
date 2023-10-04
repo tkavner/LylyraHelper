@@ -1,6 +1,8 @@
 ﻿using Celeste.Mod.Entities;
 using Celeste.Mod.Helpers;
+using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Components;
+using Celeste.Mod.LylyraHelper.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Entities;
 using Celeste.Mod.LylyraHelper.Intefaces;
 using Celeste.Mod.LylyraHelper.Other;
@@ -200,7 +202,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 }
             }
         }
-
+        
         public void AddListener(Action p)
         {
             entityCallback = p;
@@ -213,50 +215,12 @@ namespace Celeste.Mod.LylyraHelper.Components
         //There's definitely cleanup to be done in here, but in general because we want two (almost) identical copies of objects, with lots of weird exceptions
         public void Slice(bool collisionOverride = false)
         {
-            Vector2 Position = Entity.Center;
-            float Width = Entity.Width;
-            float Height = Entity.Width;
-
             secondFrameActivation.RemoveAll(secondFrameEntity =>
             {
-                if (CustomSecondFrameActions.TryGetValue(secondFrameEntity.GetType(), out Action<Entity, DynamicData> customAction))
-                {
-                    customAction.Invoke(secondFrameEntity, new DynamicData(this));
-                    return true;
-                }
-                else if (secondFrameEntity is CrushBlock crushBlock)
-                {
-                    crushBlock.Awake(Scene);
-                    crushBlock.crushDir = -Direction;
-                    crushBlock.level = level;
-                    crushBlock.Attack(-Direction);
 
-                }
-                else if (secondFrameEntity is MoveBlock moveBlock)
-                {
-                    moveBlock.triggered = true;
-                    moveBlock.border.Visible = false;
-                }
+                secondFrameEntity.Get<SliceableComponent>().Activate(this);
                 return true;
             });
-
-            intermediateFrameActivation.RemoveAll(d =>
-            {
-                secondFrameActivation.Add(d);
-                return true;
-            });
-
-            entitiesCut += slicingEntities.RemoveAll(d => { return FinishedCutting(d, collisionOverride); }
-            );
-
-
-            //new code
-
-            //cut second frame entities
-
-            //cut first frame entities
-
-            //add first frame entities to 
 
             entitiesCut += slicingEntities.RemoveAll(d => 
             {
@@ -283,7 +247,17 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             if (collisionOverride || sliceOnImpact || !sliceableEntity.CollideCheck(Entity))
             {
-                Entity[] children = Entity.Get<SliceableComponent>()?.Slice(this);
+                Entity[] children = sliceableComp.Slice(this);
+                if (children != null)
+                {
+                    foreach (Entity child in children)
+                    {
+                        if (child != null)
+                        {
+                            secondFrameActivation.Add(child);
+                        }
+                    }
+                }
                 return true;
             }
 
@@ -291,35 +265,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             //else this item should not be in the list because cutting it is not supported. Warn and have it removed.
 
             return false;
-        }
-
-
-        private void SliceDreamBlock(DreamBlock original)
-        {
-            Vector2[] resultArray = CalcCuts(original.Position, new Vector2(original.Width, original.Height), Entity.Center, Direction, CutSize);
-
-            Vector2 db1Pos = resultArray[0];
-            Vector2 db2Pos = resultArray[1];
-            int db1Width = (int)resultArray[2].X;
-            int db1Height = (int)resultArray[2].Y;
-
-            int db2Width = (int)resultArray[3].X;
-            int db2Height = (int)resultArray[3].Y;
-
-            DreamBlock d1 = null;
-            DreamBlock d2 = null;
-
-            if (db1Width >= 8 && db1Height >= 8 && original.CollideRect(new Rectangle((int)db1Pos.X, (int)db1Pos.Y, db1Width, db1Height))) Scene.Add(d1 = new DreamBlock(db1Pos, db1Width, db1Height, null, false, false));
-            if (db2Width >= 8 && db2Height >= 8 && original.CollideRect(new Rectangle((int)db2Pos.X, (int)db2Pos.Y, db2Width, db2Height))) Scene.Add(d2 = new DreamBlock(db2Pos, db2Width, db2Height, null, false, false));
-
-            List<StaticMover> staticMovers = original.staticMovers;
-            foreach (StaticMover mover in staticMovers)
-            {
-                HandleStaticMover(Scene, Direction, d1, d2, mover);
-            }
-            masterRemovedList.Add(original);
-            Scene.Remove(original);
-            AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("000000"));
         }
 
 
@@ -334,13 +279,28 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             return new Vector2((int)Math.Round(vector2.X), (int)Math.Round(vector2.Y));
         }
+        public override void DebugRender(Camera camera)
+        {
+
+            if (slicingCollider != null)
+            {
+                Vector2 positionHold = Entity.Position;
+                Entity.Position = Entity.Position + ColliderOffset;
+                Collider tempHold = Entity.Collider;
+                Entity.Collider = slicingCollider;
+                Draw.HollowRect(Entity.Collider, Color.Yellow);
+
+                Entity.Position = positionHold;
+                Entity.Collider = tempHold;
+            }
+        }
 
         private static void HandleBottomSideSpikes(
-    Scene Scene,
-    Vector2 Direction,
-    Solid cb1,
-    Solid cb2,
-    StaticMover mover)
+            Scene Scene,
+            Vector2 Direction,
+            Solid cb1,
+            Solid cb2,
+            StaticMover mover)
         {
             Entity spikes = mover.Entity;
             bool cb1Added = cb1 != null;
@@ -1092,10 +1052,16 @@ namespace Celeste.Mod.LylyraHelper.Components
             return (x % m + m) % m;
         }
 
+        public class CustomSlicingActionHolder
+        {  
+            public Func<Entity, DynamicData, Entity[]> firstFrameSlice;
+            public Action<Entity, DynamicData> secondFrameSlice;
+            public Action<Entity, DynamicData> onSliceStart;
+        }
+
+        private static List<Type> CustomAttachedSlicingTypes = new List<Type>();
         //dictionary of functions on how to slice various types of entities. should return whether or not slicing is complete. The entity to be sliced and slicer in the form of DynamicData are provided.
-        private static Dictionary<Type, Func<Entity, DynamicData, bool>> CustomSlicingActions = new Dictionary<Type, Func<Entity, DynamicData, bool>>();
-        //dictionary of actions on how to activate various entities on their second frame (if needed)
-        private static Dictionary<Type, Action<Entity, DynamicData>> CustomSecondFrameActions = new Dictionary<Type, Action<Entity, DynamicData>>();
+        private static Dictionary<Type, CustomSlicingActionHolder> CustomSlicingActions = new Dictionary<Type, CustomSlicingActionHolder>();
         //dictionary of functions describing how to spawn a new static mover entity of a given Type for a specific position and required length and orientation. The old entity's static mover will be provided for convenience.
         private static Dictionary<Type, Func<Scene, Entity, Vector2, int, string, Entity>> CustomStaticHandlerNewEntityActions = new Dictionary<Type, Func<Scene, Entity, Vector2, int, string, Entity>>();
         //dictionary of functions describing which way a type of orientable entity is facing. The entity to be sliced, the sub solids it is attached to are provided
@@ -1112,7 +1078,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         public static void RegisterSlicerAction(Type type, Func<Entity, DynamicData, bool> action)
         {
-            CustomSlicingActions.Add(type, action);
+            //CustomSlicingActions.Add(type, action);
         }
 
         public static void UnregisterSecondFrameSlicerAction(Type type)
@@ -1122,7 +1088,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         public static void RegisterSecondFrameSlicerAction(Type type, Action<Entity, DynamicData> action)
         {
-            CustomSecondFrameActions.Add(type, action);
+            //CustomSecondFrameActions.Add(type, action);
         }
 
         public static void UnregisterSlicerSMEntityFunction(Type type)
@@ -1149,20 +1115,60 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             foreach (StaticMover mover in staticMovers) ModinteropHandleStaticMover(scene, Direction, cb1, cb2, mover);
         }
-        public override void DebugRender(Camera camera)
+
+        public static void Load()
         {
+            On.Monocle.Entity.Awake += Entity_Awake;
+        }
 
-            if (slicingCollider != null)
+        public static void Unload()
+        {
+            On.Monocle.Entity.Awake -= Entity_Awake;
+        }
+
+        private static void Entity_Awake(On.Monocle.Entity.orig_Awake orig, Entity entity, Scene self)
+        {
+            orig(entity, self);
+            //vanilla entity handling
+            if (entity is BounceBlock)
             {
-                Vector2 positionHold = Entity.Position;
-                Entity.Position = Entity.Position + ColliderOffset;
-                Collider tempHold = Entity.Collider;
-                Entity.Collider = slicingCollider;
-                Draw.HollowRect(Entity.Collider, Color.Yellow);
-
-                Entity.Position = positionHold;
-                Entity.Collider = tempHold;
+                entity.Add(new BounceBlockSliceableComponent(true, true));
+            }
+            else if (entity is StarJumpBlock)
+            {
+                entity.Add(new StarJumpBlockSliceableComponent(true, true));
+            }
+            else if (entity is DashBlock)
+            {
+                entity.Add(new DashBlockSliceableComponent(true, true));
+            }
+            else if (entity is MoveBlock)
+            {
+                entity.Add(new MoveBlockSliceableComponent(true, true));
+            }
+            else if (entity is FloatySpaceBlock)
+            {
+                entity.Add(new FloatySpaceBlockSliceableComponent(true, true));
+            }
+            else if (entity is FallingBlock)
+            {
+                entity.Add(new FallingBlockSliceableComponent(true, true));
+            }
+            else if (entity is CrushBlock)
+            {
+                entity.Add(new CrushBlockSliceableComponent(true, true));
+            }
+            else if (entity is CrystalStaticSpinner)
+            {
+                entity.Add(new CrystalStaticSpinnerSliceableComponent(true, true));
+            }
+            //modded entity handling
+            else if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
+            {
+                entity.Add(new ModItemSliceableComponent(action));
             }
         }
+
+
     }
 }
