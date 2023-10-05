@@ -17,7 +17,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
         public override void Activate(Slicer slicer)
         {
-            //Entity.Awake(slicer.Scene);
+
         }
 
         public override void OnSliceStart(Slicer slicer)
