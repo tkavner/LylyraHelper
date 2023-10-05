@@ -1,5 +1,6 @@
 ﻿using Celeste;
 using Celeste.Mod;
+using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Effects;
 using Celeste.Mod.LylyraHelper.Triggers;
@@ -40,6 +41,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             PaperHitbox.Load();
             AddSlicerTrigger.Load();
             Slicer.Load();
+            AttachedTriggerSpikesSliceable.Load();
             typeof(ModExports).ModInterop();
 
             Everest.Events.Level.OnLoadBackdrop += OnLoadBackdrop;
@@ -51,6 +53,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             PaperHitbox.Unload();
             AddSlicerTrigger.Unload();
             Slicer.Unload();
+            AttachedTriggerSpikesSliceable.Unload();
             Everest.Events.Level.OnLoadBackdrop -= OnLoadBackdrop;
         }
 

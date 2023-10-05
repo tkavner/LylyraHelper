@@ -1047,6 +1047,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new BounceBlockSliceableComponent(true, true));
             }
+            else if (entity is CassetteBlock)
+            {
+                entity.Add(new CassetteBlockSliceableComponent(true, true));
+            }
             else if (entity is CrushBlock)
             {
                 entity.Add(new CrushBlockSliceableComponent(true, true));
@@ -1094,6 +1098,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             else if (entity is Spikes)
             {
                 entity.Add(new AttachedSpikesSliceable());
+            }
+            else if (entity is TriggerSpikes)
+            {
+                entity.Add(new AttachedTriggerSpikesSliceable());
             }
             else if (entity is Spring)
             {
