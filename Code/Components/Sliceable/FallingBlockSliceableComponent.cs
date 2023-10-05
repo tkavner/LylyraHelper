@@ -59,7 +59,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
             }
             FallingBlock fb1 = null;
             FallingBlock fb2 = null;
-            Scene.Remove(Entity);
+            Scene.Remove(original);
             if (cb1Width >= 8 && cb1Height >= 8)
             {
                 fb1 = new FallingBlock(cb1Pos, tileTypeChar, cb1Width, cb1Height, original.finalBoss, false, true);

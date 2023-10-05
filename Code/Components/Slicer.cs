@@ -1035,7 +1035,11 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             //standard item handling
             //vanilla entity handling
-            if (entity is Booster)
+            if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
+            {
+                entity.Add(new ModItemSliceableComponent(action));
+            }
+            else if (entity is Booster)
             {
                 entity.Add(new BoosterSliceableComponent(true, true));
             }
@@ -1080,13 +1084,14 @@ namespace Celeste.Mod.LylyraHelper.Components
                 entity.Add(new PaperSliceableComponent(true, true));
             }
             //modded entity handling
-            else if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
-            {
-                entity.Add(new ModItemSliceableComponent(action));
-            }
+            else { }
 
             //attached entity handling. seperate from normal entity handling. Items can be both.
-            if (entity is Spikes)
+            if (CustomAttachedSlicingActions.TryGetValue(entity.GetType(), out var attachedAction))
+            {
+                entity.Add(new ModItemSliceableComponent(attachedAction));
+            }
+            else if (entity is Spikes)
             {
                 entity.Add(new AttachedSpikesSliceable());
             }
@@ -1099,10 +1104,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 entity.Add(new AttachedKnifeSpikesSliceable());
             }
             //modded entity handling
-            else if (CustomAttachedSlicingActions.TryGetValue(entity.GetType(), out var action))
-            {
-                entity.Add(new ModItemSliceableComponent(action));
-            }
+            else { }
             orig(entity, self);
         }
 

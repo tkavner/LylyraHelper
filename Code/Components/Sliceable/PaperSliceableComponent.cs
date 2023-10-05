@@ -54,7 +54,22 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         public override void OnSliceStart(Slicer slicer)
         {
             slicerStarts.Remove(slicer);
-            slicerStarts.Add(slicer, slicer.Entity.Position);
+            if (slicer.Direction.X > 0)
+            {
+                slicerStarts.Add(slicer, slicer.Entity.CenterLeft);
+            }
+            else if (slicer.Direction.X < 0)
+            {
+                slicerStarts.Add(slicer, slicer.Entity.CenterRight);
+            }
+            else if (slicer.Direction.Y > 0)
+            {
+                slicerStarts.Add(slicer, slicer.Entity.TopCenter);
+            }
+            else
+            {
+                slicerStarts.Add(slicer, slicer.Entity.BottomCenter);
+            }
         }
 
         public override Entity[] Slice(Slicer slicer)
@@ -69,7 +84,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
             Vector2[] arrayResults = Slicer.CalcCuts(Position, new Vector2(Width, Height), cutPosition, slicer.Direction, slicer.CutSize); //cuts gives where the new block should exist, we want where it should not
             Vector2 p1, p2; //these points represent the cut area
-            if (slicer.Direction.X != 0) //horizontal cut, vertical gap
+            if (slicer.Direction.X != 0) //horizontal cut, vertical gaps
             {
                 p1 = arrayResults[0] + new Vector2(0, (arrayResults[2].Y > 0 ? arrayResults[2].Y : 0));
                 p2 = arrayResults[1] + new Vector2((arrayResults[3].X < Width ? arrayResults[3].X : Width), 0);
@@ -82,23 +97,31 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
             if (slicer.Direction.X > 0)
             {
-                if (cutStartPosition.X > p1.X) p1.X = (int)cutStartPosition.X;
-                if (cutPosition.X < p2.X) p2.X = (int)cutPosition.X;
+                if (cutStartPosition.X > p1.X) p1.X = cutStartPosition.X;
+                if (cutPosition.X < p2.X) p2.X = cutPosition.X;
+                p1 -= new Vector2(8, 0F);
+                p2 += new Vector2(8, 0F);
             }
             else if (slicer.Direction.X < 0)
             {
-                if (cutPosition.X > p1.X) p1.X = (int)cutPosition.X;
-                if (cutStartPosition.X < p2.X) p2.X = (int)cutStartPosition.X;
+                if (cutPosition.X > p1.X) p1.X = cutPosition.X;
+                if (cutStartPosition.X < p2.X) p2.X = cutStartPosition.X;
+                p1 -= new Vector2(8, 0F);
+                p2 += new Vector2(8, 0F);
             }
             else if (slicer.Direction.Y > 0)
             {
-                if (cutStartPosition.Y > p1.Y) p1.Y = (int)cutStartPosition.Y;
-                if (cutPosition.Y < p2.Y) p2.Y = (int)cutPosition.Y;
+                if (cutStartPosition.Y > p1.Y) p1.Y = cutStartPosition.Y;
+                if (cutPosition.Y < p2.Y) p2.Y = cutPosition.Y;
+                p1 -= new Vector2(0, 8F);
+                p2 += new Vector2(0, 8F);
             }
             else if (slicer.Direction.Y < 0)
             {
-                if (cutPosition.Y > p1.Y) p1.Y = (int)cutPosition.Y;
-                if (cutStartPosition.Y < p2.Y) p2.Y = (int)cutStartPosition.Y;
+                if (cutPosition.Y > p1.Y) p1.Y = cutPosition.Y;
+                if (cutStartPosition.Y < p2.Y) p2.Y = cutStartPosition.Y;
+                p1 -= new Vector2(0, 8F);
+                p2 += new Vector2(0, 8F);
             }
 
 
@@ -112,9 +135,9 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             int furthestLeft = Int32.MaxValue;
             int furthestRight = -1;
 
-            for (int i = (int)p1.X; i < p2.X; i++)
+            for (int i = (int)p1.X; i <= p2.X; i++)
             {
-                for (int j = (int)p1.Y; j < p2.Y; j++)
+                for (int j = (int)p1.Y; j <= p2.Y; j++)
                 {
                     if (i >= 0 && j >= 0 && i < (int)Width / 8 && j < (int)Height / 8)
                     {
@@ -138,7 +161,8 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             int counter1 = 0;
             int counter2 = 0;
             //fix top and bottom holes
-            if (slicer.Direction.X != 0) for (int i = (int)p1.X - 1; i < p2.X + 1; i++)
+            if (slicer.Direction.X != 0) 
+            for (int i = (int)p1.X - 1; i <= p2.X + 1; i++)
                 {
                     for (int j = 0; j <= 1; j++)
                     {
@@ -197,7 +221,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             else
             {
                 //left and right
-                for (int i = (int)p1.Y - 1; i < p2.Y + 1; i++)
+                for (int i = (int)p1.Y - 2; i <= p2.Y + 2; i++)
                 {
                     for (int j = 0; j <= 1; j++)
                     {
