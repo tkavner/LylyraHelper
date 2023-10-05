@@ -94,27 +94,27 @@ namespace Celeste.Mod.LylyraHelper.Entities
             if (direction.X > 0)
             {
                 directionPath = "right";
-                this.directionalCollider = new Hitbox(1, 6f, 10f, -3f);
+                this.directionalCollider = new Hitbox(1, 10f, 9f, -5f);
                 this.directionalColliderHalf1 = new Hitbox(1, 3f, 10f, -3f);
                 this.directionalColliderHalf2 = new Hitbox(1, 3f, 10f, 0f);
             }
             else if (direction.X < 0)
             {
                 directionPath = "left";
-                this.directionalCollider = new Hitbox(1, 6f, -10f, -3f);
+                this.directionalCollider = new Hitbox(1, 10f, -9f, -5f);
                 this.directionalColliderHalf1 = new Hitbox(1, 3f, -10f, -3f);
                 this.directionalColliderHalf2 = new Hitbox(1, 3f, -10f, 0f);
             }
             else if (direction.Y > 0)
             {
                 directionPath = "down";
-                this.directionalCollider = new Hitbox(6f, 1f, -3f, 10f);
+                this.directionalCollider = new Hitbox(10f, 1f, -5f, 9f);
                 this.directionalColliderHalf1 = new Hitbox(5, 1f, -3f, 10f);
                 this.directionalColliderHalf2 = new Hitbox(5, 1f, 0f, 10F);
             }
             else
             {
-                this.directionalCollider = new Hitbox(6f, 1f, -3f, -10f);
+                this.directionalCollider = new Hitbox(10f, 1f, -5f, -9f);
                 this.directionalColliderHalf1 = new Hitbox(5, 1f, -3f, -10f);
                 this.directionalColliderHalf2 = new Hitbox(5, 1f, 0f, -10f);
                 directionPath = "up";
@@ -388,21 +388,21 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 if (CutDirection.X > 0)
                 {
                     directionPath = "right";
-                    this.directionalCollider = new Hitbox(1, 6f, 10f, -5f);
+                    this.directionalCollider = new Hitbox(1, 10f, 9f, -5f);
                 }
                 else if (CutDirection.X < 0)
                 {
                     directionPath = "left";
-                    this.directionalCollider = new Hitbox(1, 6f, -10f, -5f);
+                    this.directionalCollider = new Hitbox(1, 10f, -9f, -5f);
                 }
                 else if (CutDirection.Y > 0)
                 {
                     directionPath = "down";
-                    this.directionalCollider = new Hitbox(10, 1f, -5f, 10f);
+                    this.directionalCollider = new Hitbox(10f, 1f, -5f, 9f);
                 }
                 else
                 {
-                    this.directionalCollider = new Hitbox(10, 1f, -6f, -10f);
+                    this.directionalCollider = new Hitbox(10f, 1f, -6f, -9f);
                     directionPath = "up";
                 }
                 slicer.Flip(CutDirection, directionalCollider);

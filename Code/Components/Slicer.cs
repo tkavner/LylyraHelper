@@ -1,5 +1,6 @@
 ﻿using Celeste.Mod.Entities;
 using Celeste.Mod.Helpers;
+using Celeste.Mod.LylyraHelper.Code.Components.Sliceable;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Components;
@@ -234,6 +235,28 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             );
         }
+
+        //directional position is used with instant slicing because normally slicers depend on movement to slice
+        public Vector2 GetDirectionalPosition()
+        {
+            if (Direction.X > 0)
+            {
+                return Entity.CenterLeft + new Vector2(directionalOffset, 0);
+            }
+            else if (Direction.X < 0)
+            {
+                return Entity.CenterRight + new Vector2(-directionalOffset, 0);
+            }
+            else if (Direction.Y > 0)
+            {
+                return Entity.TopCenter + new Vector2(0, directionalOffset);
+            }
+            else
+            {
+                return Entity.BottomCenter + new Vector2(0, -directionalOffset);
+            }
+        }
+
         //TODO: rename this method, its poorly named
         //this method activates the actual slicing of an entity into two pieces.
         private bool FinishedCutting(SliceableComponent sliceableComp, bool collisionOverride)
@@ -1020,13 +1043,25 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new BounceBlockSliceableComponent(true, true));
             }
-            else if (entity is StarJumpBlock)
+            else if (entity is CrushBlock)
             {
-                entity.Add(new StarJumpBlockSliceableComponent(true, true));
+                entity.Add(new CrushBlockSliceableComponent(true, true));
+            }
+            else if (entity is CrystalStaticSpinner)
+            {
+                entity.Add(new CrystalStaticSpinnerSliceableComponent(true, true));
             }
             else if (entity is DashBlock)
             {
                 entity.Add(new DashBlockSliceableComponent(true, true));
+            }
+            else if (entity is DreamBlock)
+            {
+                entity.Add(new DreamBlockSliceableComponent(true, true));
+            }
+            else if (entity is StarJumpBlock)
+            {
+                entity.Add(new StarJumpBlockSliceableComponent(true, true));
             }
             else if (entity is MoveBlock)
             {
@@ -1040,13 +1075,9 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new FallingBlockSliceableComponent(true, true));
             }
-            else if (entity is CrushBlock)
+            else if (entity is Paper)
             {
-                entity.Add(new CrushBlockSliceableComponent(true, true));
-            }
-            else if (entity is CrystalStaticSpinner)
-            {
-                entity.Add(new CrystalStaticSpinnerSliceableComponent(true, true));
+                entity.Add(new PaperSliceableComponent(true, true));
             }
             //modded entity handling
             else if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
