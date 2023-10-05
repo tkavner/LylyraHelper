@@ -23,14 +23,22 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
         public ModItemSliceableComponent(Slicer.CustomSlicingActionHolder action) : this(true, true)
         {
             this.firstFrameSlicing = action.firstFrameSlice;
-            this.secondFrameSlicing= action.secondFrameSlice;
+            this.secondFrameSlicing = action.secondFrameSlice;
             this.onSliceStart = action.onSliceStart;
         }
 
-        public override Entity[] Slice(Slicer slicer) => firstFrameSlicing(Entity, new DynamicData(slicer));
+        public override Entity[] Slice(Slicer slicer) {
+            return firstFrameSlicing?.Invoke(Entity, new DynamicData(slicer));
+        }
 
-        public override void Activate(Slicer slicer) => secondFrameSlicing(Entity, new DynamicData(slicer));
+        public override void Activate(Slicer slicer)
+        {
+            secondFrameSlicing?.Invoke(Entity, new DynamicData(slicer));
+        }
 
-        public override void OnSliceStart(Slicer slicer) => onSliceStart(Entity, new DynamicData(slicer));
+        public override void OnSliceStart(Slicer slicer)
+        {
+            onSliceStart?.Invoke(Entity, new DynamicData(slicer));
+        }
     }
 }

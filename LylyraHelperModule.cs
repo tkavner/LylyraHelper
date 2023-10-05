@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
+using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Effects;
 using Celeste.Mod.LylyraHelper.Triggers;
@@ -45,6 +46,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
             typeof(ModExports).ModInterop();
 
             Everest.Events.Level.OnLoadBackdrop += OnLoadBackdrop;
+
+
+            //MOD INTEROP TESTING
+            /*
+            Slicer.CustomSlicingActionHolder holder = new Slicer.CustomSlicingActionHolder();//test to see if Delegate can be cast to Func and back
+            Dictionary<string, Delegate> map = new Dictionary<string, Delegate>
+            {
+                { "slice", DreamBlockSliceableComponent.Slice },
+                { "activate", DreamBlockSliceableComponent.Activate },
+                { "onSliceStart", DreamBlockSliceableComponent.OnSliceStart }
+            };
+            
+            Slicer.RegisterSlicerAction(typeof(DreamBlock), map);
+            */
         }
 
         public override void Unload()
@@ -82,18 +97,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private static class ModExports
         {
 
-            public static void RegisterActivationSlicerAction(Type type, Action<Entity, DynamicData> action)
+            public static void RegisterSlicerActionSet(Type type, Dictionary<string, Delegate> actions)
             {
-                Slicer.RegisterSecondFrameSlicerAction(type, action);
-            }
-
-            public static void UnregisterSecondSlicerAction(Type type)
-            {
-                Slicer.UnregisterSecondFrameSlicerAction(type);
-            }
-            public static void RegisterSlicerAction(Type type, Func<Entity, DynamicData, bool> action)
-            {
-                Slicer.RegisterSlicerAction(type, action);
+                Slicer.RegisterSlicerAction(type, actions);
             }
 
             public static void UnregisterSlicerAction(Type type)

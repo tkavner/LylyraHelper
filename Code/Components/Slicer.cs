@@ -981,19 +981,27 @@ namespace Celeste.Mod.LylyraHelper.Components
             CustomSlicingActions.Remove(type);
         }
 
-        public static void RegisterSlicerAction(Type type, Func<Entity, DynamicData, bool> action)
+        public static void RegisterSlicerAction(Type type, Dictionary<string, Delegate> actions)
         {
-            //CustomSlicingActions.Add(type, action);
-        }
-
-        public static void UnregisterSecondFrameSlicerAction(Type type)
-        {
-            //CustomStaticHandlerNewEntityActions.Remove(type);
-        }
-
-        public static void RegisterSecondFrameSlicerAction(Type type, Action<Entity, DynamicData> action)
-        {
-            //CustomSecondFrameActions.Add(type, action);
+            bool contains = CustomSlicingActions.TryGetValue(type, out CustomSlicingActionHolder holder);
+            if (holder == null) holder = new();
+            foreach (string key in actions.Keys)
+            {
+                var action = actions[key];
+                if (key == "slice")
+                {
+                    holder.firstFrameSlice = (Func<Entity, DynamicData, Entity[]>)action;
+                }
+                else if (key == "activate")
+                {
+                    holder.secondFrameSlice = (Action<Entity, DynamicData>)action;
+                }
+                else if (key == "onSliceStart")
+                {
+                    holder.onSliceStart = (Action<Entity, DynamicData>)action;
+                }
+            }
+            if (!contains) CustomSlicingActions.Add(type, holder);
         }
 
         public static void UnregisterSlicerSMEntityFunction(Type type)
@@ -1034,11 +1042,11 @@ namespace Celeste.Mod.LylyraHelper.Components
         private static void Entity_Awake(On.Monocle.Entity.orig_Awake orig, Entity entity, Scene self)
         {
             //standard item handling
-            //vanilla entity handling
             if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
             {
                 entity.Add(new ModItemSliceableComponent(action));
             }
+            //vanilla entity handling
             else if (entity is Booster)
             {
                 entity.Add(new BoosterSliceableComponent(true, true));
@@ -1062,10 +1070,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             else if (entity is DashBlock)
             {
                 entity.Add(new DashBlockSliceableComponent(true, true));
-            }
-            else if (entity is DreamBlock)
-            {
-                entity.Add(new DreamBlockSliceableComponent(true, true));
             }
             else if (entity is StarJumpBlock)
             {
