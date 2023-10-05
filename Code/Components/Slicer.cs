@@ -1087,7 +1087,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new PaperSliceableComponent(true, true));
             }
-            //modded entity handling
             else { }
 
             //attached entity handling. seperate from normal entity handling. Items can be both.
@@ -1111,7 +1110,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new AttachedKnifeSpikesSliceable());
             }
-            //modded entity handling
             else { }
             orig(entity, self);
         }
