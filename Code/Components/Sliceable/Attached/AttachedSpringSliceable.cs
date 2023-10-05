@@ -13,7 +13,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached
     {
         public AttachedSpringSliceable() { }
 
-        public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength)
+        public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength, string orientation)
         {
             Spring spring = original as Spring;
             if (desiredLength < 16) return null;

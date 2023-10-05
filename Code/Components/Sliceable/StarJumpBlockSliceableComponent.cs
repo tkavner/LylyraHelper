@@ -45,6 +45,11 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
 
             Scene.Remove(original);
 
+            foreach (StaticMover mover in original.staticMovers)
+            {
+                Slicer.HandleStaticMover(Scene, slicer.Direction, sjb1, sjb2, mover);
+            }
+
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("FFFFFF"));
             if (b1Width >= 8 && b1Height >= 8 && original.CollideRect(new Rectangle((int)b1Pos.X, (int)b1Pos.Y, b1Width, b1Height))) Scene.Add(sjb1 = new StarJumpBlock(b1Pos, b1Width, b1Height, sinks));
             if (b2Width >= 8 && b2Height >= 8 && original.CollideRect(new Rectangle((int)b2Pos.X, (int)b2Pos.Y, b2Width, b2Height))) Scene.Add(sjb2 = new StarJumpBlock(b2Pos, b2Width, b2Height, sinks));

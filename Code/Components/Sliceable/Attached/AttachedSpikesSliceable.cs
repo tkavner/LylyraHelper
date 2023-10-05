@@ -16,7 +16,7 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
 
         }
 
-        public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength)
+        public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength, string orientation)
         {
             Spikes spikes = original as Spikes;
             string overrideType = spikes.overrideType;

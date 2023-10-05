@@ -16,7 +16,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables.Attached
 
 
         public Func<Entity, string> getOrientation;
-        public Func<Scene, Entity, Vector2, int, Entity> getNewEntity;
+        public Func<Scene, Entity, Vector2, int, string, Entity> getNewEntity;
         public Action<Scene, StaticMover, Vector2, Solid, Solid> diy;
 
         public AttachedModItemSliceable(CustomAttachedSlicingActionHolder actions) : base()
@@ -25,9 +25,9 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables.Attached
             getNewEntity = actions.getNewEntity;
             diy = actions.diy;
         }
-        public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength)
+        public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength, string orientation)
         {
-            return getNewEntity(scene, original, position, desiredLength);
+            return getNewEntity(scene, original, position, desiredLength, orientation);
         }
 
         public override string GetOrientation(Entity orientableEntity) => getOrientation(orientableEntity);

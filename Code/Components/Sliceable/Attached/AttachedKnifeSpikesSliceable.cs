@@ -12,7 +12,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached
 {
     public class AttachedKnifeSpikesSliceable : AttachedSliceableComponent
     {
-        public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength)
+        public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength, string orientation)
         {
             KnifeSpikes spikes = original as KnifeSpikes;
             string overrideType = spikes.overrideType;

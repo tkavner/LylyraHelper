@@ -21,7 +21,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         public virtual bool isDIY () { return false; }
 
         public abstract string GetOrientation(Entity orientableEntity);
-        public abstract Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength);
+        public abstract Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength, string orientation);
         public virtual void DIY(Scene scene, StaticMover mover, Vector2 direction, Solid child1, Solid child2) { }
     }
 }

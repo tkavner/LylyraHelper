@@ -817,7 +817,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             if (comp != null)
             {
-                return comp.GetNewEntity(scene, entity, position, length);
+                return comp.GetNewEntity(scene, entity, position, length, orientation.ToString().ToLower());
             }
             return null;
         }
@@ -968,7 +968,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         public class CustomAttachedSlicingActionHolder
         {
             public Func<Entity, string> getOrientation;
-            public Func<Scene, Entity, Vector2, int, Entity> getNewEntity;
+            public Func<Scene, Entity, Vector2, int, string, Entity> getNewEntity;
             public Action<Scene, StaticMover, Vector2, Solid, Solid> diy; //scene, mover in question, slicer direction, block1, block2
 
         }
