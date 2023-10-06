@@ -51,7 +51,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 get
                 {
-                    return globalSettings ?? (Session.defaultSlicerSettings != null ? new SlicerSettings(Session.defaultSlicerSettings) : _default);
+                    return globalSettings ?? ((Session != null && Session.defaultSlicerSettings != null) ? new SlicerSettings(Session.defaultSlicerSettings) : _default);
                 }
                 set
                 {
@@ -1069,7 +1069,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             
             }
 
-            if (!SlicerSettings.DefaultSettings.CanSlice(typeof(Entity))) return;
+            if (!SlicerSettings.DefaultSettings.CanSlice(entity.GetType())) return;
             //standard item handling
             if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
             {
