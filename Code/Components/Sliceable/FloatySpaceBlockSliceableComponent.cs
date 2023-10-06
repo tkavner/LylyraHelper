@@ -85,14 +85,14 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
                     if (block == original) continue;
                     if (Slicer.masterRemovedList.Contains(block)) continue;
 
-
-                    foreach (StaticMover mover in block.staticMovers)
-                    {
-                        Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
-                    }
-                    Scene.Add(new FloatySpaceBlock(block.Position, block.Width, block.Height, tileType, false));
+                    FloatySpaceBlock newBlock = new FloatySpaceBlock(block.Position, block.Width, block.Height, tileType, false);
+                    Scene.Add(newBlock);
                     Scene.Remove(block);
                     Slicer.masterRemovedList.Add(block);
+                    foreach (StaticMover mover in block.staticMovers)
+                    {
+                        Slicer.HandleStaticMover(Scene, slicer.Direction, newBlock, null, mover);
+                    }
                 }
 
             }
