@@ -1,6 +1,8 @@
 local drawableNinePatch = require("structs.drawable_nine_patch")
 local drawableRectangle = require("structs.drawable_rectangle")
 local drawableSprite = require("structs.drawable_sprite")
+local consts = require("mods").requireFromPlugin("consts")
+local helpers = require("mods").requireFromPlugin("helpers")
 
 local deathnote = {}
 
@@ -8,6 +10,7 @@ deathnote.name = "LylyraHelper/DeathNote"
 deathnote.depth = 0
 deathnote.minimumSize = {24, 24}
 deathnote.placements = {}
+deathnote.ignoredFields = consts.ignoredFields
 
 table.insert(deathnote.placements, {
 	name = "Death Note",

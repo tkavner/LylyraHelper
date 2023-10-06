@@ -1,6 +1,8 @@
 local spikeHelper = require("helpers.spikes")
 local utils = require("utils")
 local logging = require("logging")
+local consts = require("mods").requireFromPlugin("consts")
+local helpers = require("mods").requireFromPlugin("helpers")
 
 local knifeSpikes = {}
 

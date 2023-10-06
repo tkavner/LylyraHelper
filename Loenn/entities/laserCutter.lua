@@ -2,6 +2,8 @@ local drawableSprite = require("structs.drawable_sprite")
 local atlases = require("atlases")
 local utils = require("utils")
 local drawing = require("utils.drawing")
+local consts = require("mods").requireFromPlugin("consts")
+local helpers = require("mods").requireFromPlugin("helpers")
 
 local laserCutter = {}
 
@@ -10,6 +12,7 @@ laserCutter.name = "LylyraHelper/LaserCutter"
 laserCutter.placements = {}
 laserCutter.canResize = {false, false}
 laserCutter.depth = 0
+laserCutter.ignoredFields = consts.ignoredFields
 
 local directions = {"Up", "Down", "Left", "Right"}
 local modes = {"Pulse", "In Front", "Breakbeam"}
@@ -18,7 +21,7 @@ for _, dir in ipairs(directions) do
 	for __, m in ipairs(modes) do
 		table.insert(laserCutter.placements, {
 			name = "Laser Cutter ("..m..", "..dir..")",
-			data = {
+			data = helpers.createPlacementData('1', {
 				cooldown = 2.0,
 				firingLength = 1.0,
 				cutSize = 32,
@@ -28,7 +31,7 @@ for _, dir in ipairs(directions) do
 				invert=false,
 				breakbeamThickness=32,
 				sliceableEntityTypes=""
-			}
+			})
 		})
 	end
 end

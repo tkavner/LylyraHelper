@@ -1,4 +1,6 @@
 ﻿local drawableSprite = require("structs.drawable_sprite")
+local consts = require("mods").requireFromPlugin("consts")
+local helpers = require("mods").requireFromPlugin("helpers")
 
 local bubbledScissors = {}
 
@@ -7,6 +9,7 @@ bubbledScissors.depth = 100
 bubbledScissors.placements = {
     name = "bubbled_scissors",
 }
+bubbledScissors.ignoredFields = consts.ignoredFields
 
 -- Offset is from sprites.xml, not justifications
 local offsetY = -10

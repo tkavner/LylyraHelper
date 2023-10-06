@@ -1,10 +1,13 @@
 local drawableSprite = require("structs.drawable_sprite")
+local consts = require("mods").requireFromPlugin("consts")
+local helpers = require("mods").requireFromPlugin("helpers")
 
 local slicerController = {}
 slicerController.placements = {}
 slicerController.name = "LylyraHelper/SlicerController"
 slicerController.minimumSize = {48, 48}
 
+slicerController.ignoredFields = consts.ignoredFields
 local mods = require("mods")
 local v = require("utils.version_parser")
 

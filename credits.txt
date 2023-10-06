@@ -4,4 +4,5 @@ Viv for encouraging me to finish this helper module in the first place and for t
 Nerfred for making the scissor sprites, laser sprites, and art help.
 Kataiser for the scissor sound effects.
 TiltTheStars for coming up with the idea for Honeycomb Godrays.
-SJCord for generalized help and nudges along the way.
+SJCord and CelesteCord for generalized help and nudges along the way. I can't really list everything people have helped with here but know that I appreciate everyone in #coding-general in CelesteCord and every Coder from Strawberry Jam for the immense amount of help and encouragment!
+Samah for version stamping entities.

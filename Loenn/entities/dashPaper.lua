@@ -4,6 +4,8 @@ local drawableSprite = require("structs.drawable_sprite")
 local atlases = require("atlases")
 local utils = require("utils")
 local drawing = require("utils.drawing")
+local consts = require("mods").requireFromPlugin("consts")
+local helpers = require("mods").requireFromPlugin("helpers")
 
 local paper = {}
 
@@ -11,10 +13,11 @@ paper.name = "LylyraHelper/DashPaper"
 paper.depth = 0
 paper.minimumSize = {24, 24}
 paper.placements = {}
+paper.ignoredFields = consts.ignoredFields
 
 table.insert(paper.placements, {
 	name = "Dash Paper",
-    data = {
+    data = helpers.createPlacementData('1', {
 		width = 24,
         height = 24,
         spawnScissors = false,
@@ -23,13 +26,13 @@ table.insert(paper.placements, {
 		sliceableEntityTypes = ""
 		--flag = "",
 		--invertFlag = false
-    }
+    })
 })
 
 table.insert(paper.placements,
 {
 	name = "Dash Paper (With Scissors)",
-    data = {
+    data = helpers.createPlacementData('1', {
 		width = 24,
         height = 24,
         spawnScissors = true,
@@ -38,7 +41,7 @@ table.insert(paper.placements,
 		sliceableEntityTypes = ""
 		--flag = "",
 		--invertFlag = false
-    }
+    })
 })
 
 

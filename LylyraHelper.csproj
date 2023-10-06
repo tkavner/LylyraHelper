@@ -45,6 +45,7 @@
 
     <ItemGroup>
       <Folder Include="Ahorn\entities\" />
+      <Folder Include="Loenn\helpers\" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
