@@ -27,8 +27,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         public override Entity[] Slice(Slicer slicer)
         {
             CassetteBlock original = Entity as CassetteBlock;
-            if (original.Mode == CassetteBlock.Modes.Leaving) return null;
-            if (original.Mode == CassetteBlock.Modes.Returning) return null;
 
             original.ShiftSize(original.blockHeight);
             Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), slicer.Entity.Center, slicer.Direction, slicer.CutSize);
@@ -75,16 +73,18 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                     if (block == original) continue;
                     if (Slicer.masterRemovedList.Contains(block)) continue;
 
+                    original.ShiftSize(block.blockHeight);
 
+                    Scene.Remove(block);
+                    Scene.Remove(block.side);
+                    Scene.Add(new CassetteBlock(block.Position, block.ID, block.Width, block.Height, block.Index, block.Tempo));
+                    block.blockHeight = 0;
+                    Slicer.masterRemovedList.Add(block);
+                    Slicer.masterRemovedList.Add(block.side);
                     foreach (StaticMover mover in block.staticMovers)
                     {
                         Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
                     }
-                    Scene.Add(new CassetteBlock(block.Position, block.ID, block.Width, block.Height, block.Index, block.Index));
-                    Scene.Remove(block);
-                    Scene.Remove(block.side);
-                    Slicer.masterRemovedList.Add(block);
-                    Slicer.masterRemovedList.Add(block.side);
                 }
 
             }

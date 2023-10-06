@@ -46,7 +46,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
             bool fast = original.fast;
             Vector2 startPosition = original.startPosition;
 
-            bool vertical = direction == MoveBlock.Directions.Up || direction == MoveBlock.Directions.Down;
+            bool vertical = slicer.Direction.Y != 0;
 
             Scene.Remove(original);
             
@@ -54,13 +54,13 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
             {
                 mb1 = new MoveBlock(b1Pos, b1Width, b1Height, direction, canSteer, fast);
                 Scene.Add(mb1);
-                mb1.startPosition = vertical ? new Vector2(b1Pos.X, startPosition.Y) : new Vector2(startPosition.X, b1Pos.Y);
+                mb1.startPosition = vertical ? new Vector2(b1Pos.X, startPosition.Y + b1Pos.Y - original.Position.Y) : new Vector2(startPosition.X + b1Pos.X - original.Position.X, b1Pos.Y);
             }
             if (b2Width >= 16 && b2Height >= 16)
             {
                 mb2 = new MoveBlock(b2Pos, b2Width, b2Height, direction, canSteer, fast);
                 Scene.Add(mb2);
-                mb2.startPosition = vertical ? new Vector2(b2Pos.X, startPosition.Y) : new Vector2(startPosition.X, b2Pos.Y);
+                mb2.startPosition = vertical ? new Vector2(b2Pos.X, startPosition.Y + b2Pos.Y - original.Position.Y) : new Vector2(startPosition.X + b2Pos.X - original.Position.X, b2Pos.Y);
             }
 
             foreach (StaticMover mover in staticMovers)
@@ -74,6 +74,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
         public override void Activate(Slicer slicer)
         {
             MoveBlock moveBlock = Entity as MoveBlock;
+            moveBlock.Get<Coroutine>().enumerators.Peek().MoveNext();
             moveBlock.triggered = true;
             moveBlock.border.Visible = false;
         }

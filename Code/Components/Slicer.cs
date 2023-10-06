@@ -1100,6 +1100,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new DashBlockSliceableComponent(true, true));
             }
+            else if (entity is DreamBlock)
+            {
+                entity.Add(new DreamBlockSliceableComponent(true, true));
+            }
             else if (entity is StarJumpBlock)
             {
                 entity.Add(new StarJumpBlockSliceableComponent(true, true));
