@@ -1041,6 +1041,35 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         private static void Entity_Awake(On.Monocle.Entity.orig_Awake orig, Entity entity, Scene self)
         {
+            orig(entity, self);
+
+
+            //attached entity handling. seperate from normal entity handling. Items can be both.
+            if (CustomAttachedSlicingActions.TryGetValue(entity.GetType(), out var attachedAction))
+            {
+                entity.Add(new ModItemSliceableComponent(attachedAction));
+            }
+            else if (entity is Spikes)
+            {
+                entity.Add(new AttachedSpikesSliceable());
+            }
+            else if (entity is TriggerSpikes)
+            {
+                entity.Add(new AttachedTriggerSpikesSliceable());
+            }
+            else if (entity is Spring)
+            {
+                entity.Add(new AttachedSpringSliceable());
+            }
+            else if (entity is KnifeSpikes)
+            {
+                entity.Add(new AttachedKnifeSpikesSliceable());
+            }
+            else { 
+            
+            }
+
+            if (!SlicerSettings.DefaultSettings.CanSlice(typeof(Entity))) return;
             //standard item handling
             if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
             {
@@ -1093,29 +1122,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             else { }
 
-            //attached entity handling. seperate from normal entity handling. Items can be both.
-            if (CustomAttachedSlicingActions.TryGetValue(entity.GetType(), out var attachedAction))
-            {
-                entity.Add(new ModItemSliceableComponent(attachedAction));
-            }
-            else if (entity is Spikes)
-            {
-                entity.Add(new AttachedSpikesSliceable());
-            }
-            else if (entity is TriggerSpikes)
-            {
-                entity.Add(new AttachedTriggerSpikesSliceable());
-            }
-            else if (entity is Spring)
-            {
-                entity.Add(new AttachedSpringSliceable());
-            }
-            else if (entity is KnifeSpikes)
-            {
-                entity.Add(new AttachedKnifeSpikesSliceable());
-            }
-            else { }
-            orig(entity, self);
         }
 
 

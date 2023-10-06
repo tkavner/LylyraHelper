@@ -16,11 +16,12 @@ namespace LylyraHelper.Entities
     public class SlicerController : Entity
     {
         private string settings;
+        private bool limitToController;
 
         public SlicerController(EntityData data, Vector2 offset) {
             settings = data.Attr("sliceableEntityTypes", "");
-            
-            
+
+
         }
 
         public override void Awake(Scene scene)
