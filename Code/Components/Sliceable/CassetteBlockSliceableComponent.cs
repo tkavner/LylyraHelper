@@ -17,7 +17,8 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
         public override void Activate(Slicer slicer)
         {
-
+            Scene scene = slicer.Scene;
+            (Entity as CassetteBlock).SetActivatedSilently(scene.Tracker.GetEntity<CassetteBlockManager>().currentIndex == (Entity as CassetteBlock).Index);
         }
 
         public override void OnSliceStart(Slicer slicer)
@@ -27,13 +28,12 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         public override Entity[] Slice(Slicer slicer)
         {
             CassetteBlock original = Entity as CassetteBlock;
-
-            original.ShiftSize(original.blockHeight);
+            if (original.Mode != CassetteBlock.Modes.Solid) return null;
+            if (!original.Activated) return null;
             Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), slicer.Entity.Center, slicer.Direction, slicer.CutSize);
 
             original.RemoveSelf();
             original.side.RemoveSelf();
-            original.side.Visible = false;
             Slicer.masterRemovedList.Add(original.side);
             slicer.Scene.Remove(original);
             slicer.Scene.Remove(original.side);
@@ -45,6 +45,10 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             int b2Width = (int)resultArray[3].X;
             int b2Height = (int)resultArray[3].Y;
 
+            AddParticles(
+                original.Position,
+                new Vector2(original.Width, original.Height),
+                Calc.HexToColor(GetColor()), 2.5F/6.4F);
             CassetteBlock b1 = null;
             CassetteBlock b2 = null;
 
@@ -52,14 +56,16 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             {
                 b1 = new CassetteBlock(b1Pos, new EntityID(slicer.SceneAs<Level>().Session.Level, -1), b1Width, b1Height, original.Index, original.Tempo);
                 b1.Scene = slicer.Scene;
+                b1.Activated = b1.Collidable = true;
                 b1.blockHeight = 0;
-                Scene.Add(b1); 
+                Scene.Add(b1);
             }
 
             if (b2Width >= 16 && b2Height >= 16)
             {
                 b2 = new CassetteBlock(b2Pos, new EntityID(slicer.SceneAs<Level>().Session.Level, -1), b2Width, b2Height, original.Index, original.Tempo);
                 b2.Scene = slicer.Scene;
+                b2.Activated = b2.Collidable = true;
                 b2.blockHeight = 0;
                 Scene.Add(b2);
             }
@@ -73,19 +79,26 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                     if (block == original) continue;
                     if (Slicer.masterRemovedList.Contains(block)) continue;
 
-                    original.ShiftSize(block.blockHeight);
-
+                    CassetteBlock newBlock = new(block.Position, new EntityID(slicer.SceneAs<Level>().Session.Level, -1), block.Width, block.Height, block.Index, block.Tempo);
                     Scene.Remove(block);
                     Scene.Remove(block.side);
-                    Scene.Add(new CassetteBlock(block.Position, block.ID, block.Width, block.Height, block.Index, block.Tempo));
-                    block.blockHeight = 0;
+                    Scene.Add(newBlock);
+
+                    newBlock.Activated = newBlock.Collidable = true;
+                    newBlock.blockHeight = 0;
+                    block.RemoveSelf();
+                    block.side.RemoveSelf();
                     Slicer.masterRemovedList.Add(block);
                     Slicer.masterRemovedList.Add(block.side);
                     foreach (StaticMover mover in block.staticMovers)
                     {
-                        Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
+                        Slicer.HandleStaticMover(Scene, slicer.Direction, newBlock, null, mover);
                     }
                 }
+
+            } 
+            else
+            {
 
             }
 
@@ -95,6 +108,23 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             }
             return new Entity[] { b1, b2};
 
+        }
+
+        public string GetColor()
+        {
+            switch ((Entity as CassetteBlock).Index)
+            {
+                case 0:
+                    return "3da8f3";
+                case 1:
+                    return "e441be";
+                case 2:
+                    return "f0de31";
+                case 3:
+                    return "2ce246";
+                default:
+                    return "FFFFFF";
+            }
         }
 
         public static void Load()

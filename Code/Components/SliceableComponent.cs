@@ -26,10 +26,10 @@ namespace Celeste.Mod.LylyraHelper.Components
         public abstract void Activate(Slicer slicer);
 
 
-        internal void AddParticles(Vector2 position, Vector2 range, Color color)
+        internal void AddParticles(Vector2 position, Vector2 range, Color color, float percent = 1)
         {
             int numParticles = (int)(range.X * range.Y) / 10; //proportional to the area to cover
-            this.Entity.SceneAs<Level>().ParticlesFG.Emit(Cuttable.paperScraps, numParticles, position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
+            this.Entity.SceneAs<Level>().ParticlesFG.Emit(Cuttable.paperScraps, (int)(numParticles * percent), position + new Vector2(range.X / 2, range.Y / 2), new Vector2(range.X / 2, range.Y / 2), color);
         }
 
     }
