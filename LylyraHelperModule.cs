@@ -106,22 +106,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 Slicer.UnregisterSlicerAction(type);
             }
-
-            //entity = the entity being cut
-            //vector2 = the position the new entity should be spawned
-            //int = minimum length 
-            public static void RegisterSlicerStaticHandler(Type type,
-            Func<StaticMover, Solid, Solid, string> orientationFunction,
-            Func<Scene, Entity, Vector2, int, string, Entity> newEntityFunction)
-            {
-                Slicer.RegisterSlicerSMEntityFunction(type, orientationFunction, newEntityFunction);
-            }
-
-            public static void UnregisterSlicerSMEntityFunction(Type type)
-            {
-                Slicer.UnregisterSlicerSMEntityFunction(type);
-            }
-
             //this method handles attached static movers (like spikes) for Solids. Convenience Method.
             public static void HandleStaticMover(Scene scene, Vector2 direction, Solid block1, Solid block2, StaticMover mover)
             {
@@ -133,6 +117,38 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 Slicer.ModinteropHandleStaticMovers(scene, Direction, cb1, cb2, staticMovers);
             }
+            public static Vector2[] CalcNewBlockPosAndSize(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int cutSize = 8)
+            {
+                return Slicer.CalcCuts(blockPos, blockSize, cutPos, cutDir, gapWidth, cutSize);
+            }
+            public static Vector2[] CalcNewBlockPosAndSize(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth)
+            {
+                return Slicer.CalcCuts(blockPos, blockSize, cutPos, cutDir, gapWidth);
+            }
+
+
+            public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth, int cutsize = 8)
+            {
+                return Slicer.CalcCuts(blockToBeCut, cutPosition, cutDir, gapWidth, cutsize);
+            }
+            public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth)
+            {
+                return Slicer.CalcCuts(blockToBeCut, cutPosition, cutDir, gapWidth);
+            }
+
+
+            public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, DynamicData slicerData, int cutsize = 8)
+            {
+                Slicer slicer = slicerData.Target as Slicer;
+                return Slicer.CalcCuts(blockToBeCut, slicer.GetDirectionalPosition(), slicer.Direction, slicer.CutSize, cutsize);
+            }
+            public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, DynamicData slicerData)
+            {
+                Slicer slicer = slicerData.Target as Slicer;
+                return Slicer.CalcCuts(blockToBeCut, slicer.GetDirectionalPosition(), slicer.Direction, slicer.CutSize);
+            }
+
+
 
             public static DynamicData GetSlicer(Entity entity)
             {

@@ -82,9 +82,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         public int directionalOffset { get; set; }
 
         private bool sliceOnImpact;
-        private bool fragile;
         private Vector2 ColliderOffset;
-        private Action entityCallback;
 
         //TODO: Rename "master cutting list"
         //master cutting list is a static list entities are added to after they are cut in the event by multiple slicers on the same frame. Realistically this list should never see more than
@@ -127,7 +125,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             this.level = level;
             this.directionalOffset = directionalOffset;
             this.sliceOnImpact = sliceOnImpact;
-            this.fragile = fragile;
             ColliderOffset = colliderOffset;
             settings = settings.Trim();
             this.settings = settings != "" ? new SlicerSettings(settings) : SlicerSettings.DefaultSettings;
@@ -205,10 +202,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
         
-        public void AddListener(Action p)
-        {
-            entityCallback = p;
-        }
 
         //Basically all cutting requires a wild amount of differing requirements to cut in half.
         //This is because we're essentially cloning the object, which is a very complicated issue in computer programming.
