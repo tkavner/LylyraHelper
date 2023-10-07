@@ -5,7 +5,7 @@ using System;
 
 namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached
 {
-    internal class AttachedTriggerSpikesSliceable : AttachedSliceableComponent
+    public class AttachedTriggerSpikesSliceable : AttachedSliceableComponent
     {
         public override Entity GetNewEntity(Scene scene, Entity original, Vector2 position, int desiredLength, string orientation)
         {

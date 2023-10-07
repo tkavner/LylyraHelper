@@ -1067,6 +1067,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new AttachedTriggerSpikesSliceable());
             }
+            else if (entity is TriggerSpikesOriginal)
+            {
+                entity.Add(new AttachedTriggerSpikesOriginalSliceable());
+            }
             else if (entity is Spring)
             {
                 entity.Add(new AttachedSpringSliceable());
