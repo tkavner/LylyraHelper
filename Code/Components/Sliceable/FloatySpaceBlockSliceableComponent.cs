@@ -77,6 +77,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
                 group = master.Group;
             }
 
+
             //disassemble group
             if (group.Count > 1)
             {
@@ -97,17 +98,16 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
 
             }
 
-            foreach (StaticMover mover in staticMovers)
-            {
-                Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
-            }
-
             AddParticles(
                 original.Position,
                 new Vector2(original.Width, original.Height),
                 Calc.HexToColor("444444"));
             Slicer.masterRemovedList.Add(original);
             Scene.Remove(original);
+            foreach (StaticMover mover in staticMovers)
+            {
+                Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
+            }
             return null;
         }
     }
