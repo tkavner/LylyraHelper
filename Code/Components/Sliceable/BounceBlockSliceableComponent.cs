@@ -52,6 +52,10 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
             if (b1Width >= 16 && b1Height >= 16 && original.CollideRect(new Rectangle((int)b1Pos.X, (int)b1Pos.Y, b1Width, b1Height))) Scene.Add(sjb1 = new BounceBlock(b1Pos, b1Width, b1Height));
             if (b2Width >= 16 && b2Height >= 16 && original.CollideRect(new Rectangle((int)b2Pos.X, (int)b2Pos.Y, b2Width, b2Height))) Scene.Add(sjb2 = new BounceBlock(b2Pos, b2Width, b2Height));
 
+            foreach (StaticMover mover in original.staticMovers)
+            {
+                Slicer.HandleStaticMover(Scene, slicer.Direction, sjb1, sjb2, mover);
+            }
             if (Session.CoreModes.Cold == SceneAs<Level>().CoreMode)
             {
                 AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("53cee6"));

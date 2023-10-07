@@ -28,6 +28,11 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
         public override Entity[] Slice(Slicer slicer)
         {
             (Entity as DashBlock).Break(Entity.Position, slicer.Direction, true);
+
+            foreach (StaticMover mover in (Entity as DashBlock).staticMovers)
+            {
+                Scene.Remove(mover.Entity);
+            }
             return null;
         }
     }

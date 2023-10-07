@@ -623,9 +623,14 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //find out if spikes were unharmed
-                    if (cb1.Bottom >= spikes.Bottom || cb2.Top <= spikes.Top)
+                    if (cb1.Bottom >= spikes.Bottom)
                     {
                         ReattachStaticMover(cb1, mover, Orientation.Left);
+                        return;
+                    }
+                    if (cb2.Top <= spikes.Top)
+                    {
+                        ReattachStaticMover(cb2, mover, Orientation.Left);
                         return;
                     }
                     //then they intersect the hole. up to two spikes can be added in this case
@@ -749,9 +754,14 @@ namespace Celeste.Mod.LylyraHelper.Components
                         return;
                     }
                     //find out if spikes were unharmed
-                    if (cb1.Bottom >= spikes.Bottom || cb2.Top <= spikes.Top)
+                    if (cb1.Bottom >= spikes.Bottom)
                     {
                         ReattachStaticMover(cb1, mover, Orientation.Right);
+                        return;
+                    }
+                    if (cb2.Top <= spikes.Top)
+                    {
+                        ReattachStaticMover(cb2, mover, Orientation.Right);
                         return;
                     }
                     //then they intersect the hole. up to two spikes can be added in this case

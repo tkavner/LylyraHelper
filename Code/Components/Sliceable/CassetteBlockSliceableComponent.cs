@@ -71,6 +71,10 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             }
             List<CassetteBlock> group = original.group;
 
+            foreach (StaticMover mover in original.staticMovers)
+            {
+                Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
+            }
             //disassemble group
             if (group.Count > 1)
             {
@@ -102,10 +106,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
             }
 
-            foreach (StaticMover mover in original.staticMovers)
-            {
-                Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
-            }
             return new Entity[] { b1, b2};
 
         }
