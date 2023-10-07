@@ -74,7 +74,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
                     returnStack = newReturnStack
                 };
                 Scene.Add(cb1);
-                slicer.intermediateFrameActivation.Add(cb1);
             }
 
             CrushBlock cb2 = null;
@@ -92,7 +91,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
                     returnStack = newReturnStack
                 };
                 Scene.Add(cb2);
-                slicer.intermediateFrameActivation.Add(cb2);
             }
             foreach (StaticMover mover in staticMovers)
             {

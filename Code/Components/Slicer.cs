@@ -71,17 +71,15 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
-        public List<SliceableComponent> slicingEntities = new List<SliceableComponent>();
+        public List<SliceableComponent> slicingEntities = new();
         //some entities take a frame advancement to activate properly (Such as Kevins and MoveBlocks). This list is for those entities.
-        public List<Entity> secondFrameActivation = new List<Entity>();
-        public List<Entity> intermediateFrameActivation = new List<Entity>();
-        public Collider slicingCollider { get; set; }
+        public List<Entity> secondFrameActivation = new();
+        public Collider SlicingCollider { get; set; }
         public Vector2 Direction { get; private set; }
         public int CutSize { get; private set; }
-        private Level level;
-        public int directionalOffset { get; set; }
+        public int DirectionalOffset { get; set; }
 
-        private bool sliceOnImpact;
+        private bool SliceOnImpact;
         private Vector2 ColliderOffset;
 
         //TODO: Rename "master cutting list"
@@ -91,7 +89,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         private static ulong lastPurge;
         public SlicerSettings settings;
 
-        public int entitiesCut { get; private set; }
+        public int EntitiesCut { get; private set; }
 
         public Slicer(
             Vector2 Direction,
@@ -119,12 +117,11 @@ namespace Celeste.Mod.LylyraHelper.Components
             bool fragile = false,
             string settings = "") : base(active, false)
         {
-            this.slicingCollider = slicingCollider;
+            this.SlicingCollider = slicingCollider;
             this.Direction = Direction;
             this.CutSize = cutSize;
-            this.level = level;
-            this.directionalOffset = directionalOffset;
-            this.sliceOnImpact = sliceOnImpact;
+            this.DirectionalOffset = directionalOffset;
+            this.SliceOnImpact = sliceOnImpact;
             ColliderOffset = colliderOffset;
             settings = settings.Trim();
             this.settings = settings != "" ? new SlicerSettings(settings) : SlicerSettings.DefaultSettings;
@@ -170,7 +167,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             Vector2 positionHold = Entity.Position;
             Entity.Position = Entity.Position + ColliderOffset;
             Collider tempHold = Entity.Collider;
-            if (slicingCollider != null) Entity.Collider = slicingCollider;
+            if (SlicingCollider != null) Entity.Collider = SlicingCollider;
             if (Entity.Collidable) CheckCollisions();
             Slice();
             Entity.Position = positionHold;
@@ -217,7 +214,7 @@ namespace Celeste.Mod.LylyraHelper.Components
                 return true;
             });
 
-            entitiesCut += slicingEntities.RemoveAll(d => 
+            EntitiesCut += slicingEntities.RemoveAll(d => 
             {
                 if (FinishedCutting(d, collisionOverride))
                 {
@@ -234,19 +231,19 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             if (Direction.X > 0)
             {
-                return Entity.CenterLeft + new Vector2(directionalOffset, 0);
+                return Entity.CenterLeft + new Vector2(DirectionalOffset, 0);
             }
             else if (Direction.X < 0)
             {
-                return Entity.CenterRight + new Vector2(-directionalOffset, 0);
+                return Entity.CenterRight + new Vector2(-DirectionalOffset, 0);
             }
             else if (Direction.Y > 0)
             {
-                return Entity.TopCenter + new Vector2(0, directionalOffset);
+                return Entity.TopCenter + new Vector2(0, DirectionalOffset);
             }
             else
             {
-                return Entity.BottomCenter + new Vector2(0, -directionalOffset);
+                return Entity.BottomCenter + new Vector2(0, -DirectionalOffset);
             }
         }
 
@@ -263,7 +260,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 return true;
             }
-            if (collisionOverride || sliceOnImpact || !sliceableEntity.CollideCheck(Entity))
+            if (collisionOverride || SliceOnImpact || !sliceableEntity.CollideCheck(Entity))
             {
                 Entity[] children = sliceableComp.Slice(this);
                 if (children != null)
@@ -289,7 +286,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         //flips the slicer to face the new cutdirection. Can also supply a new directional collider.
         public void Flip(Vector2 cutDirection, Collider directionalCollider = null)
         {
-            slicingCollider = directionalCollider;
+            SlicingCollider = directionalCollider;
             Direction = cutDirection;
         }
 
@@ -300,12 +297,12 @@ namespace Celeste.Mod.LylyraHelper.Components
         public override void DebugRender(Camera camera)
         {
 
-            if (slicingCollider != null)
+            if (SlicingCollider != null)
             {
                 Vector2 positionHold = Entity.Position;
                 Entity.Position = Entity.Position + ColliderOffset;
                 Collider tempHold = Entity.Collider;
-                Entity.Collider = slicingCollider;
+                Entity.Collider = SlicingCollider;
                 Draw.HollowRect(Entity.Collider, Color.Yellow);
 
                 Entity.Position = positionHold;

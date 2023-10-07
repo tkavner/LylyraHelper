@@ -106,6 +106,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 Slicer.UnregisterSlicerAction(type);
             }
+
             //this method handles attached static movers (like spikes) for Solids. Convenience Method.
             public static void HandleStaticMover(Scene scene, Vector2 direction, Solid block1, Solid block2, StaticMover mover)
             {

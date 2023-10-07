@@ -113,7 +113,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
 
-                Slicer.directionalOffset = (min);
+                Slicer.DirectionalOffset = (min);
                 LaserLength = min + 8;
                 if (Direction.Y > 0 || Direction.X > 0) LaserLength = min;
                 if (Visible) AddParticles();
