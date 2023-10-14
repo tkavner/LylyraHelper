@@ -76,7 +76,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
         {
             base.LoadContent(firstLoad);
             FrostHelperImports.Load();
-            _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
+            _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml"); 
+            typeof(ModExports).ModInterop();
         }
 
         private Backdrop OnLoadBackdrop(MapData map, BinaryPacker.Element child, BinaryPacker.Element above)
@@ -92,7 +93,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             return null;
         }
 
-
         [ModExportName("LylyraHelper")]
         private static class ModExports
         {
@@ -100,6 +100,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             public static void RegisterSlicerActionSet(Type type, Dictionary<string, Delegate> actions)
             {
                 Slicer.RegisterSlicerAction(type, actions);
+                Logger.Log(LogLevel.Error, "LylyraHelper", "Registered action for type: " + type.FullName);
             }
 
             public static void UnregisterSlicerAction(Type type)

@@ -210,7 +210,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             secondFrameActivation.RemoveAll(secondFrameEntity =>
             {
 
-                secondFrameEntity.Get<SliceableComponent>().Activate(this);
+                secondFrameEntity.Get<SliceableComponent>()?.Activate(this);
                 return true;
             });
 
@@ -997,7 +997,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             if (holder == null) holder = new();
             foreach (string key in actions.Keys)
             {
-                var action = actions[key];
+                Delegate action = actions[key];
                 if (key == "slice")
                 {
                     holder.firstFrameSlice = (Func<Entity, DynamicData, Entity[]>)action;
