@@ -119,9 +119,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 Slicer.ModinteropHandleStaticMovers(scene, Direction, cb1, cb2, staticMovers);
             }
-            public static Vector2[] CalcNewBlockPosAndSize(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int cutSize = 8)
+
+            //this method handles attached static movers (like spikes) for Solids. Convenience Method.
+            public static void HandleStaticMovers(DynamicData slicerData, Solid cb1, Solid cb2, List<StaticMover> staticMovers)
             {
-                return Slicer.CalcCuts(blockPos, blockSize, cutPos, cutDir, gapWidth, cutSize);
+                Slicer slicer = slicerData.Target as Slicer;
+                Slicer.ModinteropHandleStaticMovers(slicer.Scene, slicer.Direction, cb1, cb2, staticMovers);
+            }
+
+            public static Vector2[] CalcNewBlockPosAndSize(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth, int tilingSize)
+            {
+                return Slicer.CalcCuts(blockPos, blockSize, cutPos, cutDir, gapWidth, tilingSize);
             }
             public static Vector2[] CalcNewBlockPosAndSize(Vector2 blockPos, Vector2 blockSize, Vector2 cutPos, Vector2 cutDir, int gapWidth)
             {
@@ -129,9 +137,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
 
-            public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth, int cutsize = 8)
+            public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth, int tilingSize)
             {
-                return Slicer.CalcCuts(blockToBeCut, cutPosition, cutDir, gapWidth, cutsize);
+                return Slicer.CalcCuts(blockToBeCut, cutPosition, cutDir, gapWidth, tilingSize);
             }
             public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth)
             {
@@ -139,10 +147,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
 
-            public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, DynamicData slicerData, int cutsize = 8)
+            public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, DynamicData slicerData, int tilingSize)
             {
                 Slicer slicer = slicerData.Target as Slicer;
-                return Slicer.CalcCuts(blockToBeCut, slicer.GetDirectionalPosition(), slicer.Direction, slicer.CutSize, cutsize);
+                return Slicer.CalcCuts(blockToBeCut, slicer.GetDirectionalPosition(), slicer.Direction, slicer.CutSize, tilingSize);
             }
             public static Vector2[] CalcNewBlockPosAndSize(Solid blockToBeCut, DynamicData slicerData)
             {
