@@ -53,24 +53,30 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
         public override void OnSliceStart(Slicer slicer)
         {
-            slicerStarts.Remove(slicer);
-            if (slicer.Direction.X > 0)
+            if (!slicerStarts.ContainsKey(slicer))
             {
-                slicerStarts.Add(slicer, slicer.Entity.CenterLeft);
-            }
-            else if (slicer.Direction.X < 0)
-            {
-                slicerStarts.Add(slicer, slicer.Entity.CenterRight);
-            }
-            else if (slicer.Direction.Y > 0)
-            {
-                slicerStarts.Add(slicer, slicer.Entity.TopCenter);
-            }
-            else
-            {
-                slicerStarts.Add(slicer, slicer.Entity.BottomCenter);
+                slicerStarts.Remove(slicer);
+                if (slicer.Direction.X > 0)
+                {
+                    slicerStarts.Add(slicer, slicer.Entity.CenterLeft);
+                }
+                else if (slicer.Direction.X < 0)
+                {
+                    slicerStarts.Add(slicer, slicer.Entity.CenterRight);
+                }
+                else if (slicer.Direction.Y > 0)
+                {
+                    slicerStarts.Add(slicer, slicer.Entity.TopCenter);
+                }
+                else
+                {
+                    slicerStarts.Add(slicer, slicer.Entity.BottomCenter);
+                }
             }
         }
+
+        private static Random particleRandom = new Random();
+        private float chanceOfParticle = 0.15F;
 
         public override Entity[] Slice(Slicer slicer)
         {
@@ -149,7 +155,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                             if (j < furthestTop) furthestTop = j;
                             if (j > furthestDown) furthestDown = j;
 
-                            SceneAs<Level>().ParticlesFG.Emit(paperScraps, 1, Position + new Vector2(i * 8 + 4, j * 8 + 4), new Vector2(4), Color);
+                            if (particleRandom.NextFloat() < chanceOfParticle) SceneAs<Level>().ParticlesFG.Emit(paperScraps, 1, Position + new Vector2(i * 8 + 4, j * 8 + 4), new Vector2(4), Color);
                         }
 
                         Parent.skip[i, j] = true;

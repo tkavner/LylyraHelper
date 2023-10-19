@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -105,10 +106,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 int i = r.Next(0, (int)Width / 8);
                 int j = r.Next(0, (int)Height / 8);
-                particleEmitPoints += (int)(Width * Height);
-                if (!skip[i, j] && particleEmitPoints > 40000)
+                particleEmitPoints += Math.Min(100000, Math.Max(10000, (int)(Width * Height)));
+                if (!skip[i, j] && particleEmitPoints > 200000)
                 {
-                    particleEmitPoints -= 40000;
+                    particleEmitPoints -= 200000;
                     SceneAs<Level>().ParticlesFG.Emit(paperSymbols, 1, Position + new Vector2(i * 8, j * 8), Vector2.Zero, Color.White);
                 }
 
