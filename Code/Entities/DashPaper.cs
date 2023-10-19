@@ -74,9 +74,9 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 int borderSize = width / 8 % 2 == 0 ? 32 : 24;
                 int offsetBorder = width / 8 % 4 == 1 ? -1 : -2;
-                decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom_{0}", borderSize),
+                decorations.Add(new Decoration(this, string.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_bottom_{0}", borderSize),
                     new Vector2((int)Math.Round(width / 16F) + offsetBorder, height / 8 - 2), new Vector2(borderSize / 8, 2)));
-                decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_up_{0}", borderSize),
+                decorations.Add(new Decoration(this, string.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_up_{0}", borderSize),
                     new Vector2((int)Math.Round(width / 16F) + offsetBorder, 0), new Vector2(borderSize / 8, 2)));
 
                 if (height >= 48)
@@ -93,7 +93,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                     int xOffset = width / 8 % 4 == 3 ? -3 : -2;
                     int yOffset = height / 8 % 4 == 3 ? -3 : -2;
-                    decorations.Add(new Decoration(this, String.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_center_{0}_{1}", xSize, ySize),
+                    decorations.Add(new Decoration(this, string.Format("objects/LylyraHelper/dashPaper/dash_paper_decoration_center_{0}_{1}", xSize, ySize),
                         new Vector2((int)Math.Round(width / 16F) + xOffset, (int)Math.Round(height / 16F) + yOffset), new Vector2(4, 4)));
                 }
             }

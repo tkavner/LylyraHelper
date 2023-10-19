@@ -48,7 +48,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             AddParticles(
                 original.Position,
                 new Vector2(original.Width, original.Height),
-                Calc.HexToColor(GetColor()), 2.5F/6.4F);
+                Calc.HexToColor(GetColor()));
             CassetteBlock b1 = null;
             CassetteBlock b2 = null;
 

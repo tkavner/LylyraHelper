@@ -76,7 +76,20 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         }
 
         private static Random particleRandom = new Random();
-        private float chanceOfParticle = 0.15F;
+        private float ParticleChance()
+        {
+            var amount = LylyraHelperModule.Settings.SlicerParticles;
+            switch (amount)
+            {
+                case LylyraHelperSettings.ParticleAmount.None: return 0f;
+                case LylyraHelperSettings.ParticleAmount.Light: return 0.05f;
+                case LylyraHelperSettings.ParticleAmount.Normal: return 0.15f;
+                case LylyraHelperSettings.ParticleAmount.Heavy: return 0.5f;
+                case LylyraHelperSettings.ParticleAmount.Original: return 1f;
+                case LylyraHelperSettings.ParticleAmount.Excessive: return 1f;
+                default: return 0;
+            }
+        }
 
         public override Entity[] Slice(Slicer slicer)
         {
@@ -140,7 +153,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             int furthestDown = -1;
             int furthestLeft = Int32.MaxValue;
             int furthestRight = -1;
-
+            float chanceOfParticle = ParticleChance();
             for (int i = (int)p1.X; i <= p2.X; i++)
             {
                 for (int j = (int)p1.Y; j <= p2.Y; j++)

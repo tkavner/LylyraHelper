@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using static Celeste.GaussianBlur;
 
-[assembly: IgnoresAccessChecksTo("Celeste")]
 namespace Celeste.Mod.LylyraHelper.Entities
 {
     public class LylyraHelperModule : EverestModule
@@ -33,6 +32,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public static LylyraHelperModule Instance;
         public override Type SessionType => typeof(LylyraHelperSession);
         public static LylyraHelperSession Session => Instance._Session as LylyraHelperSession;
+
+
+        public override Type SettingsType => typeof(LylyraHelperSettings);
+        public static LylyraHelperSettings Settings => Instance._Settings as LylyraHelperSettings;
 
         public override void Load()
         {
