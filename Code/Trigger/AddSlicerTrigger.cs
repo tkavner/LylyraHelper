@@ -139,7 +139,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                     }
                     else if (direction == "Left")
                     {
-                        entity.Add(new Slicer(-Vector2.UnitX, cutSize, SceneAs<Level>(), slicerLength, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                        entity.Add(new Slicer(-Vector2.UnitX, cutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                     }
                 }
             }

@@ -210,7 +210,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             secondFrameActivation.RemoveAll(secondFrameEntity =>
             {
 
-                secondFrameEntity.Get<SliceableComponent>()?.Activate(this);
+                secondFrameEntity?.Get<SliceableComponent>()?.Activate(this);
                 return true;
             });
 

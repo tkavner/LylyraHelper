@@ -150,10 +150,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
             Audio.Play("event:/Kataiser/lyra_scissors_hit", Position);
             //Partial cut non solid entities
-            if (timeElapsed > spawnGrace)
-            {
-                slicer.Slice(true);
-            }
             Collidable = false;
             yield return 0.2F;
             Audio.Play("event:/Kataiser/lyra_scissors_break", Position);

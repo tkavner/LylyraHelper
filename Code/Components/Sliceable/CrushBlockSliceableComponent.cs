@@ -107,9 +107,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
         {
 
             CrushBlock crushBlock = this.Entity as CrushBlock;
-            crushBlock.Awake(Scene);
             crushBlock.crushDir = -slicer.Direction;
-            crushBlock.level = slicer.SceneAs<Level>();
             crushBlock.Attack(-slicer.Direction);
         }
 
