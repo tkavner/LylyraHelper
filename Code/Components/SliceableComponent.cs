@@ -43,9 +43,9 @@ namespace Celeste.Mod.LylyraHelper.Components
                 case LylyraHelperSettings.ParticleAmount.None: return 0f;
                 case LylyraHelperSettings.ParticleAmount.Light: return 0.03f;
                 case LylyraHelperSettings.ParticleAmount.Normal: return 0.1f;
-                case LylyraHelperSettings.ParticleAmount.Heavy: return 0.2f;
-                case LylyraHelperSettings.ParticleAmount.Original: return 1f;
-                case LylyraHelperSettings.ParticleAmount.Excessive: return 1.25f;
+                case LylyraHelperSettings.ParticleAmount.More: return 0.2f;
+                case LylyraHelperSettings.ParticleAmount.WayTooMany: return 1f;
+                case LylyraHelperSettings.ParticleAmount.JustExcessive: return 1.25f;
                 default: return 0;
             }
         }

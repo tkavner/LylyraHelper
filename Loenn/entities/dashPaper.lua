@@ -10,7 +10,7 @@ local helpers = require("mods").requireFromPlugin("helpers")
 local paper = {}
 
 paper.name = "LylyraHelper/DashPaper"
-paper.depth = 0
+paper.depth = 100000
 paper.minimumSize = {24, 24}
 paper.placements = {}
 paper.ignoredFields = consts.ignoredFields

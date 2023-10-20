@@ -200,7 +200,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         internal override void AddPlayerEffects(Player player)
         {
-            if (!noTrail && playerParticleEmitPoints++ % 4 == 0)
+            if (!noTrail && playerParticleEmitPoints++ % 5 == 0)
             {
                 SceneAs<Level>().ParticlesFG.Emit(paperSymbols, 1, player.Center, player.Collider.HalfSize, Color.White);
             }
