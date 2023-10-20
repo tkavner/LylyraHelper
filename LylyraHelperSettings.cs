@@ -11,7 +11,7 @@ namespace Celeste.Mod.LylyraHelper
 
         public enum ParticleAmount
         {
-            None, Light, Normal, Heavy, Original, Excessive
+            None, Light, Normal, More, WayTooMany, JustExcessive
         }
         public ParticleAmount SlicerParticles { get; set; } = ParticleAmount.Normal;
 

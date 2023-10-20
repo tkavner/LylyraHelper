@@ -84,9 +84,9 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                 case LylyraHelperSettings.ParticleAmount.None: return 0f;
                 case LylyraHelperSettings.ParticleAmount.Light: return 0.05f;
                 case LylyraHelperSettings.ParticleAmount.Normal: return 0.15f;
-                case LylyraHelperSettings.ParticleAmount.Heavy: return 0.5f;
-                case LylyraHelperSettings.ParticleAmount.Original: return 1f;
-                case LylyraHelperSettings.ParticleAmount.Excessive: return 1f;
+                case LylyraHelperSettings.ParticleAmount.More: return 0.5f;
+                case LylyraHelperSettings.ParticleAmount.WayTooMany: return 1f;
+                case LylyraHelperSettings.ParticleAmount.JustExcessive: return 1f;
                 default: return 0;
             }
         }
