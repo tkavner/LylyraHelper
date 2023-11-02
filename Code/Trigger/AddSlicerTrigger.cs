@@ -66,11 +66,29 @@ namespace Celeste.Mod.LylyraHelper.Triggers
 
         public static void Load()
         {
-            On.Monocle.Scene.Add_Entity += SlicerTriggerCheck;
+            On.Monocle.Entity.Awake += SlicerTriggerCheck;
         }
         public static void Unload()
         {
-            On.Monocle.Scene.Add_Entity -= SlicerTriggerCheck;
+            On.Monocle.Entity.Awake -= SlicerTriggerCheck;
+        }
+
+        private static void SlicerTriggerCheck(On.Monocle.Entity.orig_Awake orig, Entity self, Scene scene)
+        {
+
+            orig.Invoke(self, scene);
+            if (scene == null || scene.Tracker == null) return;
+            foreach (AddSlicerTrigger trigger in scene.Tracker.GetEntities<AddSlicerTrigger>())
+            {
+                if (trigger.used) continue;
+                if (trigger.CheckFlag())
+                {
+                    if (self.Collider == null) continue;
+                    if (self.Get<Slicer>() != null) continue;
+                    if ((self.Collider != null && self.CollideCheck(trigger)))
+                        trigger.TryAddSlicer(self);
+                }
+            }
         }
 
         public bool CheckFlag()
@@ -80,19 +98,6 @@ namespace Celeste.Mod.LylyraHelper.Triggers
 
         private static void SlicerTriggerCheck(On.Monocle.Scene.orig_Add_Entity orig, Scene self, Entity entity)
         {
-            orig.Invoke(self, entity);
-            if (self == null || self.Tracker == null) return;
-            foreach (AddSlicerTrigger trigger in self.Tracker.GetEntities<AddSlicerTrigger>())
-            {
-                if (trigger.used) continue;
-                if (trigger.CheckFlag())
-                {
-                    if (entity.Collider == null) continue;
-                    if (entity.Get<Slicer>() != null) continue;
-                    if ((entity.Collider != null && entity.CollideCheck(trigger)))
-                        trigger.TryAddSlicer(entity);
-                }
-            }
         }
 
         private void TryAddSlicer(Entity entity)

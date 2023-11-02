@@ -4,13 +4,14 @@ local drawableSprite = require("structs.drawable_sprite")
 local atlases = require("atlases")
 local utils = require("utils")
 local drawing = require("utils.drawing")
+local depths = require("consts.object_depths")
 local consts = require("mods").requireFromPlugin("consts")
 local helpers = require("mods").requireFromPlugin("helpers")
 
 local paper = {}
 
 paper.name = "LylyraHelper/DashPaper"
-paper.depth = 100000
+paper.depth = depths.SolidsBelow
 paper.minimumSize = {24, 24}
 paper.placements = {}
 paper.ignoredFields = consts.ignoredFields
