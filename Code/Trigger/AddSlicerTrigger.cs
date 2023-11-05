@@ -22,6 +22,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private bool oneUse;
         private bool fragile;
         private List<string> entityTypes;
+        private float pluginVersion;
         private bool allTypes;
         private bool roomwide;
         private int slicerLength;
@@ -46,6 +47,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             invert = data.Bool("invert", false);
             sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
             entityTypes = LyraUtils.GetFullNames(data.Attr("entityTypes", ""));
+            pluginVersion = data.Float("pluginVersion");
         }
 
 
@@ -57,7 +59,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                 foreach (Entity e in Scene.Entities)
                 {
                     if (e.Collider == null) continue;
-                    if (e.Get<Slicer>() != null) continue;
+                    if (HasMatchingDirectionalSlicer(e)) continue;
                     TryAddSlicer(e);
                 }
             }
@@ -78,17 +80,50 @@ namespace Celeste.Mod.LylyraHelper.Triggers
 
             orig.Invoke(self, scene);
             if (scene == null || scene.Tracker == null) return;
+            if (!scene.Tracker.IsEntityTracked<AddSlicerTrigger>()) return; //this stops load crash bugs apparently
             foreach (AddSlicerTrigger trigger in scene.Tracker.GetEntities<AddSlicerTrigger>())
             {
                 if (trigger.used) continue;
                 if (trigger.CheckFlag())
                 {
                     if (self.Collider == null) continue;
-                    if (self.Get<Slicer>() != null) continue;
+                    if (trigger.HasMatchingDirectionalSlicer(self)) continue;
                     if ((self.Collider != null && self.CollideCheck(trigger)))
                         trigger.TryAddSlicer(self);
+
                 }
             }
+        }
+
+        private bool HasMatchingDirectionalSlicer(Entity entity)
+        {
+            foreach (Component component in entity.Components) {
+                if (component is Slicer slicer)
+                {
+                    if (pluginVersion > 0)
+                    {
+                        if (slicer.Direction == DirectionalVector() && pluginVersion > 0) return true;
+                    }
+                    else return true;
+                }
+            }
+            return false;
+        }
+
+        private Vector2 DirectionalVector()
+        {
+            switch(direction.ToLower())
+            {
+                case "up":
+                    return -Vector2.UnitY;
+                case "down":
+                    return Vector2.UnitY;
+                case "right":
+                    return Vector2.UnitX;
+                case "left":
+                    return -Vector2.UnitX;
+            }
+            return Vector2.Zero;
         }
 
         public bool CheckFlag()

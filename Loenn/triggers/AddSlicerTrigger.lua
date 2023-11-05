@@ -1,6 +1,11 @@
+local helpers = require("mods").requireFromPlugin("helpers")
+local consts = require("mods").requireFromPlugin("consts")
+
 local addSlicerOnLoadTrigger = {}
 addSlicerOnLoadTrigger.name = "LylyraHelper/AddSlicerTrigger"
 addSlicerOnLoadTrigger.placements = {}
+addSlicerOnLoadTrigger.ignoredFields = consts.ignoredFields
+
 local directions = {"Up", "Down", "Right", "Left", "All"}
 
 
@@ -22,7 +27,8 @@ addSlicerOnLoadTrigger.fieldInformation = {
 for _, dir in ipairs(directions) do
 	local placement = {
 		name = "Add Slicer Trigger ("..dir..")",
-		data = {
+		data = 
+			helpers.createPlacementData(1, {
 			sliceOnImpact = false,
 			singleUse = false,
 			entityTypes = "",
@@ -34,10 +40,11 @@ for _, dir in ipairs(directions) do
 			flag="",
 			invert=false,
 			sliceableEntityTypes=""
-		}
+		})
 	}
 	table.insert(addSlicerOnLoadTrigger.placements, placement)
 end
+
 
 
 return addSlicerOnLoadTrigger
