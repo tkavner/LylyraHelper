@@ -26,10 +26,11 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private bool allTypes;
         private bool roomwide;
         private int slicerLength;
-        private int cutSize;
+        private int minimumCutSize;
         private bool onLoad;
         private bool used;
         private bool invert;
+        private bool cutSizeMatching;
         private string sliceableEntityTypes;
         private string flag;
 
@@ -41,13 +42,18 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             fragile = data.Bool("fragileSlicer", false);
             roomwide = data.Bool("roomwide", false);
             slicerLength = data.Int("slicerLength", 8);
-            cutSize = data.Int("cutSize", 16);
             onLoad = data.Bool("onLoadOnly", false);
             flag = data.Attr("flag", "");
             invert = data.Bool("invert", false);
+            cutSizeMatching = data.Bool("matchCutSize", false);
             sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
             entityTypes = LyraUtils.GetFullNames(data.Attr("entityTypes", ""));
             pluginVersion = data.Float("pluginVersion");
+            if (pluginVersion >= 2) minimumCutSize = data.Int("minimumCutSize", 16);
+            else
+            {
+                minimumCutSize = data.Int("cutSize", 16);
+            }
         }
 
 
@@ -147,39 +153,48 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                 if (collide || roomwide)
                 {
                     used = oneUse;
-                    Collider cUp = new Hitbox(entity.Collider.Width, slicerLength, 0, 0);
+                    Collider cUp = new Hitbox(entity.Width, slicerLength, 0, 0);
                     cUp.BottomCenter = entity.Collider.TopCenter;
 
-                    Collider cDown = new Hitbox(entity.Collider.Width, slicerLength, 0, 0);
+                    Collider cDown = new Hitbox(entity.Width, slicerLength, 0, 0);
                     cDown.TopCenter = entity.Collider.BottomCenter;
 
-                    Collider cRight = new Hitbox(slicerLength, entity.Collider.Height, 0, 0);
+                    Collider cRight = new Hitbox(slicerLength, entity.Height, 0, 0);
                     cRight.CenterLeft = entity.Collider.CenterRight;
 
-                    Collider cLeft = new Hitbox(slicerLength, entity.Collider.Height, 0, 0);
+                    Collider cLeft = new Hitbox(slicerLength, entity.Height, 0, 0);
                     cLeft.CenterRight = entity.Collider.CenterLeft;
+
+                    int horizCutSize = (int)Math.Max(entity.Width, minimumCutSize);
+                    int vertCutSize = (int)Math.Max(entity.Height, minimumCutSize);
+                    if (pluginVersion < 2)
+                    {
+                        horizCutSize = minimumCutSize;
+                        vertCutSize = minimumCutSize;
+                    }
+
                     if (direction == "All")
                     {
-                        entity.Add(new Slicer(-Vector2.UnitY, cutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings:sliceableEntityTypes));
-                        entity.Add(new Slicer(Vector2.UnitY, cutSize, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                        entity.Add(new Slicer(Vector2.UnitX, cutSize, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                        entity.Add(new Slicer(-Vector2.UnitX, cutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                        entity.Add(new Slicer(-Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings:sliceableEntityTypes));
+                        entity.Add(new Slicer(Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                        entity.Add(new Slicer(Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                        entity.Add(new Slicer(-Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                     }
                     else if (direction == "Up")
                     {
-                        entity.Add(new Slicer(-Vector2.UnitY, cutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                        entity.Add(new Slicer(-Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                     }
                     else if (direction == "Down")
                     {
-                        entity.Add(new Slicer(Vector2.UnitY, cutSize, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                        entity.Add(new Slicer(Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                     }
                     else if (direction == "Right")
                     {
-                        entity.Add(new Slicer(Vector2.UnitX, cutSize, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                        entity.Add(new Slicer(Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                     }
                     else if (direction == "Left")
                     {
-                        entity.Add(new Slicer(-Vector2.UnitX, cutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                        entity.Add(new Slicer(-Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                     }
                 }
             }

@@ -34,7 +34,7 @@ for _, dir in ipairs(directions) do
 			entityTypes = "",
 			direction = dir,
 			roomwide = false,
-			cutSize = 16,
+			minimumCutSize = 16,
 			slicerLength = 8,
 			onLoadOnly=false,
 			flag="",
