@@ -23,14 +23,14 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private bool fragile;
         private List<string> entityTypes;
         private float pluginVersion;
+        private bool matchLength;
         private bool allTypes;
         private bool roomwide;
         private int slicerLength;
-        private int minimumCutSize;
+        private int cutSize;
         private bool onLoad;
         private bool used;
         private bool invert;
-        private bool cutSizeMatching;
         private string sliceableEntityTypes;
         private string flag;
 
@@ -45,15 +45,11 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             onLoad = data.Bool("onLoadOnly", false);
             flag = data.Attr("flag", "");
             invert = data.Bool("invert", false);
-            cutSizeMatching = data.Bool("matchCutSize", false);
             sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
             entityTypes = LyraUtils.GetFullNames(data.Attr("entityTypes", ""));
             pluginVersion = data.Float("pluginVersion");
-            if (pluginVersion >= 2) minimumCutSize = data.Int("minimumCutSize", 16);
-            else
-            {
-                minimumCutSize = data.Int("cutSize", 16);
-            }
+            matchLength = data.Bool("matchCutSizeToLength", false);
+            cutSize = data.Int("cutSize", 16);
         }
 
 
@@ -165,13 +161,8 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                     Collider cLeft = new Hitbox(slicerLength, entity.Height, 0, 0);
                     cLeft.CenterRight = entity.Collider.CenterLeft;
 
-                    int horizCutSize = (int)Math.Max(entity.Width, minimumCutSize);
-                    int vertCutSize = (int)Math.Max(entity.Height, minimumCutSize);
-                    if (pluginVersion < 2)
-                    {
-                        horizCutSize = minimumCutSize;
-                        vertCutSize = minimumCutSize;
-                    }
+                    int horizCutSize = (int) (matchLength ? entity.Width : cutSize);
+                    int vertCutSize = (int)(matchLength ? entity.Height : cutSize);
 
                     if (direction == "All")
                     {

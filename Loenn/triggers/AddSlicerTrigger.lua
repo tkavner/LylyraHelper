@@ -34,12 +34,13 @@ for _, dir in ipairs(directions) do
 			entityTypes = "",
 			direction = dir,
 			roomwide = false,
-			minimumCutSize = 16,
+			cutSize = 16,
 			slicerLength = 8,
 			onLoadOnly=false,
 			flag="",
 			invert=false,
-			sliceableEntityTypes=""
+			sliceableEntityTypes="",
+			matchCutSizeToLength=false
 		})
 	}
 	table.insert(addSlicerOnLoadTrigger.placements, placement)
