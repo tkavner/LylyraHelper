@@ -168,11 +168,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             Entity.Position = Entity.Position + ColliderOffset;
             Collider tempHold = Entity.Collider;
 
-            string builder = "";
-            foreach (string s in settings.SliceableList)
-            {
-                builder += s + ", ";
-            }
 
             if (SlicingCollider != null) Entity.Collider = SlicingCollider;
             if (Entity.Collidable) CheckCollisions();

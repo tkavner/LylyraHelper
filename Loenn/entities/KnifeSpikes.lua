@@ -22,10 +22,17 @@ local spikeOptions = {
         left = "LylyraHelper/KnifeSpikesLeft", 
         right = "LylyraHelper/KnifeSpikesRight"
     },
+    fieldInformation = {
+        slicerLength = {
+			fieldType = "integer",
+			minimumValue = 1
+		}
+    }
 }
 -- for each spike direction, we'll let lönn's spike helper generate most of what we need and won't need to take care of
 -- then we can replace or modify what was already generated to finish up the plugins
 
 local knifeSpikes = spikeHelper.createEntityHandlers(spikeOptions)
+
 
 return knifeSpikes
