@@ -13,7 +13,8 @@ local spikeOptions = {
     originalTriggerSpike = false,
     placementData = {
         sliceOnImpact = false,
-        sliceableEntityTypes = ""
+        sliceableEntityTypes = "",
+        slicerLength = 8
     },
     directionNames = {
         up = "LylyraHelper/KnifeSpikesUp", 

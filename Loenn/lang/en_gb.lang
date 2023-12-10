@@ -32,6 +32,10 @@ entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_cliffside=Knife Spike
 entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_reflection=Knife Spikes (Left, Reflection)
 entities.LylyraHelper/KnifeSpikesLeft.placements.name.left_tentacles=Knife Spikes (Left, Tentacles)
 
+entities.LylyraHelper/KnifeSpikesUp.attributes.description.slicerLength=The maximum distance, in pixels, the Slicer extends beyond the attached entity's hitbox. Minimum: 1
+entities.LylyraHelper/KnifeSpikesRight.attributes.description.slicerLength=The maximum distance, in pixels, the Slicer extends beyond the attached entity's hitbox. Minimum: 1
+entities.LylyraHelper/KnifeSpikesDown.attributes.description.slicerLength=The maximum distance, in pixels, the Slicer extends beyond the attached entity's hitbox. Minimum: 1
+entities.LylyraHelper/KnifeSpikesLeft.attributes.description.slicerLength=The maximum distance, in pixels, the Slicer extends beyond the attached entity's hitbox. Minimum: 1
 
 entities.LylyraHelper/KnifeSpikesUp.attributes.description.sliceOnImpact=If checked, the KnifeSpikes will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the KnifeSpikes will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox
 entities.LylyraHelper/KnifeSpikesRight.attributes.description.sliceOnImpact=If checked, the KnifeSpikes will attempt to cut on the frame that it his a Cuttable Entity.\nIf unchecked, the KnifeSpikes will not attempt to cut until the Slicer no longer collides with the Cuttable Entity's hitbox

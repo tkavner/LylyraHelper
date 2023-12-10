@@ -144,11 +144,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scissors s;
                     if (direction.Y < 0)
                     {
-                        s = new Scissors(new Vector2[] { v1, v2 }, yOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
+                        s = new Scissors([v1, v2], yOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
                     }
                     else
                     {
-                        s = new Scissors(new Vector2[] { v2, v1 }, yOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
+                        s = new Scissors([v2, v1], yOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
                     }
                     base.Scene.Add(s);
                 }
@@ -159,11 +159,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     Scissors s;
                     if (direction.X < 0)
                     {
-                        s = new Scissors(new Vector2[] { v1, v2 }, xOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
+                        s = new Scissors([v1, v2], xOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
                     }
                     else
                     {
-                        s = new Scissors(new Vector2[] { v2, v1 }, xOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
+                        s = new Scissors([v2, v1], xOnly, fragileScissors, sliceableEntityTypes: sliceableEntityTypes);
                     }
                     base.Scene.Add(s);
                 }

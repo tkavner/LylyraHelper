@@ -33,7 +33,8 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             public SlicerSettings(string settings)
             {
-                SliceableList = LyraUtils.GetFullNames(settings);
+                SliceableList = LyraUtils.GetFullNames(settings); 
+
             }
 
             public SlicerSettings(string[] settings)
@@ -71,9 +72,9 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
-        public List<SliceableComponent> slicingEntities = new();
+        public List<SliceableComponent> slicingEntities = [];
         //some entities take a frame advancement to activate properly (Such as Kevins and MoveBlocks). This list is for those entities.
-        public List<Entity> secondFrameActivation = new();
+        public List<Entity> secondFrameActivation = [];
         public Collider SlicingCollider { get; set; }
         public Vector2 Direction { get; private set; }
         public int CutSize { get; private set; }
@@ -163,10 +164,16 @@ namespace Celeste.Mod.LylyraHelper.Components
                 masterRemovedList.Clear();
             }
 
-
             Vector2 positionHold = Entity.Position;
             Entity.Position = Entity.Position + ColliderOffset;
             Collider tempHold = Entity.Collider;
+
+            string builder = "";
+            foreach (string s in settings.SliceableList)
+            {
+                builder += s + ", ";
+            }
+
             if (SlicingCollider != null) Entity.Collider = SlicingCollider;
             if (Entity.Collidable) CheckCollisions();
             Slice();

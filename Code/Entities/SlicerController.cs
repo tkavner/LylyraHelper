@@ -24,10 +24,15 @@ namespace LylyraHelper.Entities
 
         }
 
-        public override void Awake(Scene scene)
+        public override void Added(Scene scene)
         {
             Slicer.SlicerSettings.DefaultSettings = new Slicer.SlicerSettings(settings);
-            scene.Remove(this);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (Scene!=null)Scene.Remove(this);
         }
     }
 }

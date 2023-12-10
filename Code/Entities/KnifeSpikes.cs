@@ -23,6 +23,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
     {
         public bool sliceOnImpact { get; private set; }
 
+        private int slicerLength;
+
         public static Entity LoadUp(Level level, LevelData levelData, Vector2 offset, EntityData data) => new KnifeSpikes(data, offset, Directions.Up);
         public static Entity LoadDown(Level level, LevelData levelData, Vector2 offset, EntityData data) => new KnifeSpikes(data, offset, Directions.Down);
         public static Entity LoadLeft(Level level, LevelData levelData, Vector2 offset, EntityData data) => new KnifeSpikes(data, offset, Directions.Left);
@@ -31,6 +33,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             base(data, offset, dir)
         {
             sliceOnImpact = data.Bool("sliceOnImpact", false);
+            slicerLength = data.Int("slicerLength", 5);
         }
 
         public KnifeSpikes(Vector2 position, int size, Directions direction, string type, bool sliceOnImpact) : base(position, size, direction, type)
@@ -41,7 +44,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            Add(new Slicer(VectorDirection(), (int) ((Direction == Directions.Up || Direction == Directions.Down) ? Width : Height), SceneAs<Level>(), 5, sliceOnImpact: sliceOnImpact));
+            Add(new Slicer(VectorDirection(), (int) ((Direction == Directions.Up || Direction == Directions.Down) ? Width : Height), SceneAs<Level>(), slicerLength, sliceOnImpact: sliceOnImpact));
         }
 
         private Vector2 VectorDirection()
