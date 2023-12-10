@@ -19,6 +19,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
     [CustomEntity("LylyraHelper/DashPaper")]
     public class DashPaper : Paper
     {
+
         private bool spawnScissors;
         private bool fragileScissors;
         private bool noTrail;

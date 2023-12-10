@@ -2,9 +2,14 @@
 
 namespace Celeste.Mod.LylyraHelper.Components
 {
-    public abstract class PaperComponent : Component
+    public class PaperComponent : Component
     {
-        public PaperComponent() : base(true, false) { }
+        public PaperComponent() : base(true, true) { }
+
+        public override void Render()
+        {
+            base.Render();
+        }
 
     }
 }

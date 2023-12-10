@@ -24,7 +24,8 @@ table.insert(paper.placements, {
         spawnScissors = false,
 		noParticleEffects = false,
         noTrail = false,
-		sliceableEntityTypes = ""
+		sliceableEntityTypes = "",
+		regenerationDelay = 0.0
 		--flag = "",
 		--invertFlag = false
     })
@@ -39,7 +40,8 @@ table.insert(paper.placements,
         spawnScissors = true,
 		noParticleEffects = false,
         noTrail = false,
-		sliceableEntityTypes = ""
+		sliceableEntityTypes = "",
+		regenerationDelay = 0.0
 		--flag = "",
 		--invertFlag = false
     })

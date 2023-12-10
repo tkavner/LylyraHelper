@@ -6,6 +6,7 @@ using LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -27,6 +28,51 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public bool[,] skip;
         public int[,][] holeTiles;
         public int[,][] tiles;
+
+        private enum RenderMode
+        {
+            TileSet, FromDecals, Preset
+        }
+
+        private bool shouldRegenerate;
+        private float regenerateTime;
+
+        public float regenerateTimer;
+        public RegenerationState regenState;
+        public enum RegenerationState
+        {
+            NoRegeneration, Regenerated, Regenerating, Waiting
+        }
+
+        public bool ShouldRegenerate()
+        {
+            return regenerateTimer <= 0 && regenState == RegenerationState.Waiting;
+        }
+
+        public IEnumerator Regenerate()
+        {
+            regenState = RegenerationState.Regenerating;
+            float progressPerFrame = 0.17F; //percent of full progress per frame 0.05 = 5%
+            while (regenerationProgress < 1)
+            {
+                regenerationProgress += progressPerFrame;
+                yield return null;
+            }
+            yield return 0.05F;
+            regenerationProgress = 0;
+            for (int i = 0; i < (int)Width / 8; i++)
+            {
+                for (int j = 0; j < (int)Height / 8; j++)
+                {
+                    skip[i, j] = false;
+                    holeTiles[i, j] = [-1, -1];
+                }
+            }
+            regenState = RegenerationState.Regenerated;
+            regenerateTimer = regenerateTime;
+            Remove(regenCoroutine);
+            yield break;
+        }
 
         public List<Decoration> decorations = new List<Decoration>();
 
@@ -93,7 +139,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             this.noEffects = data.Bool("noEffects");
             this.flagName = data.Attr("flag");
             invert = data.Bool("invertFlag", false);
-
             Depth = Depths.SolidsBelow + 200;
             skip = new bool[width / 8, height / 8];
             tiles = new int[width / 8, height / 8][];
@@ -103,12 +148,11 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 for (int j = 0; j < height / 8; j++)
                 {
                     tiles[i, j] = new int[2];
-                    holeTiles[i, j] = new int[2] { -1, -1 };
+                    holeTiles[i, j] = [-1, -1];
                 }
             }
             MTexture cloudTexturesUnsliced = GFX.Game[texture];
             MTexture holeTexturesUnsliced = GFX.Game[gapTexture];
-
             Add(new DashListener(OnDash));
             Add(new PlayerCollider(OnPlayer));
 
@@ -131,6 +175,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
             }
 
             AddDecorations();
+
+            //regeneration intialization
+
+            regenerateTimer = regenerateTime = data.Float("regenerationDelay", 0);
+            if (regenerateTimer > 0)
+            {
+                regenState = RegenerationState.Regenerated;
+            }
+            else
+            {
+                regenState = RegenerationState.NoRegeneration;
+            }
         }
 
         public override void Awake(Scene scene)
@@ -283,11 +339,17 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         bool previousState = false;
         private bool invert = false;
+        private float regenerationProgress;
+        private Coroutine regenCoroutine;
 
         public override void Update()
         {
             base.Update();
-            
+            if (regenState == RegenerationState.Waiting)
+            {
+                regenerateTimer -= Engine.DeltaTime;
+                if (regenerateTimer <= 0) Add(regenCoroutine = new Coroutine(Regenerate()));
+            }
 
         }
 
@@ -356,9 +418,14 @@ namespace Celeste.Mod.LylyraHelper.Entities
                     }
                 }
             }
+
             foreach (Decoration deco in decorations)
             {
                 deco.Render();
+            }
+            if (regenState == RegenerationState.Regenerating)
+            {
+                Draw.Rect(Position, Width, Height, Calc.HexToColor("FFFFFFFF") * regenerationProgress);
             }
         }
 
@@ -449,5 +516,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         internal virtual void AddDecorations(){}
 
+        internal void ResetRegenTimer()
+        {
+            if (regenState != RegenerationState.Regenerating || regenState == RegenerationState.NoRegeneration)
+            {
+                regenerateTimer = regenerateTime;
+                regenState = RegenerationState.Waiting;
+            }
+        }
     }
 }

@@ -154,6 +154,8 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             int furthestLeft = Int32.MaxValue;
             int furthestRight = -1;
             float chanceOfParticle = ParticleChance();
+
+            Parent.ResetRegenTimer();
             for (int i = (int)p1.X; i <= p2.X; i++)
             {
                 for (int j = (int)p1.Y; j <= p2.Y; j++)
@@ -172,6 +174,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                         }
 
                         Parent.skip[i, j] = true;
+
                         Parent.holeTiles[i, j] = Paper.holeEmpty[0];
                     }
                 }
