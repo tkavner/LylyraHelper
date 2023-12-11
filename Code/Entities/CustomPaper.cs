@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Celeste.Mod.LylyraHelper.Code.Entities
 {
-    internal class CustomPaper : Paper
+    public class CustomPaper : Paper
     {
 
         public CustomPaper(EntityData data, Vector2 offset) :
@@ -18,4 +18,5 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities
         {
 
         }
+    }
 }
