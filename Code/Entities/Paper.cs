@@ -505,9 +505,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 xTiles = (int) Calc.Clamp(xTiles, 0, parent.Width / 8 - position.X);
                 yTiles = (int) Calc.Clamp(yTiles, 0, parent.Height / 8 - position.Y);
                 this.size = new(xTiles, yTiles);
-                Logger.Log(LogLevel.Error, "LylyraHelper", "position XY: " + position.X + "|" + position.Y);
-                Logger.Log(LogLevel.Error, "LylyraHelper", "uvStart XY: " + uvStart.X + "|" + uvStart.Y);
-                Logger.Log(LogLevel.Error, "LylyraHelper", "Tiles: " + xTiles + "|" + yTiles);
                 texSplice = new MTexture[xTiles, yTiles];
 
                 for (int i = 0; i < xTiles; i++)
