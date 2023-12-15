@@ -20,13 +20,13 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached
             switch (spikes.Direction)
             {
                 case Spikes.Directions.Right:
-                    return new KnifeSpikes(position, desiredLength, Spikes.Directions.Right, overrideType, sliceOnImpact);
+                    return new KnifeSpikes(position, desiredLength, Spikes.Directions.Right, overrideType, sliceOnImpact, spikes.slicerLength, spikes.sliceableEntityTypes);
                 case Spikes.Directions.Left:
-                    return new KnifeSpikes(position, desiredLength, Spikes.Directions.Left, overrideType, sliceOnImpact);
+                    return new KnifeSpikes(position, desiredLength, Spikes.Directions.Left, overrideType, sliceOnImpact, spikes.slicerLength, spikes.sliceableEntityTypes);
                 case Spikes.Directions.Up:
-                    return new KnifeSpikes(position, desiredLength, Spikes.Directions.Up, overrideType, sliceOnImpact);
+                    return new KnifeSpikes(position, desiredLength, Spikes.Directions.Up, overrideType, sliceOnImpact, spikes.slicerLength, spikes.sliceableEntityTypes);
                 case Spikes.Directions.Down:
-                    return new KnifeSpikes(position, desiredLength, Spikes.Directions.Down, overrideType, sliceOnImpact);
+                    return new KnifeSpikes(position, desiredLength, Spikes.Directions.Down, overrideType, sliceOnImpact, spikes.slicerLength, spikes.sliceableEntityTypes);
             }
             return null;
         }

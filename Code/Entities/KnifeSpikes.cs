@@ -23,8 +23,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
     {
         public bool sliceOnImpact { get; private set; }
 
-        private int slicerLength;
-        private string sliceableEntityTypes;
+        public int slicerLength;
+        public string sliceableEntityTypes;
 
         public static Entity LoadUp(Level level, LevelData levelData, Vector2 offset, EntityData data) => new KnifeSpikes(data, offset, Directions.Up);
         public static Entity LoadDown(Level level, LevelData levelData, Vector2 offset, EntityData data) => new KnifeSpikes(data, offset, Directions.Down);
@@ -37,12 +37,13 @@ namespace Celeste.Mod.LylyraHelper.Entities
             slicerLength = data.Int("slicerLength", 5);
             sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
         }
-
-        public KnifeSpikes(Vector2 position, int size, Directions direction, string type, bool sliceOnImpact) : base(position, size, direction, type)
+        public KnifeSpikes(Vector2 position, int size, Directions direction, string type, bool sliceOnImpact, int slicerLength, string sliceableEntityTypes) :
+            base(position, size, direction, type)
         {
             this.sliceOnImpact = sliceOnImpact;
+            this.slicerLength = slicerLength;
+            this.sliceableEntityTypes = sliceableEntityTypes;
         }
-
         public override void Added(Scene scene)
         {
             base.Added(scene);
