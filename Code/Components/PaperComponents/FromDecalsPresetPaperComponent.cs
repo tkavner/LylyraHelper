@@ -28,14 +28,14 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
         public override void AddDecorations()
         {
 
-            string[] decalPlacementArr = decalPlacements.Split(';');
-            foreach (string strDecal in decalPlacementArr)
+            if (decalPlacements.Trim() != "")
             {
-                string[] data = strDecal.Split(',');
-                Logger.Log(LogLevel.Error, "LylyraHelper", "Data: " + strDecal);
-
-                Logger.Log(LogLevel.Error, "LylyraHelper", "Data parsed: " + data[0] + "|" + float.Parse(data[1]) + "|" + data[2]);
-                decorations.Add(new Decoration(Parent, data[0], Vector2.One + new Vector2(float.Parse(data[1]), float.Parse(data[2]))));
+                string[] decalPlacementArr = decalPlacements.Split(';');
+                foreach (string strDecal in decalPlacementArr)
+                {
+                    string[] data = strDecal.Split(',');
+                    decorations.Add(new Decoration(Parent, data[0], Vector2.One + new Vector2(float.Parse(data[1]), float.Parse(data[2]))));
+                }
             }
         } 
     }

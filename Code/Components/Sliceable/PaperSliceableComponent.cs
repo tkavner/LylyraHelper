@@ -200,10 +200,10 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                         else if (!emptyTop && emptyLeft && !emptyRight && emptyBottom) Parent.holeTiles[i, y] = Paper.holeTopSideRightEdge[0];
                         else if (emptyTop && !emptyLeft && emptyRight && !emptyBottom) Parent.holeTiles[i, y] = Paper.holeBottomSideLeftEdge[0];
                         else if (emptyTop && emptyLeft && !emptyRight && !emptyBottom) Parent.holeTiles[i, y] = Paper.holeBottomSideLeftEdge[0];
-                        else if (!emptyTop) Parent.holeTiles[i, y] = Paper.holeTopSide[counter1++ % Paper.holeTopSide.Length];
-                        else if (!emptyLeft) Parent.holeTiles[i, y] = Paper.holeLeftSide[counter2++ % Paper.holeLeftSide.Length];
-                        else if (!emptyRight) Parent.holeTiles[i, y] = Paper.holeRightSide[counter1++ % Paper.holeRightSide.Length];
-                        else if (!emptyBottom) Parent.holeTiles[i, y] = Paper.holeBottomSide[counter2++ % Paper.holeBottomSide.Length];
+                        else if (!emptyTop) Parent.holeTiles[i, y] = Paper.holeTopSide[x % Paper.holeTopSide.Length];
+                        else if (!emptyLeft) Parent.holeTiles[i, y] = Paper.holeLeftSide[y % Paper.holeLeftSide.Length];
+                        else if (!emptyRight) Parent.holeTiles[i, y] = Paper.holeRightSide[y % Paper.holeRightSide.Length];
+                        else if (!emptyBottom) Parent.holeTiles[i, y] = Paper.holeBottomSide[x % Paper.holeBottomSide.Length];
 
 
                         else Parent.holeTiles[i, y] = Paper.holeEmpty[0];

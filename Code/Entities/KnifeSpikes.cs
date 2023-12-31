@@ -56,26 +56,26 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
                     Collider cUp = new Hitbox(Width, slicerLength, 0, 0);
                     cUp.BottomCenter = Collider.TopCenter;
-                    Add(new Slicer(Vector2.UnitX, (int)((Direction == Directions.Up || Direction == Directions.Down) ? Width : Height), SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, settings: sliceableEntityTypes));
+                    Add(new Slicer(-Vector2.UnitY, (int)Width, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, settings: sliceableEntityTypes));
                     break;
 
                 case Directions.Down:
 
                     Collider cDown = new Hitbox(Width, slicerLength, 0, 0);
                     cDown.TopCenter = Collider.BottomCenter;
-                    Add(new Slicer(Vector2.UnitX, (int)((Direction == Directions.Up || Direction == Directions.Down) ? Width : Height), SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, settings: sliceableEntityTypes));
+                    Add(new Slicer(Vector2.UnitY, (int)Width, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, settings: sliceableEntityTypes));
                     break;
                 case Directions.Left:
 
                     Collider cLeft = new Hitbox(slicerLength, Height, 0, 0);
                     cLeft.CenterRight = Collider.CenterLeft;
-                    Add(new Slicer(Vector2.UnitX, (int)((Direction == Directions.Up || Direction == Directions.Down) ? Width : Height), SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, settings: sliceableEntityTypes));
+                    Add(new Slicer(-Vector2.UnitX, (int)Height, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, settings: sliceableEntityTypes));
                     break;
                 case Directions.Right:
 
                     Collider cRight = new Hitbox(slicerLength, Height, 0, 0);
                     cRight.CenterLeft = Collider.CenterRight;
-                    Add(new Slicer(Vector2.UnitX, (int)((Direction == Directions.Up || Direction == Directions.Down) ? Width : Height), SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, settings: sliceableEntityTypes));
+                    Add(new Slicer(Vector2.UnitX, (int)Height, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, settings: sliceableEntityTypes));
                     break;
             }
         }
