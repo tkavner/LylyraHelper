@@ -17,7 +17,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public DeathNote(EntityData data, Vector2 offset) : base(data, offset, "objects/LylyraHelper/dashPaper/deathnote", "objects/LylyraHelper/dashPaper/deathnotegap")
         {
             thisType = this.GetType();
-            Add(new Cuttable(this, Calc.HexToColor("8f0020")));
+            //Add(new Cuttable(this, Calc.HexToColor("8f0020")));
         }
 
 

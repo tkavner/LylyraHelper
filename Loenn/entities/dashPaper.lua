@@ -16,6 +16,19 @@ paper.minimumSize = {24, 24}
 paper.placements = {}
 paper.ignoredFields = consts.ignoredFields
 
+local wallpaperModes = {"Preset: Refill Gem", "From FG Decals"}
+
+
+paper.fieldInformation = {
+	decalStampData = {
+		fieldType = "LylyraHelper.DecalWallpaperField"
+	},
+	wallpaperMode = {
+        options = wallpaperModes,
+		editable = false
+    },
+}
+
 table.insert(paper.placements, {
 	name = "Dash Paper",
     data = helpers.createPlacementData('1', {
@@ -24,7 +37,11 @@ table.insert(paper.placements, {
         spawnScissors = false,
 		noParticleEffects = false,
         noTrail = false,
-		sliceableEntityTypes = ""
+		sliceableEntityTypes = "",
+		regenerationDelay = 0.0,
+		lockStampedDecals = false,
+		decalStampData = "",
+		wallpaperMode = "Preset: Refill Gem"
 		--flag = "",
 		--invertFlag = false
     })
@@ -39,7 +56,11 @@ table.insert(paper.placements,
         spawnScissors = true,
 		noParticleEffects = false,
         noTrail = false,
-		sliceableEntityTypes = ""
+		sliceableEntityTypes = "",
+		regenerationDelay = 0.0,
+		lockStampedDecals = false,
+		decalStampData = "",
+		wallpaperMode = "From FG Decals"
 		--flag = "",
 		--invertFlag = false
     })
@@ -127,6 +148,19 @@ local ninePatchOptions = {
 
 local papercolor = {202 / 255, 199 / 255, 227 / 255}
 
+local function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
 function paper.sprite(room, entity)
 	local sprites = {}
 	
@@ -151,56 +185,68 @@ function paper.sprite(room, entity)
 	local rectangle = drawableRectangle.fromRectangle("fill", x, y, width, height, papercolor)
 	table.insert(sprites, rectangle)
 	
-	for i=0,width - 8,8 do
-		local spriteTop = drawableSprite.fromTexture(frameTexture, {x = x + i, y = y, atlas = atlas})
-		spriteTop:useRelativeQuad((tileIncrementer % 4 + 1) * 8, 0, tileWidth, tileHeight, false, false)
-		table.insert(sprites, spriteTop)
-		local spriteBottom = drawableSprite.fromTexture(frameTexture, {x = x + i, y = y + height - 8, atlas = atlas})
-		spriteBottom:useRelativeQuad((tileIncrementer % 4 + 1) * 8, 5 * 8, tileWidth, tileHeight, false, false)
-		table.insert(sprites, spriteBottom)
+
+	if entity.wallpaperMode == "From FG Decals" then
+		if not (entity.decalStampData == nil and entity.decalStampData == "") then
 		
-		tileIncrementer = tileIncrementer + 1
-	end
-	if width >= 32 then
-		local borderSize = "standard"
-		if width / 8 % 2 == 0 then
-			borderSize = "wide"
-		end
-		local offsetBorder = -2
-		if width / 8 % 2 == 1 then
-			offsetBorder = -1.5
-		end
-		local topDecoration = drawableSprite.fromTexture(decorations["top"][borderSize], {x = x + width / 2 + offsetBorder * 8, y = y, atlas = atlas})
-		
-		topDecoration:setJustification(0.0, 0.0)
-		local bottomDecoration = drawableSprite.fromTexture(decorations["bottom"][borderSize], {x = x + width / 2 + offsetBorder * 8, y = y + height - 16, atlas = atlas})
-		bottomDecoration:setJustification(0.0, 0.0)
-		table.insert(sprites, topDecoration)
-		table.insert(sprites, bottomDecoration)
-		if height >= 48 then
-			borderSize = "standard"
-            if (width / 8 % 2 == 1) then
-                borderSize = "wide"
-            end
-            if (height / 8 % 2 == 1) then
-                if borderSize == "wide" then 
-					borderSize = "big"
-				else 
-					borderSize = "tall"
-				end
+			for decalStr in string.gmatch(entity.decalStampData, "([^;]+)") do
+				local decalData = helpers.splitString(decalStr, ",")
+				print(dump(decalData))
+				local decalSprite = drawableSprite.fromTexture(decalData[1], {x = x + tonumber(decalData[2]), y = y + tonumber(decalData[3]), atlas = atlas})
+				table.insert(sprites, decalSprite)
 			end
-			
-            local xOffset = -2
+		end
+	else
+		
+		for i=0,width - 8,8 do
+			local spriteTop = drawableSprite.fromTexture(frameTexture, {x = x + i, y = y, atlas = atlas})
+			spriteTop:useRelativeQuad((tileIncrementer % 4 + 1) * 8, 0, tileWidth, tileHeight, false, false)
+			table.insert(sprites, spriteTop)
+			local spriteBottom = drawableSprite.fromTexture(frameTexture, {x = x + i, y = y + height - 8, atlas = atlas})
+			spriteBottom:useRelativeQuad((tileIncrementer % 4 + 1) * 8, 5 * 8, tileWidth, tileHeight, false, false)
+			table.insert(sprites, spriteBottom)
+			tileIncrementer = tileIncrementer + 1
+		end
+		if width >= 32 then
+			local borderSize = "standard"
+			if width / 8 % 2 == 0 then
+				borderSize = "wide"
+			end
+			local offsetBorder = -2
 			if width / 8 % 2 == 1 then
-				xOffset = -2.5
+				offsetBorder = -1.5
 			end
-            local yOffset = -2
-			if height / 8 % 2 == 1 then
-				yOffset = -2.5
+			local topDecoration = drawableSprite.fromTexture(decorations["top"][borderSize], {x = x + width / 2 + offsetBorder * 8, y = y, atlas = atlas})
+		
+			topDecoration:setJustification(0.0, 0.0)
+			local bottomDecoration = drawableSprite.fromTexture(decorations["bottom"][borderSize], {x = x + width / 2 + offsetBorder * 8, y = y + height - 16, atlas = atlas})
+			bottomDecoration:setJustification(0.0, 0.0)
+			table.insert(sprites, topDecoration)
+			table.insert(sprites, bottomDecoration)
+			if height >= 48 then
+				borderSize = "standard"
+				if (width / 8 % 2 == 1) then
+					borderSize = "wide"
+				end
+				if (height / 8 % 2 == 1) then
+					if borderSize == "wide" then 
+						borderSize = "big"
+					else 
+						borderSize = "tall"
+					end
+				end
+				local xOffset = -2
+				if width / 8 % 2 == 1 then
+					xOffset = -2.5
+				end
+				local yOffset = -2
+				if height / 8 % 2 == 1 then
+					yOffset = -2.5
+				end
+				local centerDecoration = drawableSprite.fromTexture(decorations["center"][borderSize], {x = x + width / 2 + xOffset * 8, y = y + height / 2 + yOffset * 8, atlas = atlas})
+				centerDecoration:setJustification(0.0, 0.0)
+				table.insert(sprites, centerDecoration)
 			end
-			local centerDecoration = drawableSprite.fromTexture(decorations["center"][borderSize], {x = x + width / 2 + xOffset * 8, y = y + height / 2 + yOffset * 8, atlas = atlas})
-			centerDecoration:setJustification(0.0, 0.0)
-			table.insert(sprites, centerDecoration)
 		end
 	end
 	if entity.spawnScissors then

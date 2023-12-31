@@ -1,11 +1,13 @@
 ﻿using Celeste;
 using Celeste.Mod;
+using Celeste.Mod.LylyraHelper.Code.Components.PaperComponents;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Intefaces;
 using LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -21,12 +23,57 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Vector2 groupOrigin;
         private List<Paper> group;
         private bool GroupLeader { get; set; }
-        private MTexture[,] texSplice;
-        private MTexture[,] holeTexSplice;
 
         public bool[,] skip;
         public int[,][] holeTiles;
         public int[,][] tiles;
+
+        private enum RenderMode
+        {
+            TileSet, FromDecals, Preset
+        }
+
+        private bool shouldRegenerate;
+        private float regenerateTime;
+
+        public float regenerateTimer;
+        public RegenerationState regenState;
+
+        public Color WallpaperColor = Calc.HexToColor("cac7e3");
+        public enum RegenerationState
+        {
+            NoRegeneration, Regenerated, Regenerating, Waiting
+        }
+
+        public bool ShouldRegenerate()
+        {
+            return regenerateTimer <= 0 && regenState == RegenerationState.Waiting;
+        }
+
+        public IEnumerator Regenerate()
+        {
+            regenState = RegenerationState.Regenerating;
+            float progressPerFrame = 0.17F; //percent of full progress per frame 0.05 = 5%
+            while (regenerationProgress < 1)
+            {
+                regenerationProgress += progressPerFrame;
+                yield return null;
+            }
+            yield return 0.05F;
+            regenerationProgress = 0;
+            for (int i = 0; i < (int)Width / 8; i++)
+            {
+                for (int j = 0; j < (int)Height / 8; j++)
+                {
+                    skip[i, j] = false;
+                    holeTiles[i, j] = [-1, -1];
+                }
+            }
+            regenState = RegenerationState.Regenerated;
+            regenerateTimer = regenerateTime;
+            Remove(regenCoroutine);
+            yield break;
+        }
 
         public List<Decoration> decorations = new List<Decoration>();
 
@@ -64,16 +111,16 @@ namespace Celeste.Mod.LylyraHelper.Entities
         internal static int[][] holeLeftSide = new int[][] { new int[] { 0, 1 }, new int[] { 0, 2 }, new int[] { 0, 3 } };
         internal static int[][] holeLeftSideTopEdge = new int[][] { new int[] { 3, 1 } };
         internal static int[][] holeLeftSideBottomEdge = new int[][] { new int[] { 3, 2 } };
-        internal static int[][] holeRightSide = new int[][] { new int[] { 4, 1 }, new int[] { 4, 2 }, new int[] { 4, 3 } };
-        internal static int[][] holeRightSideTopEdge = new int[][] { new int[] { 1, 2 } };
-        internal static int[][] holeRightSideBottomEdge = new int[][] { new int[] { 1, 3 } };
+        internal static int[][] holeRightSide = [[4, 1], [4, 2], [4, 3]];
+        internal static int[][] holeRightSideTopEdge = [[1, 2]];
+        internal static int[][] holeRightSideBottomEdge = [[1, 3]];
 
-        internal static int[][] holeLeftTopCorner = new int[][] { new int[] { 0, 0 } };
-        internal static int[][] holeRightTopCorner = new int[][] { new int[] { 4, 0 } };
-        internal static int[][] holeRightBottomCorner = new int[][] { new int[] { 4, 4 } };
-        internal static int[][] holeLeftBottomCorner = new int[][] { new int[] { 0, 4 } };
+        internal static int[][] holeLeftTopCorner = [[0, 0]];
+        internal static int[][] holeRightTopCorner = [[4, 0]];
+        internal static int[][] holeRightBottomCorner = [[4, 4]];
+        internal static int[][] holeLeftBottomCorner = [[0, 4]];
 
-        internal static int[][] holeEmpty = new int[][] { new int[] { 2, 2 } };
+        public static int[][] holeEmpty = [[2, 2]];
 
         public Type thisType;
         internal bool noEffects;
@@ -93,7 +140,6 @@ namespace Celeste.Mod.LylyraHelper.Entities
             this.noEffects = data.Bool("noEffects");
             this.flagName = data.Attr("flag");
             invert = data.Bool("invertFlag", false);
-
             Depth = Depths.SolidsBelow + 200;
             skip = new bool[width / 8, height / 8];
             tiles = new int[width / 8, height / 8][];
@@ -103,34 +149,61 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 for (int j = 0; j < height / 8; j++)
                 {
                     tiles[i, j] = new int[2];
-                    holeTiles[i, j] = new int[2] { -1, -1 };
+                    holeTiles[i, j] = [-1, -1];
                 }
             }
-            MTexture cloudTexturesUnsliced = GFX.Game[texture];
-            MTexture holeTexturesUnsliced = GFX.Game[gapTexture];
-
             Add(new DashListener(OnDash));
             Add(new PlayerCollider(OnPlayer));
 
-            texSplice = new MTexture[8, 6];
-            for (int i = 0; i < 8; i++)
+            wallpaper = data.Attr("wallpaperMode", "Preset: Refill Gem");
+            if (wallpaper == "Preset: Refill Gem")
             {
-                for (int j = 0; j < 6; j++)
-                {
-                    texSplice[i, j] = cloudTexturesUnsliced.GetSubtexture(new Rectangle(i * 8, j * 8, 8, 8));
-                }
+
+                Add(new RefillPresetPaperComponent(gapTexture, this));
+            } 
+            else if (wallpaper == "From FG Decals")
+            {
+                string decalPlacements = data.Attr("decalStampData", "");
+                Add(new FromDecalsPresetPaperComponent(gapTexture, decalPlacements, this, WallpaperColor));
+            } 
+            else
+            {
+                Add(new RefillPresetPaperComponent(gapTexture, this));
             }
 
-            holeTexSplice = new MTexture[5, 5];
-            for (int i = 0; i < 5; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    holeTexSplice[i, j] = holeTexturesUnsliced.GetSubtexture(new Rectangle(i * 8, j * 8, 8, 8));
-                }
-            }
 
-            AddDecorations();
+            //regeneration intialization
+
+            regenerateTimer = regenerateTime = data.Float("regenerationDelay", 0);
+            if (regenerateTimer > 0)
+            {
+                regenState = RegenerationState.Regenerated;
+            }
+            else
+            {
+                regenState = RegenerationState.NoRegeneration;
+            }
+            Chooser<MTexture> sourceChooser = new Chooser<MTexture>(
+                    GFX.Game["particles/LylyraHelper/dashpapershard00"],
+                    GFX.Game["particles/LylyraHelper/dashpapershard01"],
+                    GFX.Game["particles/LylyraHelper/dashpapershard02"]);
+            Cuttable.paperScraps = new ParticleType()
+            {
+                SourceChooser = sourceChooser,
+                Color = Calc.HexToColor("cac7e3"),
+                Acceleration = new Vector2(0f, 4f),
+                LifeMin = 0.8f,
+                LifeMax = 1.6f,
+                Size = .8f,
+                SizeRange = 0.2f,
+                Direction = (float)Math.PI / 2f,
+                DirectionRange = (float)Math.PI * 2F,
+                SpeedMin = 5f,
+                SpeedMax = 7F,
+                RotationMode = ParticleType.RotationModes.Random,
+                ScaleOut = true,
+                UseActualDeltaTime = true
+            };
         }
 
         public override void Awake(Scene scene)
@@ -283,11 +356,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         bool previousState = false;
         private bool invert = false;
+        private float regenerationProgress;
+        private Coroutine regenCoroutine;
+        private string wallpaper;
 
         public override void Update()
         {
             base.Update();
-            
+            if (regenState == RegenerationState.Waiting)
+            {
+                regenerateTimer -= Engine.DeltaTime;
+                if (regenerateTimer <= 0) Add(regenCoroutine = new Coroutine(Regenerate()));
+            }
 
         }
 
@@ -322,43 +402,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
         public override void Render()
         {
             base.Render();
-            for (int i = 0; i < (int)Width / 8; i++)
+
+            if (regenState == RegenerationState.Regenerating)
             {
-                for (int j = 0; j < (int)Height / 8; j++)
-                {
-                    if (!skip[i, j])
-                    {
-                        texSplice[tiles[i, j][0], tiles[i, j][1]].DrawOutline(Position + new Vector2(i * 8, j * 8));
-                    }
-                    else
-                    {
-                        if (holeTiles[i, j] != holeEmpty[0])
-                        {
-                            holeTexSplice[holeTiles[i, j][0], holeTiles[i, j][1]].DrawOutline(Position + new Vector2(i * 8, j * 8));
-                        }
-                    }
-                }
-            }
-            for (int i = 0; i < (int)Width / 8; i++)
-            {
-                for (int j = 0; j < (int)Height / 8; j++)
-                {
-                    if (!skip[i, j])
-                    {
-                        texSplice[tiles[i, j][0], tiles[i, j][1]].Draw(Position + new Vector2(i * 8, j * 8));
-                    }
-                    else
-                    {
-                        if (holeTiles[i, j] != holeEmpty[0])
-                        {
-                            holeTexSplice[holeTiles[i, j][0], holeTiles[i, j][1]].Draw(Position + new Vector2(i * 8, j * 8));
-                        }
-                    }
-                }
-            }
-            foreach (Decoration deco in decorations)
-            {
-                deco.Render();
+                Draw.Rect(Position, Width, Height, Calc.HexToColor("FFFFFFFF") * regenerationProgress);
             }
         }
 
@@ -390,7 +437,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public bool TileEmpty(int x, int y)
         {
-            if (x >= 0 && x < (int)Width / 8 && y >= 0 && y < (int)Height / 8) return skip[x, y];
+            if (TileExists(x,y)) return skip[x, y];
             else return true;
         }
 
@@ -411,16 +458,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public class Decoration
         {
-            public Vector2 position; //in tiles relative to the paper
+            public Vector2 StartingTile; //in tiles relative to the paper
             public Vector2 size;
+            public Vector2 FirstRowAndColumnRenderOffset; //in pixels relative to tile position
             private MTexture[,] texSplice;
             private Paper parent;
+            private bool Visible = true;
 
-            public Decoration(Paper parent, String filePath, Vector2 tilingPosition, Vector2 size)
+            public Decoration(Paper parent, string filePath, Vector2 tilingPosition, Vector2 size)
             {
                 this.parent = parent;
                 this.size = size;
-                this.position = tilingPosition;
+                this.StartingTile = tilingPosition;
                 texSplice = new MTexture[(int)size.X, (int)size.Y];
                 MTexture uncut = GFX.Game[filePath];
                 for (int i = 0; i < (int)size.X; i++)
@@ -432,22 +481,136 @@ namespace Celeste.Mod.LylyraHelper.Entities
                 }
             }
 
+            public Decoration(Paper parent, string filePath, Vector2 relativePos /*in pixels*/)
+            {
+                this.parent = parent;
+                MTexture uncut = GFX.Game[filePath];
+
+                //our goal is to cut up the mtexture into sub textures from the relativePos listed as the Center into an array of sub MTextures
+
+                //relativePos is in pixels from the center of the decal to the top left of the image
+
+                //find the center pixel of the image (split in to parity cases) in UV coordinates
+                //for odd sized dimensions: this is Math.Ceil(dimension / 2)
+                //for even sized dimensions: this is dimension / 2 (Math.Ceil(dimension / 2) is equivelent)
+
+                Vector2 decalCenterPixelUVCoords = new Vector2((float) Math.Ceiling(uncut.Width/2F), (float)Math.Ceiling(uncut.Height / 2F));
+                //find how much of the original image to use in each direction. each should be ~= dimension / 2.
+                //the center pixel counts as part of the top and left of the image.
+
+
+                int maxLeftPixels = (int)decalCenterPixelUVCoords.X;
+                int maxRightPixels = uncut.Width - (int)decalCenterPixelUVCoords.X;
+                int maxTopPixels = uncut.Height - (int)decalCenterPixelUVCoords.Y;
+                int maxBottomPixels =  (int)decalCenterPixelUVCoords.Y;
+
+                //for each maxPixel trim based on criterion
+
+                //left pixel cannot go off left side of canvas, check and shrink if needed
+                //keep convention that since positive y = down the screen, bottom pixels = top of screen
+                int leftPixels = (int)Math.Min(maxLeftPixels, relativePos.X);
+                int rightPixels = (int)Math.Min(maxRightPixels, parent.Width - relativePos.X);
+                int bottomPixels = (int)Math.Min(maxBottomPixels, relativePos.Y);
+                int topPixels = (int)Math.Min(maxTopPixels, parent.Height - relativePos.Y);
+
+                //combine to get widths and heights
+                int renderedImageWidth = rightPixels + leftPixels;
+                int renderedImageHeight = topPixels + bottomPixels;
+
+                //subtract top and left from relative position to get starting tiling coordinate
+                //tilingPixels guarenteed to be positive on both x and y since leftPixels,bottomPixel <= relativePos on a per coord basis
+                Vector2 tilingPixelStart = relativePos - new Vector2(leftPixels, bottomPixels);
+                Vector2 tilingPixelEnd = tilingPixelStart + new Vector2(renderedImageWidth, renderedImageHeight);
+                Vector2 startingTileCoords = StartingTile = new Vector2((int)Math.Floor(tilingPixelStart.X / 8), (int)Math.Floor(tilingPixelStart.Y / 8));
+                Vector2 endingTileCoords = new Vector2((int)Math.Floor(tilingPixelEnd.X / 8), (int)Math.Floor(tilingPixelEnd.Y / 8));
+                Vector2 tilesRequired = size = endingTileCoords - startingTileCoords;
+
+                Vector2 startingPixelOffset = FirstRowAndColumnRenderOffset = tilingPixelStart - startingTileCoords * 8;
+                Vector2 startingUVCoordinate = decalCenterPixelUVCoords - new Vector2(leftPixels, bottomPixels);
+                Vector2 endingUVCoordinate = decalCenterPixelUVCoords + new Vector2(rightPixels, topPixels);
+                if (tilesRequired.X <= 0 || tilesRequired.Y <= 0)
+                {
+                    //this happens if the decal is completely off the canvas (can happen if resized)
+                    texSplice = new MTexture[0, 0];
+                    Visible = false;
+                    return;
+                }
+                texSplice = new MTexture[(int)tilesRequired.X, (int)tilesRequired.Y];
+                
+                for (int i = 0; i < tilesRequired.X; i++)
+                {
+                    for (int j = 0; j < tilesRequired.Y; j++)
+                    {
+                        int textureSizeX = 8;
+                        int textureSizeY = 8;
+                        if (i == 0 && startingPixelOffset.X != 0) textureSizeX = 8 - (int)startingPixelOffset.X;
+                        if (j == 0 && startingPixelOffset.Y != 0) textureSizeY = 8 - (int)startingPixelOffset.Y;
+                        int texturePixelX;
+                        if (i == 0)
+                        {
+                            texturePixelX = (int)startingUVCoordinate.X;
+                        }
+                        else
+                        {
+                            texturePixelX = i * 8 + (int)startingUVCoordinate.X - (int)FirstRowAndColumnRenderOffset.X;
+                        }
+                        int texturePixelY;
+                        if (j == 0)
+                        {
+                            texturePixelY = (int)startingUVCoordinate.Y;
+                        }
+                        else
+                        {
+                            texturePixelY = j * 8 + (int)startingUVCoordinate.Y - (int)FirstRowAndColumnRenderOffset.Y;
+                        }
+                        if (i == tilesRequired.X - 1) textureSizeX = (int)(endingUVCoordinate.X - texturePixelX);
+                        if (j == tilesRequired.Y - 1) textureSizeY = (int)(endingUVCoordinate.Y - texturePixelY);
+
+                        texSplice[i, j] = uncut.GetSubtexture(new Rectangle(texturePixelX, texturePixelY, textureSizeX, textureSizeY));
+
+                    }
+                }
+            }
+
+
             public void Render()
             {
+                if (Visible)
                 for (int i = 0; i < (int)size.X; i++)
                 {
                     for (int j = 0; j < (int)size.Y; j++)
                     {
-                        if (!parent.TileEmpty((position + new Vector2(i, j))))
+                        if (!parent.TileEmpty((StartingTile + new Vector2(i, j))))
                         {
-                            texSplice[i, j].Draw(parent.Position + position * 8 + new Vector2(i * 8, j * 8));
-                        }
+                            Vector2 offset = Vector2.Zero;
+                            if (i == 0) offset.X = FirstRowAndColumnRenderOffset.X;
+                            if (j == 0) offset.Y = FirstRowAndColumnRenderOffset.Y;
+                            Vector2 drawPos = parent.TopLeft + offset + StartingTile * 8 + new Vector2(i * 8, j * 8);
+                                texSplice[i, j].Draw(drawPos);
+                        } 
                     }
                 }
             }
+
+            private static float Mod(float x, float m)
+            {
+                return (x % m + m) % m;
+            }
+            private static Vector2 Mod(Vector2 x, float m)
+            {
+                return new Vector2((x.X % m + m) % m, (x.Y % m + m) % m);
+            }
         }
 
-        internal virtual void AddDecorations(){}
+        public virtual void AddDecorations(){}
 
+        internal void ResetRegenTimer()
+        {
+            if (regenState != RegenerationState.Regenerating && regenState != RegenerationState.NoRegeneration)
+            {
+                regenerateTimer = regenerateTime;
+                regenState = RegenerationState.Waiting;
+            }
+        }
     }
 }
