@@ -182,126 +182,50 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
             int counter1 = 0;
             int counter2 = 0;
-            //fix top and bottom holes
-            if (slicer.Direction.X != 0) 
             for (int i = (int)p1.X - 1; i <= p2.X + 1; i++)
-                {
-                    for (int j = 0; j <= 1; j++)
-                    {
-                        int x = i;
-                        int y1 = (int)p1.Y - j;
-                        int y2 = (int)p2.Y + j - 1;
-                        if (Parent.TileExists(x, y1))
-                        {
-                            bool emptyTop = Parent.TileEmpty(i, y1 - 1);
-                            bool emptyLeft = Parent.TileEmpty(i - 1, y1);
-                            bool emptyRight = Parent.TileEmpty(i + 1, y1);
-
-                            if (!emptyTop)
-                            {
-                                if (i == 0)
-                                {
-                                    Parent.holeTiles[i, y1] = Paper.holeTopSideLeftEdge[0];
-                                }
-                                else if (i == (int)Width / 8 - 1)
-                                {
-                                    Parent.holeTiles[i, y1] = Paper.holeTopSideLeftEdge[0];
-                                }
-                                else
-                                {
-                                    Parent.holeTiles[i, y1] = Paper.holeTopSide[(counter1++ % Paper.holeTopSide.Length)];
-                                }
-                            }
-                            else if (emptyTop && emptyLeft && emptyRight) Parent.holeTiles[i, y1] = Paper.holeEmpty[0];
-                        }
-
-                        if (Parent.TileExists(x, y2))
-                        {
-                            bool emptyTop = Parent.TileEmpty(i, y2 + 1);
-                            bool emptyLeft = Parent.TileEmpty(i - 1, y2);
-                            bool emptyRight = Parent.TileEmpty(i + 1, y2);
-
-                            if (!emptyTop)
-                            {
-                                if (i == 0)
-                                {
-                                    Parent.holeTiles[i, y2] = Paper.holeBottomSideLeftEdge[0];
-                                }
-                                else if (i == (int)Width / 8 - 1)
-                                {
-                                    Parent.holeTiles[i, y2] = Paper.holeBottomSideRightEdge[0];
-                                }
-                                else
-                                {
-                                    Parent.holeTiles[i, y2] = Paper.holeBottomSide[(counter2++ % Paper.holeBottomSide.Length)];
-                                }
-                            }
-                            else if (emptyTop && emptyLeft && emptyRight) Parent.holeTiles[i, y2] = Paper.holeEmpty[0];
-                        }
-                    }
-                }
-            else
             {
-                //left and right
-                for (int i = (int)p1.Y - 2; i <= p2.Y + 2; i++)
+                for (int j = (int)p1.Y - 1; j <= p2.Y + 1; j++)
                 {
-                    for (int j = 0; j <= 1; j++)
+
+                    int x = i;
+                    int y = j;
+                    if (Parent.TileExists(x, y))
                     {
-                        //left
-                        int y = i;
-                        int x1 = (int)p1.X - j;
-                        int x2 = (int)p2.X + j - 1;
-                        if (Parent.TileExists(x1, y))
+                        bool emptyTop = Parent.TileEmpty(i, y - 1);
+                        bool emptyLeft = Parent.TileEmpty(i - 1, y);
+                        bool emptyRight = Parent.TileEmpty(i + 1, y);
+                        bool emptyBottom = Parent.TileEmpty(i, y + 1);
+                        if (emptyTop && emptyLeft && emptyRight && emptyBottom) Parent.holeTiles[i, y] = Paper.holeEmpty[0];
+                        else if (!emptyTop && !emptyLeft && emptyRight && emptyBottom) Parent.holeTiles[i, y] = Paper.holeTopSideLeftEdge[0];
+                        else if (!emptyTop && emptyLeft && !emptyRight && emptyBottom) Parent.holeTiles[i, y] = Paper.holeTopSideRightEdge[0];
+                        else if (emptyTop && !emptyLeft && emptyRight && !emptyBottom) Parent.holeTiles[i, y] = Paper.holeBottomSideLeftEdge[0];
+                        else if (emptyTop && emptyLeft && !emptyRight && !emptyBottom) Parent.holeTiles[i, y] = Paper.holeBottomSideLeftEdge[0];
+                        else if (!emptyTop) Parent.holeTiles[i, y] = Paper.holeTopSide[counter1++ % Paper.holeTopSide.Length];
+                        else if (!emptyLeft) Parent.holeTiles[i, y] = Paper.holeLeftSide[counter2++ % Paper.holeLeftSide.Length];
+                        else if (!emptyRight) Parent.holeTiles[i, y] = Paper.holeRightSide[counter1++ % Paper.holeRightSide.Length];
+                        else if (!emptyBottom) Parent.holeTiles[i, y] = Paper.holeBottomSide[counter2++ % Paper.holeBottomSide.Length];
+
+
+                        else Parent.holeTiles[i, y] = Paper.holeEmpty[0];
+                        if (!emptyTop)
                         {
-                            bool emptyTop = Parent.TileEmpty(x1 - 1, y);
-
-                            bool emptyLeft = Parent.TileEmpty(x1, y - 1);
-
-                            bool emptyRight = Parent.TileEmpty(x1, y + 1);
-                            if (!emptyTop)
+                            if (i == 0)
                             {
-                                if (i == 0)
-                                {
-                                    Parent.holeTiles[x1, y] = Paper.holeLeftSideTopEdge[0];
-                                }
-                                else if (i == (int)Height / 8 - 1)
-                                {
-                                    Parent.holeTiles[x1, y] = Paper.holeLeftSideBottomEdge[0];
-                                }
-                                else
-                                {
-                                    Parent.holeTiles[x1, y] = Paper.holeLeftSide[(counter1++ % Paper.holeLeftSide.Length)];
-                                }
+                                Parent.holeTiles[i, y] = Paper.holeTopSideLeftEdge[0];
                             }
-                            else if (emptyTop && emptyLeft && emptyRight) Parent.holeTiles[x1, y] = Paper.holeEmpty[0];
-                        }
-                        //right
-                        if (Parent.TileExists(x2, y))
-                        {
-                            bool emptyTop = Parent.TileEmpty(x2 + 1, y);
-                            bool emptyLeft = Parent.TileEmpty(x2, y - 1);
-
-                            bool emptyRight = Parent.TileEmpty(x2, y + 1);
-                            if (!emptyTop)
+                            else if (i == (int)Width / 8 - 1)
                             {
-                                if (i == 0)
-                                {
-                                    Parent.holeTiles[x2, y] = Paper.holeRightSideTopEdge[0];
-                                }
-                                else if (i == (int)Height / 8 - 1)
-                                {
-                                    Parent.holeTiles[x2, y] = Paper.holeRightSideBottomEdge[0];
-                                }
-                                else
-                                {
-                                    Parent.holeTiles[x2, y] = Paper.holeRightSide[(counter2++ % Paper.holeRightSide.Length)];
-                                }
+                                Parent.holeTiles[i, y] = Paper.holeTopSideLeftEdge[0];
                             }
-                            else if (emptyTop && emptyLeft && emptyRight) Parent.holeTiles[x2, y] = Paper.holeEmpty[0];
+                            else
+                            {
+                                Parent.holeTiles[i, y] = Paper.holeTopSide[(counter1++ % Paper.holeTopSide.Length)];
+                            }
                         }
                     }
                 }
             }
+
             return null;
         }
     }
