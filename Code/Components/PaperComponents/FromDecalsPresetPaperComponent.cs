@@ -35,7 +35,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
                 Logger.Log(LogLevel.Error, "LylyraHelper", "Data: " + strDecal);
 
                 Logger.Log(LogLevel.Error, "LylyraHelper", "Data parsed: " + data[0] + "|" + float.Parse(data[1]) + "|" + data[2]);
-                decorations.Add(new Decoration(Parent, data[0], new Vector2(float.Parse(data[1]), float.Parse(data[2]))));
+                decorations.Add(new Decoration(Parent, data[0], Vector2.One + new Vector2(float.Parse(data[1]), float.Parse(data[2]))));
             }
         } 
     }

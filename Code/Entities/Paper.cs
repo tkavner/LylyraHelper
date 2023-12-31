@@ -437,7 +437,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public bool TileEmpty(int x, int y)
         {
-            if (x >= 0 && x < (int)Width / 8 && y >= 0 && y < (int)Height / 8) return skip[x, y];
+            if (TileExists(x,y)) return skip[x, y];
             else return true;
         }
 
@@ -458,17 +458,18 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         public class Decoration
         {
-            public Vector2 position; //in tiles relative to the paper
+            public Vector2 StartingTile; //in tiles relative to the paper
             public Vector2 size;
-            public Vector2 renderOffset; //in pixels relative to tile position
+            public Vector2 FirstRowAndColumnRenderOffset; //in pixels relative to tile position
             private MTexture[,] texSplice;
             private Paper parent;
+            private bool Visible = true;
 
             public Decoration(Paper parent, string filePath, Vector2 tilingPosition, Vector2 size)
             {
                 this.parent = parent;
                 this.size = size;
-                this.position = tilingPosition;
+                this.StartingTile = tilingPosition;
                 texSplice = new MTexture[(int)size.X, (int)size.Y];
                 MTexture uncut = GFX.Game[filePath];
                 for (int i = 0; i < (int)size.X; i++)
@@ -484,60 +485,120 @@ namespace Celeste.Mod.LylyraHelper.Entities
             {
                 this.parent = parent;
                 MTexture uncut = GFX.Game[filePath];
-                relativePos -= new Vector2(uncut.Width, uncut.Height)/2;
-                Vector2 uvStart = -relativePos;
-                if (uvStart.X <= 0) uvStart.X = 0;
-                if (uvStart.Y <= 0) uvStart.Y = 0;
-                this.position = new Vector2((int)(relativePos.X / 8), (int)(relativePos.Y / 8));/*in tiles*/
-                this.renderOffset = relativePos - (position * 8);/*in pixels*/
 
-                if (position.X < 0)
-                {
-                    position.X = 0;
-                    renderOffset.X = 0;
-                }
-                if (position.Y < 0) {
-                    position.Y = 0;
-                    renderOffset.Y = 0;
-                }
-                int xTiles = (int) (uncut.Width /*in pixels*/- uvStart.X/*in pixels*/) / 8 + (renderOffset.X != 0 ? 1 : 0);
-                int yTiles = (int) (uncut.Height /*in pixels*/- uvStart.Y/*in pixels*/) / 8 + (renderOffset.Y != 0 ? 1 : 0);
-                xTiles = (int) Calc.Clamp(xTiles, 0, parent.Width / 8 - position.X);
-                yTiles = (int) Calc.Clamp(yTiles, 0, parent.Height / 8 - position.Y);
-                this.size = new(xTiles, yTiles);
-                texSplice = new MTexture[xTiles, yTiles];
+                //our goal is to cut up the mtexture into sub textures from the relativePos listed as the Center into an array of sub MTextures
 
-                for (int i = 0; i < xTiles; i++)
+                //relativePos is in pixels from the center of the decal to the top left of the image
+
+                //find the center pixel of the image (split in to parity cases) in UV coordinates
+                //for odd sized dimensions: this is Math.Ceil(dimension / 2)
+                //for even sized dimensions: this is dimension / 2 (Math.Ceil(dimension / 2) is equivelent)
+
+                Vector2 decalCenterPixelUVCoords = new Vector2((float) Math.Ceiling(uncut.Width/2F), (float)Math.Ceiling(uncut.Height / 2F));
+                //find how much of the original image to use in each direction. each should be ~= dimension / 2.
+                //the center pixel counts as part of the top and left of the image.
+
+
+                int maxLeftPixels = (int)decalCenterPixelUVCoords.X;
+                int maxRightPixels = uncut.Width - (int)decalCenterPixelUVCoords.X;
+                int maxTopPixels = uncut.Height - (int)decalCenterPixelUVCoords.Y;
+                int maxBottomPixels =  (int)decalCenterPixelUVCoords.Y;
+
+                //for each maxPixel trim based on criterion
+
+                //left pixel cannot go off left side of canvas, check and shrink if needed
+                //keep convention that since positive y = down the screen, bottom pixels = top of screen
+                int leftPixels = (int)Math.Min(maxLeftPixels, relativePos.X);
+                int rightPixels = (int)Math.Min(maxRightPixels, parent.Width - relativePos.X);
+                int bottomPixels = (int)Math.Min(maxBottomPixels, relativePos.Y);
+                int topPixels = (int)Math.Min(maxTopPixels, parent.Height - relativePos.Y);
+
+                //combine to get widths and heights
+                int renderedImageWidth = rightPixels + leftPixels;
+                int renderedImageHeight = topPixels + bottomPixels;
+
+                //subtract top and left from relative position to get starting tiling coordinate
+                //tilingPixels guarenteed to be positive on both x and y since leftPixels,bottomPixel <= relativePos on a per coord basis
+                Vector2 tilingPixelStart = relativePos - new Vector2(leftPixels, bottomPixels);
+                Vector2 tilingPixelEnd = tilingPixelStart + new Vector2(renderedImageWidth, renderedImageHeight);
+                Vector2 startingTileCoords = StartingTile = new Vector2((int)Math.Floor(tilingPixelStart.X / 8), (int)Math.Floor(tilingPixelStart.Y / 8));
+                Vector2 endingTileCoords = new Vector2((int)Math.Floor(tilingPixelEnd.X / 8), (int)Math.Floor(tilingPixelEnd.Y / 8));
+                Vector2 tilesRequired = size = endingTileCoords - startingTileCoords;
+
+                Vector2 startingPixelOffset = FirstRowAndColumnRenderOffset = tilingPixelStart - startingTileCoords * 8;
+                Vector2 startingUVCoordinate = decalCenterPixelUVCoords - new Vector2(leftPixels, bottomPixels);
+                Vector2 endingUVCoordinate = decalCenterPixelUVCoords + new Vector2(rightPixels, topPixels);
+                if (tilesRequired.X <= 0 || tilesRequired.Y <= 0)
                 {
-                    for (int j = 0; j < yTiles; j++)
+                    //this happens if the decal is completely off the canvas (can happen if resized)
+                    texSplice = new MTexture[0, 0];
+                    Visible = false;
+                    return;
+                }
+                texSplice = new MTexture[(int)tilesRequired.X, (int)tilesRequired.Y];
+                
+                for (int i = 0; i < tilesRequired.X; i++)
+                {
+                    for (int j = 0; j < tilesRequired.Y; j++)
                     {
-                        int startPixelX = (int)(uvStart.X + i * 8);
-                        int startPixelY = (int)(uvStart.Y + j * 8);
                         int textureSizeX = 8;
                         int textureSizeY = 8;
-                        if (i == 0) textureSizeX = (int)(8 - (int)renderOffset.X);
-                        if (j == 0) textureSizeY = (int)(8 - (int)renderOffset.Y);
+                        if (i == 0 && startingPixelOffset.X != 0) textureSizeX = 8 - (int)startingPixelOffset.X;
+                        if (j == 0 && startingPixelOffset.Y != 0) textureSizeY = 8 - (int)startingPixelOffset.Y;
+                        int texturePixelX;
+                        if (i == 0)
+                        {
+                            texturePixelX = (int)startingUVCoordinate.X;
+                        }
+                        else
+                        {
+                            texturePixelX = i * 8 + (int)startingUVCoordinate.X - (int)FirstRowAndColumnRenderOffset.X;
+                        }
+                        int texturePixelY;
+                        if (j == 0)
+                        {
+                            texturePixelY = (int)startingUVCoordinate.Y;
+                        }
+                        else
+                        {
+                            texturePixelY = j * 8 + (int)startingUVCoordinate.Y - (int)FirstRowAndColumnRenderOffset.Y;
+                        }
+                        if (i == tilesRequired.X - 1) textureSizeX = (int)(endingUVCoordinate.X - texturePixelX);
+                        if (j == tilesRequired.Y - 1) textureSizeY = (int)(endingUVCoordinate.Y - texturePixelY);
 
-                        if (i == xTiles - 1) textureSizeX = (int)Math.Min((uncut.Width - i * 8 - uvStart.X), 8);
-                        if (j == yTiles - 1) textureSizeY = (int)Math.Min(((uncut.Height - j * 8 - uvStart.Y)), 8);
-                        texSplice[i, j] = uncut.GetSubtexture(new Rectangle(startPixelX, startPixelY, textureSizeX, textureSizeY));
+                        texSplice[i, j] = uncut.GetSubtexture(new Rectangle(texturePixelX, texturePixelY, textureSizeX, textureSizeY));
+
                     }
                 }
             }
 
+
             public void Render()
             {
+                if (Visible)
                 for (int i = 0; i < (int)size.X; i++)
                 {
                     for (int j = 0; j < (int)size.Y; j++)
                     {
-                        if (!parent.TileEmpty((position + new Vector2(i, j))))
+                        if (!parent.TileEmpty((StartingTile + new Vector2(i, j))))
                         {
-                            Vector2 drawPos = parent.TopLeft + renderOffset + position * 8 + new Vector2(i * 8, j * 8);
-                            texSplice[i, j].Draw(drawPos);
-                        }
+                            Vector2 offset = Vector2.Zero;
+                            if (i == 0) offset.X = FirstRowAndColumnRenderOffset.X;
+                            if (j == 0) offset.Y = FirstRowAndColumnRenderOffset.Y;
+                            Vector2 drawPos = parent.TopLeft + offset + StartingTile * 8 + new Vector2(i * 8, j * 8);
+                                texSplice[i, j].Draw(drawPos);
+                        } 
                     }
                 }
+            }
+
+            private static float Mod(float x, float m)
+            {
+                return (x % m + m) % m;
+            }
+            private static Vector2 Mod(Vector2 x, float m)
+            {
+                return new Vector2((x.X % m + m) % m, (x.Y % m + m) % m);
             }
         }
 

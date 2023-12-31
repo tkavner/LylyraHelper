@@ -47,7 +47,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
             base.Render();
             for (int i = 0; i < (int)Entity.Width / 8; i++)
             {
-                for (int j = 0; j < (int)Entity.Height / 8; j++)
+                /*for (int j = 0; j < (int)Entity.Height / 8; j++)
                 {
                     if (!Parent.skip[i, j])
                     {
@@ -55,12 +55,12 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
                     }
                     else
                     {
-                        if (Parent.holeTiles[i, j] != Paper.holeEmpty[0])
+                        if (Parent.holeTiles[i, j] != holeEmpty[0])
                         {
                             holeTexSplice[Parent.holeTiles[i, j][0], Parent.holeTiles[i, j][1]].DrawOutline(Parent.Position + new Vector2(i * 8, j * 8));
                         }
                     }
-                }
+                }*/
             }
             for (int i = 0; i < (int)Parent.Width / 8; i++)
             {
@@ -72,7 +72,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
                     }
                     else
                     {
-                        if (Parent.holeTiles[i, j] != Paper.holeEmpty[0])
+                        if (Parent.holeTiles[i, j] != holeEmpty[0])
                         {
                             holeTexSplice[Parent.holeTiles[i, j][0], Parent.holeTiles[i, j][1]].Draw(Parent.Position + new Vector2(i * 8, j * 8));
                         }
