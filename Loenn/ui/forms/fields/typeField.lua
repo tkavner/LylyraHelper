@@ -6,6 +6,8 @@ local uiElements = require("ui.elements")
 local listOfTypeField = {}
 listOfTypeField.fieldType = "LylyraHelper.TypeField"
 
+
+--much of this was adapted from frosthelper's source code because ja is a saint of open sourcing and letting me see how to do this stuff
 local function getEntitiesInBox(room)
     local theEntity = nil
     for _, entity in ipairs(room.entities) do

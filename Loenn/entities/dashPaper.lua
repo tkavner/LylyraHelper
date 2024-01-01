@@ -39,7 +39,6 @@ table.insert(paper.placements, {
         noTrail = false,
 		sliceableEntityTypes = "",
 		regenerationDelay = 0.0,
-		lockStampedDecals = false,
 		decalStampData = "",
 		wallpaperMode = "Preset: Refill Gem"
 		--flag = "",
@@ -58,7 +57,6 @@ table.insert(paper.placements,
         noTrail = false,
 		sliceableEntityTypes = "",
 		regenerationDelay = 0.0,
-		lockStampedDecals = false,
 		decalStampData = "",
 		wallpaperMode = "From FG Decals"
 		--flag = "",

@@ -4,40 +4,64 @@ local utils = require("utils")
 local languageRegistry = require("language_registry")
 local uiElements = require("ui.elements")
 local decalStruct = require("structs.decal")
+local helpers = require("mods").requireFromPlugin("helpers")
+local contextWindow = require("ui.windows.selection_context_window")
+local windows = require("ui.windows")
 local listOfTypeField = {}
 listOfTypeField.fieldType = "LylyraHelper.DecalWallpaperField"
 
+local function findValue(table, value)
+  for k,v in pairs(table) do
+    if table[k] and table[k]._textStr and helpers.starts(table[k]._textStr, value) then
+      return k
+    end
+  end
+  return false
+end
 
-local function getEntitiesInBox(room)
-    --a workaround until I can convince loenn devs to include the entity a formfield belongs to be easily accessible
-    
-    
+local function getEntitiesInBox(formField, room)
+    --absolutely cursed workaround until I can convince loenn devs to include the entity a formfield belongs to be easily accessible
+    local edittingText = formField.label.__ui.root.all[findValue(formField.label.__ui.root.all, "Editing Selection")]:getText()
+    local index = edittingText:match'^.*() '
+    local PaperID = tonumber(string.sub(edittingText,index,string.len(edittingText)))
+    local ourPaper = nil
     for _, entity in ipairs(room.entities) do
-        if entity and entity["decalStampData"] and not entity.lockStampedDecals and entity.wallpaperMode == "From FG Decals" then
-            local r1 = utils.rectangle(entity.x, entity.y, entity.width, entity.height)
-
-            local builder = ""
-            for __, decal in ipairs(room.decalsFg) do
-            
-                local r2 = nil
-                local e2Width = decal.width or decal.Width or 8
-                local e2Height = decal.height or decal.Height or 8
-                r2 = utils.rectangle(decal.x, decal.y, e2Width, e2Height)
-                local deltaX = decal.x - entity.x
-                local deltaY = decal.y - entity.y
-                if utils.aabbCheck(r1, r2) then
-                    builder = builder..(decal.texture)..","..(deltaX)..","..(deltaY)..";"
-                end
-            end
-            entity.decalStampData = string.sub(builder, 1, -2)
+        if tonumber(entity["_id"]) == PaperID then
+            ourPaper = entity
+            break
         end
     end
+    if ourPaper == nil then
+        return ""
+    end
+    local PaperX = ourPaper.x
+    local PaperY = ourPaper.y
+    local PaperWidth = ourPaper.width
+    local PaperHeight = ourPaper.height
+    local r1 = utils.rectangle(PaperX, PaperY, PaperWidth, PaperHeight)
+    local builder = ""
+    for _, decal in ipairs(room.decalsFg) do
+            
+        local r2 = nil
+        local e2Width = decal.width or decal.Width or 8
+        local e2Height = decal.height or decal.Height or 8
+        r2 = utils.rectangle(decal.x, decal.y, e2Width, e2Height)
+        local deltaX = decal.x - PaperX
+        local deltaY = decal.y - PaperY
+        if utils.aabbCheck(r1, r2) then
+            builder = builder..(decal.texture)..","..(deltaX)..","..(deltaY)..";"
+        end
+    end    
+    
+    return string.sub(builder, 1, -2)        
+
 
 end
 
 local function buttonPressed(formField)
     return function (element)
-        getEntitiesInBox(state.getSelectedRoom())
+        
+        formField.field.text = tostring(getEntitiesInBox(formField, state.getSelectedRoom()))
 
         formField:notifyFieldChanged()
     end
@@ -77,7 +101,7 @@ function listOfTypeField.getElement(name, value, options)
 
     button.style.padding *= 0.36
     button.style.spacing = 0
-    button.tooltipText = "*FrostHelper required*\nThis field will be set to the names of all entities overlapped by the Slicer Controller. This will overwrite any information currently there."-- tostring(language.ui.lylyrahelper.typeField.tooltip)
+    button.tooltipText = "*FrostHelper required*\nThis field will be set to the names of all FG Decals whose *centers* OF ALL PAPER are overlapped by the paper. This will overwrite any information currently there.\n\nMAKE SURE TO SET "-- tostring(language.ui.lylyrahelper.typeField.tooltip)
     formField.field:addChild(button)
     formField.field.button = button
 
