@@ -66,6 +66,11 @@ entities.LylyraHelper/DashPaper.attributes.description.spawnScissors=If checked,
 entities.LylyraHelper/DashPaper.attributes.description.noParticleEffects=If checked, this entity does not emit particle effects (besides player trail effects)
 entities.LylyraHelper/DashPaper.attributes.description.noTrail=If checked, this entity will not add a trail of particle effects to the player when the player is inside the paper.
 entities.LylyraHelper/DashPaper.attributes.description.sliceableEntityTypes=(Optional) The full name of the type(s) of entity(s) Scissors created by this Dash Paper can slice.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nLeave blank to allow slicing of all types in your SlicerController.\nIf FrostHelper is installed, you can use either Full Names or Entity IDs (the text at the top of a window when you edit an entity, ex: fallingBlock, LylyraHelper/DashPaper).
+entities.LylyraHelper/DashPaper.attributes.description.regenerationDelay=How long in seconds before the paper should reset. Set to 0 to not regenerate / reset.
+entities.LylyraHelper/DashPaper.attributes.description.decalStampData=(Optional)Data for decals to be rendered on the paper. PLEASE JUST USE THE SET FROM FG DECALS BUTTON, do not attempt to edit this one yourself.
+entities.LylyraHelper/DashPaper.attributes.description.wallpaperMode=What preset decals to add to your paper.
+entities.LylyraHelper/DashPaper.attributes.description.wallpaperColor=Color to make the paper background.
+
 
 #entities.LylyraHelper/DashPaper.attributes.description.FragileScissors=
 #entities.LylyraHelper/DashPaper.attributes.description.Flag=The name of the session flag to set. Flag is set to true
