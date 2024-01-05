@@ -187,17 +187,6 @@ function paper.sprite(room, entity)
 	local r,g,b = helpers.hex2rgb(wallpaperColor)
 	local rectangle = drawableRectangle.fromRectangle("fill", x, y, width, height, {r / 255, g / 255, b / 255})
 	table.insert(sprites, rectangle)
-		local decalStampData = entity.decalStampData or ""
-
-		if not (decalStampData == nil and decalStampData == "") then
-		
-			for decalStr in string.gmatch(decalStampData, "([^;]+)") do
-				local decalData = helpers.splitString(decalStr, ",")
-				print(dump(decalData))
-				local decalSprite = drawableSprite.fromTexture(decalData[1], {x = x + tonumber(decalData[2]), y = y + tonumber(decalData[3]), atlas = atlas})
-				table.insert(sprites, decalSprite)
-			end
-		end
 	
 	if entity.wallpaperMode == "Preset: Refill Gem" then
 		
@@ -252,6 +241,18 @@ function paper.sprite(room, entity)
 			end
 		end
 	end
+
+	
+	local decalStampData = entity.decalStampData or ""
+
+	if not (decalStampData == nil and decalStampData == "") then
+	for decalStr in string.gmatch(decalStampData, "([^;]+)") do
+		local decalData = helpers.splitString(decalStr, ",")
+		local decalSprite = drawableSprite.fromTexture(decalData[1], {x = x + tonumber(decalData[2]), y = y + tonumber(decalData[3]), atlas = atlas})
+		table.insert(sprites, decalSprite)
+		end
+	end
+
 	if entity.spawnScissors then
 		
 		if width == 24 then
