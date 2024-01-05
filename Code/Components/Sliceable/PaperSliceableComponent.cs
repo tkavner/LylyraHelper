@@ -15,7 +15,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 {
     public class PaperSliceableComponent : SliceableComponent
     {
-        private Color Color = Calc.HexToColor("cac7e3");
         public static ParticleType paperScraps;
         private Dictionary<Slicer, Vector2> slicerStarts = new Dictionary<Slicer, Vector2>();
         public PaperSliceableComponent(bool active, bool visible) : base(active, visible)
@@ -170,7 +169,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                             if (j < furthestTop) furthestTop = j;
                             if (j > furthestDown) furthestDown = j;
 
-                            if (particleRandom.NextFloat() < chanceOfParticle) SceneAs<Level>().ParticlesFG.Emit(paperScraps, 1, Position + new Vector2(i * 8 + 4, j * 8 + 4), new Vector2(4), Color);
+                            if (particleRandom.NextFloat() < chanceOfParticle) SceneAs<Level>().ParticlesFG.Emit(paperScraps, 1, Position + new Vector2(i * 8 + 4, j * 8 + 4), new Vector2(4), Parent.WallpaperColor);
                         }
 
                         Parent.skip[i, j] = true;

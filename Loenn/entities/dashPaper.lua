@@ -16,7 +16,7 @@ paper.minimumSize = {24, 24}
 paper.placements = {}
 paper.ignoredFields = consts.ignoredFields
 
-local wallpaperModes = {"Preset: Refill Gem", "From FG Decals"}
+local wallpaperModes = {"Preset: Refill Gem", "Blank"}
 
 
 paper.fieldInformation = {
@@ -26,6 +26,9 @@ paper.fieldInformation = {
 	wallpaperMode = {
         options = wallpaperModes,
 		editable = false
+    },
+	wallpaperColor = {
+        fieldType = "color"
     },
 }
 
@@ -40,7 +43,8 @@ table.insert(paper.placements, {
 		sliceableEntityTypes = "",
 		regenerationDelay = 0.0,
 		decalStampData = "",
-		wallpaperMode = "Preset: Refill Gem"
+		wallpaperMode = "Preset: Refill Gem",
+		wallpaperColor = "cac7e3"
 		--flag = "",
 		--invertFlag = false
     })
@@ -58,7 +62,8 @@ table.insert(paper.placements,
 		sliceableEntityTypes = "",
 		regenerationDelay = 0.0,
 		decalStampData = "",
-		wallpaperMode = "From FG Decals"
+		wallpaperMode = "Preset: Refill Gem",
+		wallpaperColor = "cac7e3"
 		--flag = "",
 		--invertFlag = false
     })
@@ -178,23 +183,23 @@ function paper.sprite(room, entity)
     local borderBottom = tileHeight
     local realSize = false
 	local tileIncrementer = 0
-	
-	
-	local rectangle = drawableRectangle.fromRectangle("fill", x, y, width, height, papercolor)
+	local wallpaperColor = entity.wallpaperColor or "cac7e3"
+	local r,g,b = helpers.hex2rgb(wallpaperColor)
+	local rectangle = drawableRectangle.fromRectangle("fill", x, y, width, height, {r / 255, g / 255, b / 255})
 	table.insert(sprites, rectangle)
-	
+		local decalStampData = entity.decalStampData or ""
 
-	if entity.wallpaperMode == "From FG Decals" then
-		if not (entity.decalStampData == nil and entity.decalStampData == "") then
+		if not (decalStampData == nil and decalStampData == "") then
 		
-			for decalStr in string.gmatch(entity.decalStampData, "([^;]+)") do
+			for decalStr in string.gmatch(decalStampData, "([^;]+)") do
 				local decalData = helpers.splitString(decalStr, ",")
 				print(dump(decalData))
 				local decalSprite = drawableSprite.fromTexture(decalData[1], {x = x + tonumber(decalData[2]), y = y + tonumber(decalData[3]), atlas = atlas})
 				table.insert(sprites, decalSprite)
 			end
 		end
-	else
+	
+	if entity.wallpaperMode == "Preset: Refill Gem" then
 		
 		for i=0,width - 8,8 do
 			local spriteTop = drawableSprite.fromTexture(frameTexture, {x = x + i, y = y, atlas = atlas})

@@ -13,14 +13,16 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
 {
     public class PresetPaperComponent : PaperComponent
     {
+        private string decalPlacements;
         private MTexture[,] holeTexSplice;
         internal Color WallpaperColor;
         internal List<Decoration> decorations = [];
 
-        public PresetPaperComponent(string gapTexture, Paper Parent) : base(Parent)
+        public PresetPaperComponent(string gapTexture, string decalPlacements, Paper Parent, Color wallpaperColor) : base(Parent)
         {
             MTexture holeTexturesUnsliced = GFX.Game[gapTexture];
-
+            this.decalPlacements = decalPlacements;
+            this.WallpaperColor = wallpaperColor;
             holeTexSplice = new MTexture[5, 5];
             for (int i = 0; i < 5; i++)
             {
@@ -39,7 +41,16 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
 
         public virtual void AddDecorations()
         {
-            
+
+            if (decalPlacements.Trim() != "")
+            {
+                string[] decalPlacementArr = decalPlacements.Split(';');
+                foreach (string strDecal in decalPlacementArr)
+                {
+                    string[] data = strDecal.Split(',');
+                    decorations.Add(new Decoration(Parent, data[0], Vector2.One + new Vector2(float.Parse(data[1]), float.Parse(data[2]))));
+                }
+            }
         }
 
         public override void Render()
@@ -47,7 +58,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
             base.Render();
             for (int i = 0; i < (int)Entity.Width / 8; i++)
             {
-                /*for (int j = 0; j < (int)Entity.Height / 8; j++)
+                for (int j = 0; j < (int)Entity.Height / 8; j++)
                 {
                     if (!Parent.skip[i, j])
                     {
@@ -60,7 +71,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
                             holeTexSplice[Parent.holeTiles[i, j][0], Parent.holeTiles[i, j][1]].DrawOutline(Parent.Position + new Vector2(i * 8, j * 8));
                         }
                     }
-                }*/
+                }
             }
             for (int i = 0; i < (int)Parent.Width / 8; i++)
             {
@@ -74,7 +85,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
                     {
                         if (Parent.holeTiles[i, j] != holeEmpty[0])
                         {
-                            holeTexSplice[Parent.holeTiles[i, j][0], Parent.holeTiles[i, j][1]].Draw(Parent.Position + new Vector2(i * 8, j * 8));
+                            holeTexSplice[Parent.holeTiles[i, j][0], Parent.holeTiles[i, j][1]].Draw(Parent.Position + new Vector2(i * 8, j * 8), Vector2.Zero, WallpaperColor);
                         }
                     }
                 }

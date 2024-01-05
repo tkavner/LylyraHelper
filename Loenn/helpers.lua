@@ -6,6 +6,12 @@ local consts = require("mods").requireFromPlugin("consts")
 
 local helpers = {}
 
+--https://gist.github.com/jasonbradley/4357406 stolen from here cuz i cbf to write yet another color conversion function
+function helpers.hex2rgb(hex)
+    hex = hex:gsub("#","")
+    return tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+end
+
 function helpers.union(...)
     local tbl = {}
     local source = {...}

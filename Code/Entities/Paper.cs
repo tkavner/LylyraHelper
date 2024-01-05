@@ -156,19 +156,20 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Add(new PlayerCollider(OnPlayer));
 
             wallpaper = data.Attr("wallpaperMode", "Preset: Refill Gem");
+            string decalPlacements = data.Attr("decalStampData", "");
+            WallpaperColor = Calc.HexToColor(data.Attr("wallpaperColor", "cac7e3"));
             if (wallpaper == "Preset: Refill Gem")
             {
 
-                Add(new RefillPresetPaperComponent(gapTexture, this));
+                Add(new RefillPresetPaperComponent(gapTexture, decalPlacements, this, WallpaperColor));
             } 
-            else if (wallpaper == "From FG Decals")
+            else if (wallpaper == "Blank" || wallpaper == "From FG Decals")
             {
-                string decalPlacements = data.Attr("decalStampData", "");
-                Add(new FromDecalsPresetPaperComponent(gapTexture, decalPlacements, this, WallpaperColor));
+                Add(new BlankPresetPaperComponent(gapTexture, decalPlacements, this, WallpaperColor));
             } 
             else
             {
-                Add(new RefillPresetPaperComponent(gapTexture, this));
+                Add(new RefillPresetPaperComponent(gapTexture, decalPlacements, this, WallpaperColor));
             }
 
 
@@ -190,7 +191,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Cuttable.paperScraps = new ParticleType()
             {
                 SourceChooser = sourceChooser,
-                Color = Calc.HexToColor("cac7e3"),
+                Color = WallpaperColor,
                 Acceleration = new Vector2(0f, 4f),
                 LifeMin = 0.8f,
                 LifeMax = 1.6f,

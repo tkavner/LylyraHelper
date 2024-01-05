@@ -13,9 +13,9 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
     public class RefillPresetPaperComponent : PresetPaperComponent
     {
 
-        public RefillPresetPaperComponent(string gapTexture, Paper Parent) : base(gapTexture, Parent)
+        public RefillPresetPaperComponent(string gapTexture, string decalPlacements, Paper Parent, Color wallpaperColor) : base(gapTexture, decalPlacements, Parent, wallpaperColor)
         {
-            WallpaperColor = Calc.HexToColor("cac7e3");
+            WallpaperColor = wallpaperColor;
         }
 
         public override void Render()
@@ -63,6 +63,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
                         new Vector2(i, height / 8 - 1), new Vector2(1, 1)));
             }
 
+            base.AddDecorations();
         }
     }
 }
