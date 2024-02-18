@@ -60,7 +60,8 @@ end
 
 local function buttonPressed(formField)
     return function (element)
-        
+        print(helpers.findElementFromString(formField.label.__ui.root, "Editing Selection"))
+        print(helpers.findElementPathInTable(formField.label.__ui.root, "Editing Selection"))
         formField.field.text = tostring(getEntitiesInBox(formField, state.getSelectedRoom()))
 
         formField:notifyFieldChanged()

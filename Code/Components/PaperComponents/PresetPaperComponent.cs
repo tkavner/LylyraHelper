@@ -1,4 +1,5 @@
 ﻿using Celeste.Mod.LylyraHelper.Entities;
+using FMOD;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
@@ -17,6 +18,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
         private MTexture[,] holeTexSplice;
         internal Color WallpaperColor;
         internal List<Decoration> decorations = [];
+        private int VisualExtend = 0;
 
         public PresetPaperComponent(string gapTexture, string decalPlacements, Paper Parent, Color wallpaperColor) : base(Parent)
         {
@@ -52,13 +54,27 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
                 }
             }
         }
+        //adapted from Monocole.TileGrid
+        public Rectangle GetClippedRenderTiles()
+        {
+            Vector2 entityPos = base.Entity.Position;
+            Camera clipCamera = SceneAs<Level>().Camera;
+            if (clipCamera == null) return new Rectangle(0, 0, 0, 0);
+            int val = (int)Math.Max(0.0, Math.Floor((clipCamera.Left - Parent.Right) / (float)Parent.TileWidth) - (double)VisualExtend);
+            int val2 = (int)Math.Max(0.0, Math.Floor((clipCamera.Top - Parent.Bottom) / (float)Parent.TileHeight) - (double)VisualExtend);
+            int val3 = (int)Math.Min(Parent.TilesX, Math.Ceiling((clipCamera.Right - Parent.X) / (float)Parent.TileWidth) + (double)VisualExtend);
+            int val4 = (int)Math.Min(Parent.TilesY, Math.Ceiling((clipCamera.Bottom - Parent.Y) / (float)Parent.TileHeight) + (double)VisualExtend);
+
+            return new Rectangle(val, val2, val3 - val, val4 - val2);
+        }
 
         public override void Render()
         {
             base.Render();
-            for (int i = 0; i < (int)Entity.Width / 8; i++)
+            Rectangle visibleTiles = GetClippedRenderTiles();
+            for (int i = visibleTiles.X; i < visibleTiles.Width; i++)
             {
-                for (int j = 0; j < (int)Entity.Height / 8; j++)
+                for (int j = visibleTiles.Y; j < visibleTiles.Height; j++)
                 {
                     if (!Parent.skip[i, j])
                     {
@@ -73,9 +89,9 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
                     }
                 }
             }
-            for (int i = 0; i < (int)Parent.Width / 8; i++)
+            for (int i = visibleTiles.X; i < visibleTiles.Width; i++)
             {
-                for (int j = 0; j < (int)Parent.Height / 8; j++)
+                for (int j = visibleTiles.Y; j < visibleTiles.Height; j++)
                 {
                     if (!Parent.skip[i, j])
                     {
@@ -92,7 +108,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents
             }
             foreach (Decoration deco in decorations)
             {
-                deco.Render();
+                deco.Render(visibleTiles);
             }
         }
 

@@ -44,7 +44,8 @@ table.insert(paper.placements, {
 		regenerationDelay = 0.0,
 		decalStampData = "",
 		wallpaperMode = "Preset: Refill Gem",
-		wallpaperColor = "cac7e3"
+		wallpaperColor = "cac7e3",
+		outline = false
 		--flag = "",
 		--invertFlag = false
     })
@@ -63,7 +64,8 @@ table.insert(paper.placements,
 		regenerationDelay = 0.0,
 		decalStampData = "",
 		wallpaperMode = "Preset: Refill Gem",
-		wallpaperColor = "cac7e3"
+		wallpaperColor = "cac7e3",
+		outline = false
 		--flag = "",
 		--invertFlag = false
     })

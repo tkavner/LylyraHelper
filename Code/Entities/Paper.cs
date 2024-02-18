@@ -1,18 +1,14 @@
-﻿using Celeste;
-using Celeste.Mod;
+﻿
 using Celeste.Mod.LylyraHelper.Code.Components.PaperComponents;
 using Celeste.Mod.LylyraHelper.Components;
-using Celeste.Mod.LylyraHelper.Intefaces;
 using LylyraHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace Celeste.Mod.LylyraHelper.Entities
 {
@@ -23,6 +19,10 @@ namespace Celeste.Mod.LylyraHelper.Entities
         private Vector2 groupOrigin;
         private List<Paper> group;
         private bool GroupLeader { get; set; }
+        public float TilesX { get { return Width / TileWidth; } }
+        public float TilesY { get { return Height / TileHeight; } }
+        public float TileWidth { get { return 8; } }
+        public float TileHeight { get { return 8; } }
 
         public bool[,] skip;
         public int[,][] holeTiles;
@@ -600,6 +600,37 @@ namespace Celeste.Mod.LylyraHelper.Entities
             private static Vector2 Mod(Vector2 x, float m)
             {
                 return new Vector2((x.X % m + m) % m, (x.Y % m + m) % m);
+            }
+
+            internal void Render(Rectangle visibleTiles)
+            {
+                if (Visible)
+                {
+                    if (visibleTiles.Right < StartingTile.X) return;
+                    if (visibleTiles.Left > StartingTile.X + size.X) return;
+                    if (visibleTiles.Top > StartingTile.Y + size.Y) return;
+                    if (visibleTiles.Bottom < StartingTile.Y) return;
+                    int left = (int)Math.Max(visibleTiles.Left, StartingTile.X);
+                    int top = (int)Math.Max(visibleTiles.Top, StartingTile.Y);
+
+                    int right = (int)Math.Min(visibleTiles.Right, StartingTile.X + size.X);
+                    int bottom = (int)Math.Min(visibleTiles.Bottom, StartingTile.Y + size.Y);
+                    for (int i = left; i < right; i++)
+                    {
+                        for (int j = top; j < bottom; j++)
+                        {
+                            if (!parent.TileEmpty(i, j))
+                            {
+                                Vector2 offset = Vector2.Zero;
+                                if (i == left) offset.X = FirstRowAndColumnRenderOffset.X;
+                                if (j == top) offset.Y = FirstRowAndColumnRenderOffset.Y;
+                                Vector2 drawPos = parent.TopLeft + offset + new Vector2(i * 8, j * 8);
+                                texSplice[i - left, j - top].Draw(drawPos);
+                            }
+                        }
+                    }
+                }
+                    
             }
         }
 

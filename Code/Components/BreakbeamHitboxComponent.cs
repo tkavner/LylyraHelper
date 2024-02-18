@@ -189,10 +189,6 @@ namespace LylyraHelper.Other
                 }
 
             }
-
-            
         }
-
-
     }
 }
