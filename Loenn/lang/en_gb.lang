@@ -9,6 +9,25 @@ style.effects.LylyraHelper/HexagonalGodray.description.rotation=How many degrees
 style.effects.LylyraHelper/HexagonalGodray.description.rotationRandomness=Adds a random amount to the rotation of each godray in degrees to each hexagon between -randomness and +randomness. Set to 0 to not add randomness to rotations.
 style.effects.LylyraHelper/HexagonalGodray.description.blendingMode=What color format to use when blending color and fadeColor. Different formats will achieve different effects.\nHSV:Best when you have dissimilar colors (example: red and green)\nRGB: Good when your colors are similar (example: red and dark red)
 
+#Atmospheric Wind
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.hsvBlending=Use HSV coordinates when blending color and fadeColor. If off, will use RGB coordinates. \nHSV:Best when you have dissimilar colors (example: red and green)\nRGB: Good when your colors are similar (example: red and dark red)
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.initAngle=The initial angle (in degrees) that wind should come from. 0 = east, 90 is south, 180 is west, 270 is north.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.initAngleVariance= Added to the initial angle that the wind comes from for each wind strand randomly between -initAngleVariance and +initAngleVariance.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.speed=Literally the pixel distance between rendering points.\nHigher values will create faster looking winds.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.angularJerk=The change in the acceleration of the direction as the wind moves across the screen.\nHigh values will create more twisted, curly winds.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.startingAngularAcceleration=The starting acceleration of the direction the wind is moving in, in degrees per point.\nHigher values will lead to more curved winds.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.frequency=The number of wind strands that are spawned per second.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.speedVariance=The variance in speed of wind strands.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.pointsPointWind=The number of rendering points to use in the wind.\n\nWill additionally speed up the wind similar to speed if increased, and slow down if decreased.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.maxAngularAcceleration=The maximum allowable angular acceleration in degrees per point moved along its path.\nGood for limiting your wind if it gets too curly / spirals out of control.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.color=The color of the wind at the start of its lifespan.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.fadeColor=The color the wind should change to by the time the wind dies.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.transparency=Transparency of the wind strand.\n0 = completely invisible, 1 = completely solid
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.scrollX=Horizontal parallaxing.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.scrollY=Vertical parallaxing.
+style.effects.LylyraHelper/SS2024/AtmosphericWind.description.windLifespan=How long each wind strand should exist for before fading.
+
+
 #Knife Spikes
 
 entities.LylyraHelper/KnifeSpikesUp.placements.name.up_default=Knife Spikes (Up, Default)
