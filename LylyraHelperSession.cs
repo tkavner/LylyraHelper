@@ -28,5 +28,6 @@ namespace LylyraHelper
             this.ignoreDash = ignoreDashNew;
             this.playerCursed = playerCursed || !ignoreDashNew;
         }
+        public bool NoFastfall { get; set; }
     }
 }
