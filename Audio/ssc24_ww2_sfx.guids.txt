@@ -1,0 +1,10 @@
+{27bc7832-da05-4261-a2dd-5f7e2e40d60f} event:/Kataiser/sfx/ww2_ssc24_explosion.wav
+{f58f0c73-8125-4b7a-a7ed-2e67a029f4cf} event:/Kataiser/sfx/ww2_ssc24_hk_death_explosion
+{4b1cf572-f3f3-4c66-8484-3efb7a814744} event:/Kataiser/sfx/ww2_ssc24_hk_scream
+{f4feb8a1-fa52-4d49-b334-aaaecd0cf114} event:/Kataiser/sfx/ww2_ssc24_hk_tree_hit
+{a105bf66-4034-4651-84c7-8e04079a91b4} event:/Kataiser/sfx/ww2_woodenkey_landhard
+{abbee27b-ceaf-44d6-a5c8-d17cca7d0ff1} event:/Kataiser/sfx/ww2_woodenkey_landsoft
+{12c19585-2e34-4b37-bdd3-cd0c97c14fc1} event:/Kataiser/sfx/ww2_woodenkey_seeker
+{a4f28198-ee61-4238-aea0-966ce68fbfe4} event:/Kataiser/sfx/ww2_woodenkey_unlock
+{06ec5a87-48c3-4e8c-9c27-0ea340853e5f} event:/Kataiser/sfx/ww2_woodenkey_wall
+{e52f0e6b-cbd6-41ee-8fe6-a0ca15e86eda} bank:/ssc24_ww2_sfx

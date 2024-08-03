@@ -1,0 +1,2 @@
+{8b3c6bc9-3ba9-4fbf-ad87-a8adfb4ada07} event:/Kataiser/sfx/hydro_ancientgenerator_explosion
+{5c01cf68-0d92-4a2d-abc7-b475fc0bcfe2} bank:/hydro_ancientgenerator_explosion

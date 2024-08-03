@@ -1,0 +1,6 @@
+{a105bf66-4034-4651-84c7-8e04079a91b4} event:/Kataiser/sfx/ww2_woodenkey_landhard
+{abbee27b-ceaf-44d6-a5c8-d17cca7d0ff1} event:/Kataiser/sfx/ww2_woodenkey_landsoft
+{12c19585-2e34-4b37-bdd3-cd0c97c14fc1} event:/Kataiser/sfx/ww2_woodenkey_seeker
+{a4f28198-ee61-4238-aea0-966ce68fbfe4} event:/Kataiser/sfx/ww2_woodenkey_unlock
+{06ec5a87-48c3-4e8c-9c27-0ea340853e5f} event:/Kataiser/sfx/ww2_woodenkey_wall
+{e52f0e6b-cbd6-41ee-8fe6-a0ca15e86eda} bank:/ww2_woodenkey

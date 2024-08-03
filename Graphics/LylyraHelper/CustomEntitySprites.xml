@@ -81,6 +81,43 @@
     <bubbledscissors path="objects/LylyraHelper/bubbledScissors/" start="idle">
         <Loop id="idle" path="bubble" delay="0.1" frames="0"/>
     </bubbledscissors>
+	
+	<smwKey path="objects/LylyraHelper/ss2024/smwKey/" start="idle">
+		<Loop id="idle" path="leafkey" delay="0.1" frames="0"/>
+		<Anim id="destroyed" path="leafkey" delay="0.05" frames="1-12"/>
+	</smwKey>
+	<smwDoorLock path="objects/LylyraHelper/ss2024/smwDoor/" start="idle">
+		<Center/>
+		<Loop id="idle" path="pomf" delay="0.1" frames="0"/>
+		<Anim id="open" path="pomf" delay="0.1" frames="1-5" goto="postopen"/>
+		<Anim id="postopen" path="pomf" delay="0.1" frames="6-12"/>
+	</smwDoorLock>
+	<smwDoorLockH path="objects/LylyraHelper/ss2024/smwDoor/" start="idle">
+		<Center/>
+		<Loop id="idle" path="lockh" delay="0.1" frames="0"/>
+		<Anim id="open" path="lockh" delay="0.1" frames="1-5" goto="postopen"/>
+		<Anim id="postopen" path="pomf" delay="0.1" frames="6-12"/>
+	</smwDoorLockH>
+	<smwDoorChainBot path="objects/LylyraHelper/ss2024/smwDoor/" start="idle">
+		<Center/>
+		<Loop id="idle" path="chainBot" delay="0.1" frames="0"/>
+		<Anim id="open" path="chainBot" delay="0.1" frames="1-2"/>
+	</smwDoorChainBot>
+	<smwDoorChainTop path="objects/LylyraHelper/ss2024/smwDoor/" start="idle">
+		<Center/>
+		<Loop id="idle" path="chainTop" delay="0.1" frames="0"/>
+		<Anim id="open" path="chainTop" delay="0.1" frames="1-2"/>
+	</smwDoorChainTop>
+	<smwDoorChainHBot path="objects/LylyraHelper/ss2024/smwDoor/" start="idle">
+		<Center/>
+		<Loop id="idle" path="chainHBot" delay="0.1" frames="0"/>
+		<Anim id="open" path="chainHBot" delay="0.1" frames="1-2"/>
+	</smwDoorChainHBot>
+	<smwDoorChainHTop path="objects/LylyraHelper/ss2024/smwDoor/" start="idle">
+		<Center/>
+		<Loop id="idle" path="chainHTop" delay="0.1" frames="0"/>
+		<Anim id="open" path="chainHTop" delay="0.1" frames="1-2"/>
+	</smwDoorChainHTop>
 
 
 </Sprites>
