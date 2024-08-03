@@ -133,10 +133,6 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             return flag == "" || (SceneAs<Level>().Session.GetFlag(flag) ^ invert);
         }
 
-        private static void SlicerTriggerCheck(On.Monocle.Scene.orig_Add_Entity orig, Scene self, Entity entity)
-        {
-        }
-
         private void TryAddSlicer(Entity entity)
         {
             string entityName = entity.GetType().FullName;
