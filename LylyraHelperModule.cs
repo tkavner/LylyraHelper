@@ -2,8 +2,10 @@
 using Celeste.Mod;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
+using Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Effects;
+using Celeste.Mod.LylyraHelper.Entities;
 using Celeste.Mod.LylyraHelper.Triggers;
 using LylyraHelper;
 using LylyraHelper.Entities;
@@ -17,7 +19,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using static Celeste.GaussianBlur;
 
-namespace Celeste.Mod.LylyraHelper.Entities
+namespace Celeste.Mod.LylyraHelper
 {
     public class LylyraHelperModule : EverestModule
     {
@@ -50,6 +52,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
             Everest.Events.Level.OnLoadBackdrop += OnLoadBackdrop;
 
+            CursedRefill.Load();
 
             //MOD INTEROP TESTING
             /*
@@ -73,6 +76,8 @@ namespace Celeste.Mod.LylyraHelper.Entities
             Slicer.Unload();
             AttachedTriggerSpikesSliceable.Unload();
             Everest.Events.Level.OnLoadBackdrop -= OnLoadBackdrop;
+
+            CursedRefill.Unload();
         }
 
         public override void LoadContent(bool firstLoad)
