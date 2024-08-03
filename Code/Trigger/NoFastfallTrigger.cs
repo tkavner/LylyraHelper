@@ -31,6 +31,12 @@ namespace Celeste.Mod.LylyraHelper.Triggers
             session.NoFastfall = !invert;
 
         }
+        public override void OnStay(Player player)
+        {
+            base.OnEnter(player);
+            session.NoFastfall = !invert;
+
+        }
         public override void OnLeave(Player player)
         {
             base.OnLeave(player);
