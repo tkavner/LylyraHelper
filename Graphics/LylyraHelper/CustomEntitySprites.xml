@@ -70,8 +70,11 @@
         <Loop id="idle" path="normalbigcloud" delay="0.1" frames="0"/>
         <Anim id="fade" path="normalbigcloud" delay="0.1" frames="1-5"/>
     </bigcloud>
-
-
+	<shockwaveEmitter path="objects/LylyraHelper/ss2024/ellipticalShockwave/" start="idle">
+		<Center/>
+		<Loop id="idle" path="hydro_ancientgenerator" delay="0.1" />
+		<Anim id="explode" path="hydro_ancientgenerator_explosion" delay="0.1"/>
+	</shockwaveEmitter>
 	<fragilebigcloud path="objects/LylyraHelper/bigCloud/" start="idle">
 		<Anim id="spawn" path="fragilebigcloud" delay="0.1" frames="6-10" goto="idle"/>
 		<Loop id="idle" path="fragilebigcloud" delay="0.1" frames="0"/>
