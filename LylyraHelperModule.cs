@@ -52,7 +52,6 @@ namespace Celeste.Mod.LylyraHelper
             AttachedTriggerSpikesSliceable.Load();
             typeof(ModExports).ModInterop();
 
-            Everest.Events.Level.OnLoadBackdrop += OnLoadBackdrop;
 
             NoFastfallTrigger.Load();
             WhimsyKey.Load();
@@ -80,7 +79,6 @@ namespace Celeste.Mod.LylyraHelper
             AddSlicerTrigger.Unload();
             Slicer.Unload();
             AttachedTriggerSpikesSliceable.Unload();
-            Everest.Events.Level.OnLoadBackdrop -= OnLoadBackdrop;
             SetFlagStatesOnRespawnTrigger.Unload();
 
             NoFastfallTrigger.Unload();
@@ -96,18 +94,6 @@ namespace Celeste.Mod.LylyraHelper
             typeof(ModExports).ModInterop();
         }
 
-        private Backdrop OnLoadBackdrop(MapData map, BinaryPacker.Element child, BinaryPacker.Element above)
-        {
-            if (child.Name.Equals("LylyraHelper/HexagonalGodray", StringComparison.OrdinalIgnoreCase))
-            {
-                return new HexagonalGodray(child.Attr("color"), child.Attr("fadeColor"), child.AttrInt("numberOfRays"), child.AttrFloat("speedX"), child.AttrFloat("speedY"), child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.Attr("blendingMode", "HSV"));
-            }
-            if (child.Name.Equals("LylyraHelper/StarGodray", StringComparison.OrdinalIgnoreCase))
-            {
-                return new StarGodray(child.Attr("color"), child.Attr("fadeColor"), child.AttrInt("numberOfRays"), child.AttrFloat("speedX"), child.AttrFloat("speedY"), child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.Attr("blendingMode", "HSV"));
-            }
-            return null;
-        }
 
         [ModExportName("LylyraHelper")]
         private static class ModExports

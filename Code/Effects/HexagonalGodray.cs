@@ -4,10 +4,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Celeste.TrackSpinner;
 // Adapted from Celeste.Godrays, most base code taken from said file
 namespace Celeste.Mod.LylyraHelper.Effects
 {
@@ -67,6 +69,13 @@ namespace Celeste.Mod.LylyraHelper.Effects
         private float minRotation;
         private float maxRotation;
 
+
+        public HexagonalGodray(BinaryPacker.Element child) : this(child.Attr("color"), child.Attr("fadeColor"), child.AttrInt("numberOfRays"), child.AttrFloat("speedX"), 
+            child.AttrFloat("speedY"), child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.Attr("blendingMode", "HSV"))
+        {
+
+        }
+           
         public HexagonalGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, string blendingMode)
         {
             vertices = new VertexPositionColor[12 * numRays];
@@ -97,6 +106,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
         public override void Update(Scene scene)
         {
+            base.Update(scene);
             Level level = scene as Level;
             bool flag = IsVisible(level);
             fade = Calc.Approach(fade, flag ? 1 : 0, Engine.DeltaTime);

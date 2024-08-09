@@ -1,4 +1,4 @@
-﻿using Celeste.Mod.Backdrops;
+﻿using Celeste.Mod;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -166,7 +166,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Effects.SecretSanta
 
         public override void Update(Scene scene)
         {
-
+            base.Update(scene);
             Level level = scene as Level;
 
             Player player = level.Tracker.GetEntity<Player>();

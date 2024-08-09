@@ -72,6 +72,12 @@ namespace Celeste.Mod.LylyraHelper.Effects
         private bool hsvBlending;
         private float minRotation;
         private float maxRotation;
+        
+        public StarGodray(BinaryPacker.Element child) : this(child.Attr("color"), child.Attr("fadeColor"), child.AttrInt("numberOfRays"), child.AttrFloat("speedX"), child.AttrFloat("speedY"), 
+            child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.Attr("blendingMode", "HSV"))
+        {
+
+        }
 
         public StarGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, string blendingMode)
         {
@@ -102,6 +108,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
         public override void Update(Scene scene)
         {
+            base.Update(scene);
             Level level = scene as Level;
             bool flag = IsVisible(level);
             fade = Calc.Approach(fade, flag ? 1 : 0, Engine.DeltaTime);
