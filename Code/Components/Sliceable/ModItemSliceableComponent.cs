@@ -12,6 +12,7 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
     public class ModItemSliceableComponent : SliceableComponent
     {
         public Func<Entity, DynamicData, Entity[]> firstFrameSlicing;
+        public Action<Entity[], Entity, DynamicData> postSlice;
         public Action<Entity, DynamicData> secondFrameSlicing;
         public Action<Entity, DynamicData> onSliceStart;
 
@@ -25,6 +26,8 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
             this.firstFrameSlicing = action.firstFrameSlice;
             this.secondFrameSlicing = action.secondFrameSlice;
             this.onSliceStart = action.onSliceStart;
+            this.postSlice = action.postSlice;
+
         }
 
         public override Entity[] Slice(Slicer slicer) {

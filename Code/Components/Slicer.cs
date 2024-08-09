@@ -976,6 +976,15 @@ namespace Celeste.Mod.LylyraHelper.Components
             public Func<Entity, DynamicData, Entity[]> firstFrameSlice;
             public Action<Entity, DynamicData> secondFrameSlice;
             public Action<Entity, DynamicData> onSliceStart;
+            public Action<Entity[], Entity, DynamicData> postSlice;
+
+            public Func<Entity, DynamicData, Color> GetParticleColor;
+            public Func<Entity, DynamicData, ParticleType> GetParticleType;
+            public Func<Entity, DynamicData, EntityData> GetEntityData;
+            public Func<Entity, DynamicData, int> GetMinWidth;
+            public Func<Entity, DynamicData, int> GetMinHeight;
+
+            public bool SimpleSlice => GetEntityData != null;
         }
 
         public class CustomAttachedSlicingActionHolder
@@ -1012,6 +1021,30 @@ namespace Celeste.Mod.LylyraHelper.Components
                 else if (key == "onSliceStart")
                 {
                     holder.onSliceStart = (Action<Entity, DynamicData>)action;
+                }
+                else if (key == "GetParticleColor")
+                {
+                    holder.GetParticleColor = (Func<Entity, DynamicData, Color>)action;
+                }
+                else if (key == "GetParticleType")
+                {
+                    holder.GetParticleType = (Func<Entity, DynamicData, ParticleType>)action;
+                }
+                else if (key == "GetEntityData")
+                {
+                    holder.GetEntityData = (Func<Entity, DynamicData, EntityData>)action;
+                }
+                else if (key == "GetMinWidth")
+                {
+                    holder.GetMinWidth = (Func<Entity, DynamicData, int>)action;
+                }
+                else if (key == "GetMinHeight")
+                {
+                    holder.GetMinHeight = (Func<Entity, DynamicData, int>)action;
+                }
+                else if (key == "postSlice")
+                {
+                    holder.postSlice = (Action<Entity[], Entity, DynamicData>)action;
                 }
             }
             if (!contains) CustomSlicingActions.Add(type, holder);
@@ -1090,7 +1123,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             //standard item handling
             if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
             {
-                entity.Add(new ModItemSliceableComponent(action));
+                if (action.SimpleSlice) entity.Add(new SimpleModItemSliceableComponent(action)); //most work done for them
+                else entity.Add(new ModItemSliceableComponent(action)); //full custom
             }
             //lylyrahelper custom handling
             else if (entity is AutoReturnFallingBlock)
