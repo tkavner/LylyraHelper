@@ -3,6 +3,7 @@ using Celeste.Mod.Helpers;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceable;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
+using Celeste.Mod.LylyraHelper.Code.Entities.SS2024;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Entities;
@@ -1090,6 +1091,11 @@ namespace Celeste.Mod.LylyraHelper.Components
             if (CustomSlicingActions.TryGetValue(entity.GetType(), out var action))
             {
                 entity.Add(new ModItemSliceableComponent(action));
+            }
+            //lylyrahelper custom handling
+            else if (entity is AutoReturnFallingBlock)
+            {
+                entity.Add(new ARFBSlicableComponent(true, true));
             }
             //vanilla entity handling
             else if (entity is Booster)

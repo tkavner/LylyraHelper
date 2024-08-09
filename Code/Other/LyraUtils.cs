@@ -1,4 +1,5 @@
 ﻿using Celeste.Mod.LylyraHelper.Entities;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,25 @@ namespace Celeste.Mod.LylyraHelper.Other
 {
     public static class LyraUtils
     {
+        public static EntityData CloneEntityData(EntityData original, int width = 8, int height = 8)
+        {
+
+            return CloneEntityData(original, original.Position, width, height);
+        }
+        public static EntityData CloneEntityData(EntityData original, Vector2 position, int width = 8, int height = 8)
+        {
+            EntityData newData = new EntityData();
+
+            newData.Nodes = original.Nodes;
+            newData.Values = new(original.Values);
+            newData.Name = original.Name;
+
+            newData.Position = position;
+            newData.Width = width;
+            newData.Height = height;
+
+            return newData;
+        }
         public static List<string> GetFullNames(string unparsedNames)
         {
             if (unparsedNames == null) return null;

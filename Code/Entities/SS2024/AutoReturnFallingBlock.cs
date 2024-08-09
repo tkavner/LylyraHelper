@@ -1,4 +1,5 @@
 ﻿using Celeste.Mod.Entities;
+using Celeste.Mod.LylyraHelper.Components;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -29,12 +30,16 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         private float restartTimer;
         private bool goingUp;
         private Orientation orientation;
-        private Vector2 initialPos;
+        public Vector2 initialPos { get; set; }
         private string shakeSound;
         private string impactSound;
         private string returnSound;
         private float returnMaxSpeed;
         private float returnAcceleration;
+        public bool returning;
+        public bool impacted;
+
+        public EntityData originalData { get; private set; }
 
         public AutoReturnFallingBlock(EntityData data, Vector2 offset) : base(data, offset)
         {
@@ -81,6 +86,8 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
             initialPos = Position;
             Remove(Get<Coroutine>());
             Add(new Coroutine(NewSequence()));
+
+            originalData = data;
         }
 
         private enum Orientation { Up, Down, Left, Right }
@@ -89,127 +96,136 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         {
             while (true)
             {
-                while (!Triggered && !PlayerFallCheck())
+                    bool impact = false;
+                if (!returning && !impacted)
                 {
-                    if (flagTrigger != "" && (SceneAs<Level>().Session.GetFlag(flagTrigger) ^ invertTriggerFlag))
+                    while (!Triggered && !PlayerFallCheck())
                     {
-                        Triggered = true;
-                    }
-                    yield return null;
-                }
-
-                while (FallDelay > 0f)
-                {
-                    FallDelay -= Engine.DeltaTime;
-                    yield return null;
-                }
-
-                bool impact = false;
-                while (true)
-                {
-                    ShakeSfx();
-                    StartShaking();
-                    Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-
-                    yield return 0.2f;
-                    float timer = 0.4f;
-
-                    while (timer > 0f && PlayerWaitCheck())
-                    {
-                        yield return null;
-                        timer -= Engine.DeltaTime;
-                    }
-
-                    StopShaking();
-                    if (flagOnFall != "") SceneAs<Level>().Session.SetFlag(flagOnFall, fallFlagState); //fall flag
-                    for (int i = 2; i < Width; i += 4)
-                    {
-                        if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -2f)))
+                        if (flagTrigger != "" && (SceneAs<Level>().Session.GetFlag(flagTrigger) ^ invertTriggerFlag))
                         {
-                            SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Y), Vector2.One * 4f, (float)Math.PI / 2f);
+                            Triggered = true;
                         }
-
-                        SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Y), Vector2.One * 4f);
+                        yield return null;
                     }
 
-                    float speed = 0f;
-                    float maxSpeed = this.maxSpeed;
+                    while (FallDelay > 0f)
+                    {
+                        FallDelay -= Engine.DeltaTime;
+                        yield return null;
+                    }
+
                     while (true)
                     {
-                        Level level = SceneAs<Level>();
-                        speed = Calc.Approach(speed, maxSpeed, fallingAcceleration * Engine.DeltaTime);
+                        ShakeSfx();
+                        StartShaking();
+                        Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
+
+                        yield return 0.2f;
+                        float timer = 0.4f;
+
+                        while (timer > 0f && PlayerWaitCheck())
+                        {
+                            yield return null;
+                            timer -= Engine.DeltaTime;
+                        }
+
+                        StopShaking();
+                        if (flagOnFall != "") SceneAs<Level>().Session.SetFlag(flagOnFall, fallFlagState); //fall flag
+                        for (int i = 2; i < Width; i += 4)
+                        {
+                            if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -2f)))
+                            {
+                                SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Y), Vector2.One * 4f, (float)Math.PI / 2f);
+                            }
+
+                            SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Y), Vector2.One * 4f);
+                        }
+
+                        float speed = 0f;
+                        float maxSpeed = this.maxSpeed;
+                        while (true)
+                        {
+                            Level level = SceneAs<Level>();
+                            speed = Calc.Approach(speed, maxSpeed, fallingAcceleration * Engine.DeltaTime);
+                            switch (orientation)
+                            {
+                                case Orientation.Up:
+                                    if (impact = MoveVCollideSolids(-speed * Engine.DeltaTime, thruDashBlocks: true)) break;
+                                    break;
+                                case Orientation.Down:
+                                    if (impact = MoveVCollideSolids(speed * Engine.DeltaTime, thruDashBlocks: true)) break;
+                                    break;
+                                case Orientation.Left:
+                                    if (impact = MoveHCollideSolids(-speed * Engine.DeltaTime, thruDashBlocks: true)) break;
+                                    break;
+                                case Orientation.Right:
+                                    if (impact = MoveHCollideSolids(speed * Engine.DeltaTime, thruDashBlocks: true)) break;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (impact) break;
+                            if (Top > level.Bounds.Bottom + 16 || Top > level.Bounds.Bottom - 1 && CollideCheck<Solid>(Position + new Vector2(0f, 1f)))
+                            {
+                                Collidable = Visible = false;
+                                yield return 0.2f;
+                                if (level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Bottom + 12f)))
+                                {
+                                    yield return 0.2f;
+                                    SceneAs<Level>().Shake();
+                                    Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
+                                }
+
+                                RemoveSelf();
+                                DestroyStaticMovers();
+                                yield break;
+                            }
+
+                            yield return null;
+                        }
+                        ImpactSfx();
+                        Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
+                        SceneAs<Level>().DirectionalShake(Vector2.UnitY, 0.3f);
                         switch (orientation)
                         {
                             case Orientation.Up:
-                                if (impact = MoveVCollideSolids(-speed * Engine.DeltaTime, thruDashBlocks: true)) break;
-                                break;
                             case Orientation.Down:
-                                if (impact = MoveVCollideSolids(speed * Engine.DeltaTime, thruDashBlocks: true)) break;
+                                SceneAs<Level>().DirectionalShake(Vector2.UnitY, 0.3f);
                                 break;
                             case Orientation.Left:
-                                if (impact = MoveHCollideSolids(-speed * Engine.DeltaTime, thruDashBlocks: true)) break;
-                                break;
                             case Orientation.Right:
-                                if (impact = MoveHCollideSolids(speed * Engine.DeltaTime, thruDashBlocks: true)) break;
-                                break;
-                            default:
+                                SceneAs<Level>().DirectionalShake(Vector2.UnitX, 0.3f);
                                 break;
                         }
-                        if (impact) break;
-                        if (Top > level.Bounds.Bottom + 16 || Top > level.Bounds.Bottom - 1 && CollideCheck<Solid>(Position + new Vector2(0f, 1f)))
-                        {
-                            Collidable = Visible = false;
-                            yield return 0.2f;
-                            if (level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Bottom + 12f)))
-                            {
-                                yield return 0.2f;
-                                SceneAs<Level>().Shake();
-                                Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-                            }
 
-                            RemoveSelf();
-                            DestroyStaticMovers();
-                            yield break;
-                        }
-
-                        yield return null;
+                        StartShaking();
+                        if (flagOnLand != "") SceneAs<Level>().Session.SetFlag(flagOnLand, landFlagState); //land flag
+                        LandParticles();
+                        yield return 0.2f;
+                        StopShaking();
+                        break;
                     }
-                    ImpactSfx();
-                    Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-                    SceneAs<Level>().DirectionalShake(Vector2.UnitY, 0.3f);
-                    switch (orientation)
-                    {
-                        case Orientation.Up:
-                        case Orientation.Down:
-                            SceneAs<Level>().DirectionalShake(Vector2.UnitY, 0.3f);
-                            break;
-                        case Orientation.Left:
-                        case Orientation.Right:
-                            SceneAs<Level>().DirectionalShake(Vector2.UnitX, 0.3f);
-                            break;
-                    }
-
-                    StartShaking();
-                    if (flagOnLand != "") SceneAs<Level>().Session.SetFlag(flagOnLand, landFlagState); //land flag
-                    LandParticles();
-                    yield return 0.2f;
                     StopShaking();
-                    break;
                 }
-                StopShaking();
+                impacted = true;
                 float impactTimer = restartDelay;
 
                 Vector2 crashPosition = Position;
-
-                while (impactTimer > 0f)
+                if (!returning)
                 {
-                    yield return null;
-                    impactTimer -= Engine.DeltaTime;
+
+                    while (impactTimer > 0f)
+                    {
+                        yield return null;
+                        impactTimer -= Engine.DeltaTime;
+                    }
                 }
-                impact = false;
+                impactTimer = 0;
+                impacted = false;
                 //return code
                 while (true)
                 {
+                    returning = true;
                     ShakeSfx();
                     StartShaking();
                     Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
@@ -354,6 +370,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                     }
                     yield return 0.2f;
                     StopShaking();
+                    returning = false;
                     break;
                 }
                 Safe = true;
