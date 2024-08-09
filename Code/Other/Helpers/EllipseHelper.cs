@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Celeste.Mod.LylyraHelper.Code.Other.Helpers
+namespace Celeste.Mod.LylyraHelper.Other.Helpers
 {
     public static class EllipseHelper
     {

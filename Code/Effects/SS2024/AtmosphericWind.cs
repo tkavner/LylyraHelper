@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celeste.Mod.LylyraHelper.Other.Helpers;
-using Celeste.Mod.LylyraHelper.Code.Other.Helpers;
+using Celeste.Mod.Backdrops;
 
-namespace Celeste.Mod.LylyraHelper.Code.Effects.SecretSanta
+namespace Celeste.Mod.LylyraHelper.Effects.SecretSanta
 {
     [CustomBackdrop("LylyraHelper/SS2024/AtmosphericWind")]
     public class AtmosphericWind : Backdrop
