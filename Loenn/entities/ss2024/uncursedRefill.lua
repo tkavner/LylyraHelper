@@ -1,3 +1,5 @@
+local helpers = require("mods").requireFromPlugin("helpers")
+
 local refill = {}
 
 refill.name = "LylyraHelper/SS2024/UncursedRefill"
@@ -5,9 +7,9 @@ refill.depth = -100
 refill.placements = {
     {
         name = "Uncursed Refill",
-        data = {
+        data = helpers.createPlacementData('1', {
             oneUse = false
-        }
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-LylyraHelper was coded by @lyraohmi (discord) but there were many people who have helped along the way. This is the list of credits and thanks for other's contributions:
+LylyraHelper was designed and coded by @lyraohmi (discord) but there were many people who have helped along the way. This is the list of credits and thanks for other's contributions:
 
 Viv for encouraging me to finish this helper module in the first place and for their help navigating more nuanced parts of the Celeste and Everest code.
 Nerfred for making the scissor sprites, laser sprites, and art help.
@@ -11,4 +11,5 @@ Secret Santa Collab 2024 items:
 
 Nerfred / nuki made the Whimsy Key and Door sprites and animations.
 Kataiser did the Key and Door sounds.
-??? did the generator sounds and art for the map By Hydro.
+Kataiser did the generator sounds and ??? did art for the ancient generators from ??? By Hydro.
+butcherberries(?) did the art for the Cursed and Uncursed refills.

@@ -4,6 +4,7 @@ using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta;
 using Celeste.Mod.LylyraHelper.Code.Entities.SS2024;
+using Celeste.Mod.LylyraHelper.Code.Triggers.SS2024;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Effects;
 using Celeste.Mod.LylyraHelper.Entities;
@@ -56,6 +57,7 @@ namespace Celeste.Mod.LylyraHelper
             NoFastfallTrigger.Load();
             WhimsyKey.Load();
             CursedRefill.Load();
+            SetFlagStatesOnRespawnTrigger.Load();
 
             //MOD INTEROP TESTING
             /*
@@ -79,6 +81,7 @@ namespace Celeste.Mod.LylyraHelper
             Slicer.Unload();
             AttachedTriggerSpikesSliceable.Unload();
             Everest.Events.Level.OnLoadBackdrop -= OnLoadBackdrop;
+            SetFlagStatesOnRespawnTrigger.Unload();
 
             NoFastfallTrigger.Unload();
             WhimsyKey.Unload();

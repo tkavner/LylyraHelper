@@ -127,7 +127,7 @@ triggers.LylyraHelper/RemoveSlicerTrigger.attributes.description.entityTypes=The
 #Big Cloud
 style.effects.LylyraHelper/BigCloud.description.fragile=If cloud should despawn after being used.
 
-#ShockwaveEmitter
+#Shockwave Emitter
 
 entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.focalRatio=Focal Ratio of the Ellipse.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
 entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.initialSize=The initial size of the shockwave in pixels.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
@@ -139,3 +139,36 @@ entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.flag=Sessi
 entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.cycle=Whether or not the the emitter should stop after the last wave is reached or if it should cycle.
 entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.absoluteMaxGlobs=Render optimization option. Controls the detail level on the back of the shockwaves.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
 entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.renderPointsOnMesh=Render optimization option. Controls the quality of the render mesh used for the shockwave.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
+
+#Auto Return Falling Block
+
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.tiletype=What tileset to use with this block.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.climbFall=If the block should trigger on climb jump.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.behind=If the block should render behind or above other entities.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.resetDelay=A timer in seconds that must complete before the block can reactivate, starting after the block returns to its starting location.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.flagOnReset=(Optional) The flag to set when the falling block returns to its original location
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.flagOnFall=(Optional) The flag to set when the falling block starts falling.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.flagOnLand=(Optional) The flag to set when the falling block lands.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.flagTrigger=The flag that needs to be active for this falling block to trigger. Block is active by default if left blank.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.resetFlagState=The state that the Flag On Reset should be set to.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.fallFlagState=The state that the Flag On Fall should be set to.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.landFlagState=The state that the Flag On Land should be set to.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.maxSpeed=The maximum speed in pixels per second that the block should move.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.acceleration=The acceleration of the block in pixels per second squared.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.direction=The direction the block travels in.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.landingSound=(Optional) File path for a custom landing sound, if desired. Uses standard falling block sounds if left blank.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.returnSound=(Optional) File path for a custom return sound, if desired. Uses standard falling block sounds if left blank.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.shakeSound=(Optional) File path for a custom shake sound, if desired. Uses standard falling block sounds if left blank.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.invertFlagTrigger=If checked, the flag listed by Flag Trigger must be false for this block to be active.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.returnMaxSpeed=The maximum speed in pixels per second that the block should move on its return journey.
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.returnAcceleration=The acceleration of the block in pixels per second squared on its return journey.
+
+#Set Flag States On Respawn Trigger
+
+entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.flags=The set of flags to monitor and record states for when this trigger is entered.
+
+#SMW Key / Whimsy Key
+
+entities.LylyraHelper/SS2024/WhimsyKey.attributes.description.grabbable=Whether or not this key should be grabbable / throwable.
+entities.LylyraHelper/SS2024/WhimsyKey.attributes.description.spritePath=(Optional) Path to a custom sprite animations.
+entities.LylyraHelper/SS2024/WhimsyKey.attributes.description.optimized=Reduces computational demands of the key in exchange for slightly less accurate collision checks.\nUseful if you want a room with 50+ keys, or your room is suffering from performance issues.

@@ -29,5 +29,7 @@ namespace LylyraHelper
             this.playerCursed = playerCursed || !ignoreDashNew;
         }
         public bool NoFastfall { get; set; }
+
+        public Dictionary<string, bool> respawnFlagMonitor = new();
     }
 }

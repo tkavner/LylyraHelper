@@ -44,7 +44,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Ahorn\entities\" />
       <Folder Include="Loenn\helpers\" />
     </ItemGroup>
     <ItemGroup>
