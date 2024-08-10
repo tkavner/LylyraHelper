@@ -50,16 +50,16 @@ namespace Celeste.Mod.LylyraHelper.Components
             if (b1Width >= minWidth && b1Height >= minHeight)
             {
                 EntityData clonedData = LyraUtils.CloneEntityData(GetEntityData(Entity, dynamicData), b1Pos, b1Width, b1Height);
-                Entity theirEntity = (Entity)theirEntityType.
+                b1 = (Solid)theirEntityType.
                     GetConstructor(new Type[] { typeof(EntityData), typeof(Vector2) }).Invoke(new object[] { clonedData, Vector2.Zero });
-                Scene.Add(theirEntity);
+                Scene.Add(b1);
             }
             if (b2Width >= minWidth && b2Height >= minHeight)
             {
                 EntityData clonedData = LyraUtils.CloneEntityData(GetEntityData(Entity, dynamicData), b2Pos, b2Width, b2Height);
-                Entity theirEntity = (Entity)theirEntityType.
+                b2 = (Solid)theirEntityType.
                     GetConstructor(new Type[] { typeof(EntityData), typeof(Vector2) }).Invoke(new object[] { clonedData, Vector2.Zero });
-                Scene.Add(theirEntity);
+                Scene.Add(b2);
             }
             Scene.Remove(original);
             foreach (StaticMover mover in original.staticMovers)
