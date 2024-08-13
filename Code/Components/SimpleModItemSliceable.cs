@@ -20,6 +20,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         private Func<Entity, DynamicData, ParticleType> GetParticleType = action.GetParticleType;
         private Func<Entity, DynamicData, int> GetMinWidth = action.GetMinWidth;
         private Func<Entity, DynamicData, int> GetMinHeight = action.GetMinHeight;
+        private Func<Entity, DynamicData, string> GetAudioPath = action.GetAudioPath;
 
         public override Entity[] Slice(Slicer slicer)
         {
@@ -46,6 +47,8 @@ namespace Celeste.Mod.LylyraHelper.Components
 
             AddParticles(original.Position, new Vector2(original.Width, original.Height), color);
 
+            if (GetAudioPath != null) Audio.Play(GetAudioPath.Invoke(original, dynamicData));
+
             Type theirEntityType = FakeAssembly.GetFakeEntryAssembly().GetType(original.GetType().FullName);
             if (b1Width >= minWidth && b1Height >= minHeight)
             {
@@ -66,7 +69,8 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
             }
-            postSlice?.Invoke([b1, b2], Entity, dynamicData);
+            if (b1!=null) postSlice?.Invoke(b1, Entity, dynamicData);
+            if (b2!=null) postSlice?.Invoke(b2, Entity, dynamicData);
             return [b1, b2];
         }
     }

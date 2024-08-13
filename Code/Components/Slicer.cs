@@ -976,13 +976,14 @@ namespace Celeste.Mod.LylyraHelper.Components
             public Func<Entity, DynamicData, Entity[]> firstFrameSlice;
             public Action<Entity, DynamicData> secondFrameSlice;
             public Action<Entity, DynamicData> onSliceStart;
-            public Action<Entity[], Entity, DynamicData> postSlice;
+            public Action<Entity, Entity, DynamicData> postSlice;
 
             public Func<Entity, DynamicData, Color> GetParticleColor;
             public Func<Entity, DynamicData, ParticleType> GetParticleType;
             public Func<Entity, DynamicData, EntityData> GetEntityData;
             public Func<Entity, DynamicData, int> GetMinWidth;
             public Func<Entity, DynamicData, int> GetMinHeight;
+            public Func<Entity, DynamicData, string> GetAudioPath;
 
             public bool SimpleSlice => GetEntityData != null;
         }
@@ -1007,47 +1008,81 @@ namespace Celeste.Mod.LylyraHelper.Components
         {
             bool contains = CustomSlicingActions.TryGetValue(type, out CustomSlicingActionHolder holder);
             if (holder == null) holder = new();
+            //TODO: Formalize this, but for the moment this will suffice
             foreach (string key in actions.Keys)
             {
                 Delegate action = actions[key];
-                if (key == "slice")
+                string lowercaseKey = key.ToLower();
+                if (lowercaseKey == "slice")
                 {
                     holder.firstFrameSlice = (Func<Entity, DynamicData, Entity[]>)action;
                 }
-                else if (key == "activate")
+                else if (lowercaseKey == "activate")
                 {
                     holder.secondFrameSlice = (Action<Entity, DynamicData>)action;
                 }
-                else if (key == "onSliceStart")
+                else if (lowercaseKey == "onslicestart")
                 {
                     holder.onSliceStart = (Action<Entity, DynamicData>)action;
                 }
-                else if (key == "GetParticleColor")
+                else if (lowercaseKey == "getparticlecolor")
                 {
                     holder.GetParticleColor = (Func<Entity, DynamicData, Color>)action;
                 }
-                else if (key == "GetParticleType")
+                else if (lowercaseKey == "getparticletype")
                 {
                     holder.GetParticleType = (Func<Entity, DynamicData, ParticleType>)action;
                 }
-                else if (key == "GetEntityData")
+                else if (lowercaseKey == "getentitydata")
                 {
                     holder.GetEntityData = (Func<Entity, DynamicData, EntityData>)action;
                 }
-                else if (key == "GetMinWidth")
+                else if (lowercaseKey == "getminwidth")
                 {
                     holder.GetMinWidth = (Func<Entity, DynamicData, int>)action;
                 }
-                else if (key == "GetMinHeight")
+                else if (lowercaseKey == "getminheight")
                 {
                     holder.GetMinHeight = (Func<Entity, DynamicData, int>)action;
                 }
-                else if (key == "postSlice")
+                else if (lowercaseKey == "postslice")
                 {
-                    holder.postSlice = (Action<Entity[], Entity, DynamicData>)action;
+                    holder.postSlice = (Action<Entity, Entity, DynamicData>)action;
+                }
+                else if (lowercaseKey == "getaudiopath")
+                {
+                    holder.GetAudioPath = (Func<Entity, DynamicData, string>)action;
                 }
             }
             if (!contains) CustomSlicingActions.Add(type, holder);
+        }
+
+        internal static void RegisterSimpleSolidSlicerAction(Type type, Func<Entity, DynamicData, EntityData> getEntityData, string particleColorHex, int minWidth, int minHeight, string audioPath)
+        {
+            Func<Entity, DynamicData, Color> GetParticleColor = null;
+            if (particleColorHex != null) GetParticleColor = (Entity data, DynamicData slicer) => {
+                return Calc.HexToColor(particleColorHex);
+            };
+            Func<Entity, DynamicData, int> GetMinWidth = null;
+            GetMinWidth = (Entity data, DynamicData slicer) => {
+                return minWidth;
+            };
+            Func<Entity, DynamicData, int> GetMinHeight = null;
+            GetMinHeight = (Entity data, DynamicData slicer) => {
+                return minHeight;
+            };
+            Func<Entity, DynamicData, string> GetAudioPath = null;
+            if (audioPath != null) GetAudioPath = (Entity data, DynamicData slicer) => {
+                return audioPath;
+            };
+            Dictionary<string, Delegate> map = new Dictionary<string, Delegate>() {
+                {"GetEntityData", getEntityData },
+                {"GetParticleColor", GetParticleColor },
+                {"GetMinWidth", GetMinWidth },
+                {"GetMinHeight", GetMinHeight },
+                {"GetAudioPath", GetAudioPath },
+            };
+            RegisterSlicerAction(type, map);
         }
 
         public static void UnregisterSlicerSMEntityFunction(Type type)
@@ -1183,7 +1218,6 @@ namespace Celeste.Mod.LylyraHelper.Components
             else { }
 
         }
-
 
     }
 }

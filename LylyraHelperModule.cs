@@ -102,13 +102,20 @@ namespace Celeste.Mod.LylyraHelper
             public static void RegisterSlicerActionSet(Type type, Dictionary<string, Delegate> actions)
             {
                 Slicer.RegisterSlicerAction(type, actions);
-                Logger.Log(LogLevel.Error, "LylyraHelper", "Registered action for type: " + type.FullName);
             }
 
             public static void UnregisterSlicerAction(Type type)
             {
                 Slicer.UnregisterSlicerAction(type);
             }
+
+
+            public static void RegisterSimpleSolidSlicerAction(Type type, Func<Entity, DynamicData, EntityData> GetEntityData, string particleColorHex, int minWidth, int minHeight, string audioPath)
+            {
+                Slicer.RegisterSimpleSolidSlicerAction(type, GetEntityData, particleColorHex, minWidth, minHeight, audioPath);
+                Logger.Log(LogLevel.Info, "LylyraHelper", "Registered simple solid slicer action for type: " + type.FullName);
+            }
+
 
             //this method handles attached static movers (like spikes) for Solids. Convenience Method.
             public static void HandleStaticMover(Scene scene, Vector2 direction, Solid block1, Solid block2, StaticMover mover)
