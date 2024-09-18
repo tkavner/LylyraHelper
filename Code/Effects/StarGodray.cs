@@ -192,6 +192,7 @@ namespace Celeste.Mod.LylyraHelper.Effects
         public override void Render(Scene scene)
         {
             base.Render(scene);
+            if (!Visible) return;
             if (vertexCount > 0 && fade > 0f)
             {
                 GFX.DrawVertices(Matrix.Identity, vertices, vertexCount);

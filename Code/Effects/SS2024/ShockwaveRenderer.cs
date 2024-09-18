@@ -25,6 +25,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Effects.SS2024
         public override void Render(Scene scene)
         {
             base.Render(scene);
+            if (!Visible) return;
             foreach (EllipticalShockwave shockwave in scene.Tracker.GetEntities<EllipticalShockwave>())
             {
                 shockwave.RenderWave();

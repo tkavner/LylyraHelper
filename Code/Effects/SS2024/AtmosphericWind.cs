@@ -167,6 +167,7 @@ namespace Celeste.Mod.LylyraHelper.Effects.SecretSanta
         public override void Update(Scene scene)
         {
             base.Update(scene);
+            if (!Visible) return;
             Level level = scene as Level;
 
             Player player = level.Tracker.GetEntity<Player>();
@@ -242,7 +243,7 @@ namespace Celeste.Mod.LylyraHelper.Effects.SecretSanta
                 windCounter = 0;
                 float angle = initAngle + rand.NextFloat() * angleVariance - angleVariance / 2F;
                 var num1 = EllipseHelper.PointOnEllipseFromAngle(screenDimensions, angle);
-                float pointRangeTLLength = (float) (320 - 140 * Math.Cos(angle));
+                float pointRangeTLLength = (float) (320 - 140 * Math.Cos(angle)); //what we should do is map the ellipse to a rectangle using parametric coordinates
                 var pointRangeOnTangentLine = EllipseHelper.TangentToEllipseAtPoint(screenDimensions, angle) * (rand.NextFloat() * pointRangeTLLength - pointRangeTLLength / 2);
                 var normal = EllipseHelper.NormalToEllipseAtPoint(screenDimensions, angle);
                 var randomStartingOffsetInDirectionOfWind = -normal * (rand.NextFloat() * screenDimensions.X / 2);
