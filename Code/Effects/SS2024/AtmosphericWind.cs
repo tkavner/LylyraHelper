@@ -242,7 +242,8 @@ namespace Celeste.Mod.LylyraHelper.Effects.SecretSanta
                 windCounter = 0;
                 float angle = initAngle + rand.NextFloat() * angleVariance - angleVariance / 2F;
                 var num1 = EllipseHelper.PointOnEllipseFromAngle(screenDimensions, angle);
-                var pointRangeOnTangentLine = EllipseHelper.TangentToEllipseAtPoint(screenDimensions, angle) * (rand.NextFloat() * 180 - 90);
+                float pointRangeTLLength = (float) (320 - 140 * Math.Cos(angle));
+                var pointRangeOnTangentLine = EllipseHelper.TangentToEllipseAtPoint(screenDimensions, angle) * (rand.NextFloat() * pointRangeTLLength - pointRangeTLLength / 2);
                 var normal = EllipseHelper.NormalToEllipseAtPoint(screenDimensions, angle);
                 var randomStartingOffsetInDirectionOfWind = -normal * (rand.NextFloat() * screenDimensions.X / 2);
                 var cameraPos = level.Camera.Position;
@@ -262,6 +263,7 @@ namespace Celeste.Mod.LylyraHelper.Effects.SecretSanta
 
         public override void Render(Scene scene)
         {
+            base.Render(scene);
             if (vertexCount > 0)
             {
                 GFX.DrawVertices(Matrix.Identity, vertices, vertexCount);
