@@ -23,6 +23,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         private int[] absoluteMaxGlobs;
         private int[] renderPointsOnMesh;
         private int currentWave;
+        private bool IgnorePlayerSpeedChecks;
 
         private string flag;
         private bool cycle;
@@ -40,6 +41,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
             var breakoutSpeeds = data.Attr("breakoutSpeeds", "1000").Split(',');
             var absoluteMaxGlobs = data.Attr("absoluteMaxGlobs", "4000").Split(',');
             var renderPointsOnMesh = data.Attr("renderPointsOnMesh", "2000").Split(',');
+            IgnorePlayerSpeedChecks = data.Bool("ignorePlayerSpeedChecks", false);
             normalizedFocalRatio = new Vector2[focalRatio.Length];
             for (int i = 0; i < focalRatio.Length; i++)
             {
@@ -118,7 +120,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                     var breakoutSpeed = GetElementCapped(this.breakoutSpeeds);
                     var absoluteMaxGlobs = GetElementCapped(this.absoluteMaxGlobs);
                     var renderPointsOnMesh = GetElementCapped(this.renderPointsOnMesh);
-                    Scene.Add(new EllipticalShockwave(Position, focalRatio.X, focalRatio.Y, initialSize, expandRate, shockwaveThickness, breakoutSpeed, absoluteMaxGlobs, renderPointsOnMesh));
+                    Scene.Add(new EllipticalShockwave(Position, focalRatio.X, focalRatio.Y, initialSize, expandRate, shockwaveThickness, breakoutSpeed, absoluteMaxGlobs, renderPointsOnMesh, IgnorePlayerSpeedChecks));
                     currentWave++;
                     if (cycle && currentWave >= timers.Length)
                     {

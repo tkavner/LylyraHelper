@@ -139,6 +139,7 @@ entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.flag=Sessi
 entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.cycle=Whether or not the the emitter should stop after the last wave is reached or if it should cycle.
 entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.absoluteMaxGlobs=Render optimization option. Controls the detail level on the back of the shockwaves.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
 entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.renderPointsOnMesh=Render optimization option. Controls the quality of the render mesh used for the shockwave.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
+entities.LylyraHelper/SS2024/ShockwaveRenderer.attributes.description.ignorePlayerSpeedChecks=Shockwaves track potential maximum speed the player can have to detect teleports and other modded entities. On slow moving /non-nyoom maps, this same code can lead to clipping through the shockwaves. Check if you don't use teleportation of any sort.
 
 #Auto Return Falling Block
 

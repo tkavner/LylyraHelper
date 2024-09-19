@@ -66,6 +66,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         public int currentMaxGlobs { get { return (int)Math.Min(absoluteMaxGlobs, (200 + expand * expand / 4)); } }
         private Random random = new Random();
 
+
         private void UpdateShockwave()
         {
             expand += expandRate * Engine.DeltaTime;
@@ -199,6 +200,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         private int outerRingTriangleCounter;
         private int innerRingTriangleCounter;
         private Vector2 previousPlayerPos;
+        private bool IgnorePlayerSpeedChecks;
 
         public int NumVerteces
         {
@@ -206,13 +208,14 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         }
 
 
-        public EllipticalShockwave(Vector2 Position, float a, float b, float initialSize, float expandRate, float shockwaveThickness, float breakoutSpeed, int absoluteMaxGlobs, int renderPointsOnMesh) : base(Position)
+        public EllipticalShockwave(Vector2 Position, float a, float b, float initialSize, float expandRate, float shockwaveThickness, float breakoutSpeed, int absoluteMaxGlobs, int renderPointsOnMesh, bool ignorePlayerSpeedChecks) : base(Position)
         {
             this.b = b;
             this.a = a;
             this.expand = initialSize;
             this.expandRate = expandRate;
             this.breakoutSpeed = breakoutSpeed;
+            this.IgnorePlayerSpeedChecks = ignorePlayerSpeedChecks;
             thickness = shockwaveThickness;
             Depth = Depths.Above;
             this.absoluteMaxGlobs = absoluteMaxGlobs;
@@ -225,6 +228,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                 double angle = (float)(i / (float)numPoints * 2 * Math.PI);
                 ellipsePoints[i] = new Vector2((float)(b * Math.Cos(angle)), (float)(a * Math.Sin(angle)));
             }
+            IgnorePlayerSpeedChecks = ignorePlayerSpeedChecks;
         }
 
         public override void Awake(Scene scene)
@@ -346,7 +350,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
             float increment = (float)((player.Position - previousPlayerPos).Length() == 0 ? 1 : Math.Max(0.001, 1 / (player.Position - previousPlayerPos).Length()));
             if (player.Speed != Vector2.Zero)
             {
-                if ((previousPlayerPos - player.Position).Length() <= Math.Ceiling(player.Speed.Length() * Engine.DeltaTime))
+                if (IgnorePlayerSpeedChecks || (previousPlayerPos - player.Position).Length() <= Math.Min(400F, Math.Ceiling(player.Speed.Length() * Engine.DeltaTime))) //this checks for portal jumps and stuff, slow maps
                 {
 
                     for (float i = 0; i <= 1; i += increment)

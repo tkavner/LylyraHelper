@@ -15,7 +15,8 @@ shockwaveEmitter.placements = {
             flag = "shockwaveStarter",
             cycle = false,
             absoluteMaxGlobs = "4000",
-            renderPointsOnMesh = "2000"
+            renderPointsOnMesh = "2000",
+            ignorePlayerSpeedChecks=false
         }
 
     }
