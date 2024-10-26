@@ -100,6 +100,12 @@ entities.LylyraHelper/DashPaper.attributes.description.wallpaperColor=Color to m
 
 entities.LylyraHelper/SlicerController.attributes.description.sliceableEntityTypes=The full name of the type(s) of entity(s) you want to be Sliceable.\nUse commas to specify multiple Entity Types (ex:Celeste.Player,Celeste.FallingBlock,Celeste.CrushBlock).\nIf FrostHelper is installed, you can use names in Entity ID format (the text at the top of a window when you edit an entity, ex: fallingBlock, LylyraHelper/DashPaper).\nAdditionally, if FrostHelper is installed, you can use the "Set from Intersect" button to automatically set this field to the names of all Entities overlapping the Slicer Controller.\nNote that your finished map will require FrostHelper to function.
 
+#Dependency Trigger
+
+triggers.LylyraHelper/DependencyTrigger.attributes.description.dependency=The name of the mod to check for. ex: LylyraHelper
+triggers.LylyraHelper/DependencyTrigger.attributes.description.flag=The flag to set if the dependency is found.
+triggers.LylyraHelper/DependencyTrigger.attributes.description.invert=If checked, sets the flag value to false instead of true.
+
 #Add Slicer Trigger
 
 triggers.LylyraHelper/AddSlicerTrigger.attributes.description.cutSize=The size of the hole cut by the Slicer, in pixels. Minimum: 8
