@@ -28,11 +28,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
         public override void OnEnter(Player player)
         {
             base.OnEnter(player);
-            foreach (EverestModule module in Everest.Modules)
-            {
-                Logger.Log(LogLevel.Error, "LylyraHelper", "loaded module: " + module.Metadata.Name);
-            }
-            Logger.Log(LogLevel.Error, "LylyraHelper", "needed loaded module: " + dependency);
             if (Everest.Modules.Any(m => m.Metadata.Name == dependency))
             {
                 SceneAs<Level>().Session.SetFlag(flagName, !invert);
