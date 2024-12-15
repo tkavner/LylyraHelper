@@ -22,7 +22,7 @@ namespace Celeste.Mod.LylyraHelper.Components
         private Func<Entity, DynamicData, int> GetMinHeight = action.GetMinHeight;
         private Func<Entity, DynamicData, string> GetAudioPath = action.GetAudioPath;
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
             Solid original = Entity as Solid;
 
@@ -71,7 +71,7 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             if (b1!=null) postSlice?.Invoke(b1, Entity, dynamicData);
             if (b2!=null) postSlice?.Invoke(b2, Entity, dynamicData);
-            return [b1, b2];
+            return new SlicerCollisionResults([b1, b2], original);
         }
     }
 }

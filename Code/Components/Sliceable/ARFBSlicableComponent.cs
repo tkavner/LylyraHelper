@@ -21,14 +21,14 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         {
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
             AutoReturnFallingBlock block = Entity as AutoReturnFallingBlock;
             block.Get<Coroutine>().enumerators.Peek().MoveNext();
             block.Triggered = true;
         }
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
             AutoReturnFallingBlock original = Entity as AutoReturnFallingBlock;
 
@@ -72,7 +72,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                 Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
             }
 
-            return [b1, b2];
+            return new([b1, b2], original);
         }
 
     }

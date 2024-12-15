@@ -30,11 +30,12 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
 
         }
 
-        public override Entity[] Slice(Slicer slicer) {
-            return firstFrameSlicing?.Invoke(Entity, new DynamicData(slicer));
+        public override SlicerCollisionResults Slice(Slicer slicer) {
+            Entity[] children = firstFrameSlicing?.Invoke(Entity, new DynamicData(slicer));
+            return children == null ? null : new SlicerCollisionResults(children, Entity);
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
             secondFrameSlicing?.Invoke(Entity, new DynamicData(slicer));
         }

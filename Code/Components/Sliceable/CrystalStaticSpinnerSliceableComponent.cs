@@ -15,7 +15,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
 
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
         {
         }
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
             (Entity as CrystalStaticSpinner).Destroy();
             return null;

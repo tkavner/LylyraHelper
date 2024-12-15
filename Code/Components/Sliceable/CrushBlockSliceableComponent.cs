@@ -20,7 +20,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
         }
 
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
 
             CrushBlock original = this.Entity as CrushBlock;
@@ -100,10 +100,10 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
             Scene.Remove(original);
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("62222b"));
 
-            return new Entity[] {cb1, cb2};
+            return new(new Entity[] {cb1, cb2}, original);
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
 
             CrushBlock crushBlock = this.Entity as CrushBlock;

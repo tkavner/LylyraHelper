@@ -20,7 +20,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
 
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
         }
 
@@ -29,7 +29,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
         }
         
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
             DreamBlock original = Entity as DreamBlock;
             Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), slicer.Entity.Center, slicer.Direction, slicer.CutSize);

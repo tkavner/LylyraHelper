@@ -15,7 +15,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         {
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
             Scene scene = slicer.Scene;
             (Entity as CassetteBlock).SetActivatedSilently(scene.Tracker.GetEntity<CassetteBlockManager>().currentIndex == (Entity as CassetteBlock).Index);
@@ -25,7 +25,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         {
         }
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
             CassetteBlock original = Entity as CassetteBlock;
             if (original.Mode != CassetteBlock.Modes.Solid) return null;
@@ -106,7 +106,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
             }
 
-            return new Entity[] { b1, b2};
+            return new(new Entity[] {b1, b2}, original);
 
         }
 

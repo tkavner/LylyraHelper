@@ -75,7 +75,7 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         public List<SliceableComponent> slicingEntities = [];
         //some entities take a frame advancement to activate properly (Such as Kevins and MoveBlocks). This list is for those entities.
-        public List<Entity> secondFrameActivation = [];
+        public List<NewlySlicedEntityWrapper> secondFrameActivation = [];
         public Collider SlicingCollider { get; set; }
         public Vector2 Direction { get; private set; }
         public int CutSize { get; private set; }
@@ -202,6 +202,21 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
         
+        public class NewlySlicedEntityWrapper
+        {
+            public Entity child;
+            public Entity parent;
+
+            public NewlySlicedEntityWrapper(Entity child, Entity parent, SlicerCollisionResults results = null)
+            {
+                this.child = child;
+                this.parent = parent;
+                Results = results;
+            }
+
+
+            public SlicerCollisionResults Results { get; }
+        }
 
         //Basically all cutting requires a wild amount of differing requirements to cut in half.
         //This is because we're essentially cloning the object, which is a very complicated issue in computer programming.
@@ -210,10 +225,10 @@ namespace Celeste.Mod.LylyraHelper.Components
         //There's definitely cleanup to be done in here, but in general because we want two (almost) identical copies of objects, with lots of weird exceptions
         public void Slice(bool collisionOverride = false)
         {
-            secondFrameActivation.RemoveAll(secondFrameEntity =>
+            secondFrameActivation.RemoveAll(secondFrameEntityCombo =>
             {
 
-                secondFrameEntity?.Get<SliceableComponent>()?.Activate(this);
+                secondFrameEntityCombo.child?.Get<SliceableComponent>()?.Activate(this, secondFrameEntityCombo);
                 return true;
             });
 
@@ -265,14 +280,16 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
             if (collisionOverride || SliceOnImpact || !sliceableEntity.CollideCheck(Entity))
             {
-                Entity[] children = sliceableComp.Slice(this);
-                if (children != null)
+                SlicerCollisionResults results = sliceableComp.Slice(this);
+
+                if (results != null) Logger.Log(LogLevel.Error, "LylyraHelper", "got this far: " + (results.Children == null) + "|" + sliceableComp.Entity.GetType().Name);
+                if (results != null && results.Children != null)
                 {
-                    foreach (Entity child in children)
+                    foreach (Entity child in results.Children)
                     {
                         if (child != null)
                         {
-                            secondFrameActivation.Add(child);
+                            secondFrameActivation.Add(new(child, sliceableEntity, results));
                         }
                     }
                 }
@@ -1171,6 +1188,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new BoosterSliceableComponent(true, true));
             }
+            else if (entity is ZipMover)
+            {
+                entity.Add(new ZipMoverSliceableComponent(true, true));
+            }
             else if (entity is BounceBlock)
             {
                 entity.Add(new BounceBlockSliceableComponent(true, true));
@@ -1219,5 +1240,19 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         }
 
+    }
+
+    public class SlicerCollisionResults
+    {
+        public Entity[] Children { get; set; } //children can be null, so can elements in the array
+        public Entity Parent { get; set; }
+        public Vector2[] CollisionResults;
+
+        public SlicerCollisionResults(Entity[] entities, Entity entity, Vector2[] resultArray = null)
+        {
+            this.Children = entities;
+            this.Parent = entity;
+            CollisionResults = resultArray;
+        }
     }
 }

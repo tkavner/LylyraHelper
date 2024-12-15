@@ -16,7 +16,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
         {
         }
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
             MoveBlock original = Entity as MoveBlock;
             if (original.state == MoveBlock.MovementState.Breaking)
@@ -68,10 +68,10 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceables
                 Slicer.HandleStaticMover(Scene, slicer.Direction, mb1, mb2, mover);
             }
 
-            return new Entity[] {mb1, mb2 };
+            return new(new Entity[] {mb1, mb2 }, original);
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
             MoveBlock moveBlock = Entity as MoveBlock;
             moveBlock.Get<Coroutine>().enumerators.Peek().MoveNext();

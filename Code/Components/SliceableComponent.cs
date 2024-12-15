@@ -22,9 +22,9 @@ namespace Celeste.Mod.LylyraHelper.Components
 
         public abstract void OnSliceStart(Slicer slicer);
 
-        public abstract Entity[] Slice(Slicer slicer);
+        public abstract SlicerCollisionResults Slice(Slicer slicer);
 
-        public abstract void Activate(Slicer slicer);
+        public abstract void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo);
 
 
         internal void AddParticles(Vector2 position, Vector2 range, Color color)

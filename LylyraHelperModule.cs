@@ -1,5 +1,6 @@
 ﻿using Celeste;
 using Celeste.Mod;
+using Celeste.Mod.LylyraHelper.Code.Components.Sliceable;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta;
@@ -57,6 +58,7 @@ namespace Celeste.Mod.LylyraHelper
             WhimsyKey.Load();
             CursedRefill.Load();
             SetFlagStatesOnRespawnTrigger.Load();
+            ZipMoverSliceableComponent.Load();
 
             //MOD INTEROP TESTING
             /*
@@ -84,6 +86,7 @@ namespace Celeste.Mod.LylyraHelper
             NoFastfallTrigger.Unload();
             WhimsyKey.Unload();
             CursedRefill.Unload();
+            ZipMoverSliceableComponent.Unload();
         }
 
         public override void LoadContent(bool firstLoad)

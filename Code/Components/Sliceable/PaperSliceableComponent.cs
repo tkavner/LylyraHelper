@@ -45,7 +45,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             }
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
             
         }
@@ -90,7 +90,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             }
         }
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
             Paper Parent = (Paper)this.Entity;
             Vector2 Position = Parent.Position;

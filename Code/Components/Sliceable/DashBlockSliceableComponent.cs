@@ -15,7 +15,7 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
         {
         }
 
-        public override void Activate(Slicer slicer)
+        public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
 
         }
@@ -25,7 +25,7 @@ namespace Celeste.Mod.LylyraHelper.Components.Sliceables
 
         }
 
-        public override Entity[] Slice(Slicer slicer)
+        public override SlicerCollisionResults Slice(Slicer slicer)
         {
             (Entity as DashBlock).Break(Entity.Position, slicer.Direction, true);
 
