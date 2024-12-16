@@ -1195,6 +1195,10 @@ namespace Celeste.Mod.LylyraHelper.Components
             {
                 entity.Add(new BoosterSliceableComponent(true, true));
             }
+            else if (entity is SwapBlock)
+            {
+                entity.Add(new SwapBlockSliceableComponent(true, true));
+            }
             else if (entity is ZipMover)
             {
                 entity.Add(new ZipMoverSliceableComponent(true, true));
