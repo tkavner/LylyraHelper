@@ -22,6 +22,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         private bool shouldActivate = false;
         private Vector2 actualStartingPosition;
         private float origLerp;
+        private bool artificial;
         private bool useOrigLerp;
 
         public ZipMoverSliceableComponent(bool active, bool visible) : base(active, visible)
@@ -33,6 +34,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             //newly created zip movers are activated by an ILHook. We simply set the shouldActivate attribute to true to trigger it.
             //Since this method is only called on newly sliced entities, it does not apply to zip movers by default.
             shouldActivate = true;
+            artificial = true;
             var resultArray = data.Results.CollisionResults;
             ZipMover original = (data.Results.Parent as ZipMover);
             Vector2 b1Pos = resultArray[0];
@@ -45,15 +47,35 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             {
                 actualStartingPosition = b2Pos;
             }
-            if ((original.target - original.start).Length() == 0) origLerp = original.percent;//fails on non moving zippers, use percent for a good estimation
-            else origLerp = (original.Position - original.start).Length() / (original.target - original.start).Length(); 
 
+            //attempt to recreate the variable "at2" from percent, which is given by percent = Ease.SineIn(at2) and Ease.SineIn is given by 0f - (float)Math.Cos((float)Math.PI / 2f * t) + 1f
+            //percent = (0f - (float)Math.Cos((float)Math.PI / 2f * t) + 1f)
+            //percent = (0f - (float)Math.Cos((float)Math.PI / 2f * t) + 1f)
+            //percent = 1f - Math.Cos((float)Math.PI / 2f * t)
+            //1f - percent = Math.Cos((float)Math.PI / 2f * t)
+            //arccos(1f - percent) = math.pi / 2f * t
+
+            origLerp = (float) (Math.Acos(1 - original.percent) * 2 / Math.PI);
+
+            Logger.Log(LogLevel.Error, "LylyraHelper", "" + origLerp + "|" + original.percent + "|" + (1 - Ease.SineIn(origLerp)));
             useOrigLerp = true;
+
+            foreach (StaticMover sm in (Entity as Solid).staticMovers)
+            {
+                sm.Entity.Position -= Entity.Position + actualStartingPosition;
+            }
             Entity.Position = actualStartingPosition;
+
             (Entity as ZipMover).start = original.start + actualStartingPosition - original.Position;
             (Entity as ZipMover).target = original.target + actualStartingPosition - original.Position;
             (Entity as ZipMover).percent = original.percent;
         }
+
+        private enum Orientation
+        {
+            Up, Down, Left, Right
+        }
+
 
         public override void OnSliceStart(Slicer slicer)
         {
@@ -61,6 +83,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
         public override SlicerCollisionResults Slice(Slicer slicer)
         {
+            if (artificial && shouldActivate) return null; //Recently sliced zip movers need immunity to slicing because of their abnormal position set up logic. Basically, since sliced zip movers aren't in their proper position until shouldActivate is set to false, we don't attempt to slice until we are in our proper position
             ZipMover original = Entity as ZipMover;
             Vector2[] resultArray = Slicer.CalcCuts(original.Position, new Vector2(original.Width, original.Height), slicer.Entity.Center, slicer.Direction, slicer.CutSize);
 
@@ -79,17 +102,37 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             Scene.Remove(original);
             if (b1Width >= 16 && b1Height >= 16)
             {
-                b1 = new ZipMover(original.start + new Vector2(original.Width - b1Width, original.Height - b1Height) / 2, b1Width, b1Height, original.target + new Vector2(original.Width - b1Width, original.Height - b1Height) / 2, original.theme);
+                b1 = new ZipMover(original.pathRenderer.from + new Vector2( - b1Width,  - b1Height) / 2, b1Width, b1Height, original.pathRenderer.to + new Vector2( - b1Width,  - b1Height) / 2, original.theme);
                 Scene.Add(b1);
             }
             if (b2Width >= 16 && b2Height >= 16)
             {
-                b2 = new ZipMover(original.start + new Vector2(original.Width - b2Width, original.Height - b2Height) / 2, b2Width, b2Height, original.target + new Vector2(original.Width - b2Width, original.Height - b2Height) / 2, original.theme);
+                b2 = new ZipMover(original.pathRenderer.from + new Vector2( - b2Width,  - b2Height) / 2, b2Width, b2Height, original.pathRenderer.to + new Vector2( - b2Width,  - b2Height) / 2, original.theme);
                 Scene.Add(b2);
             }
             foreach (StaticMover mover in original.staticMovers)
             {
+                if (b1 != null) b1.Position = b1Pos; 
+                if (b2 != null) b2.Position = b2Pos;
                 Slicer.HandleStaticMover(Scene, slicer.Direction, b1, b2, mover);
+
+                if (b1 != null)
+                {
+                    Logger.Log(LogLevel.Error, "LylyraHelper", "nummovers b1" + (b1.staticMovers.Count));
+                    foreach (StaticMover sm in b1.staticMovers)
+                    {
+                        sm.Entity.Position += original.start + new Vector2(original.Width - b1Width, original.Height - b1Height) / 2 - b1.Position;
+                    }
+                    b1.Position = original.start + new Vector2(original.Width - b1Width, original.Height - b1Height) / 2;
+                }
+                if (b2 != null)
+                {
+                    foreach (StaticMover sm in b2.staticMovers)
+                    {
+                        sm.Entity.Position += original.start + new Vector2(original.Width - b2Width, original.Height - b2Height) / 2 - b2.Position;
+                    }
+                    b2.Position = original.start + new Vector2(original.Width - b2Width, original.Height - b2Height) / 2;
+                }
             }
             AddParticles(
                 original.Position,
@@ -129,7 +172,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                 break;
             }
 
-            Logger.Log(LogLevel.Error, "LylyraHelper", "got this far" + (fieldLabel != null) + fieldLabel.Name);
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt("Celeste.Solid", "HasPlayerRider")))
             {
                 cursor.Emit(OpCodes.Pop);

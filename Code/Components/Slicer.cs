@@ -881,21 +881,28 @@ namespace Celeste.Mod.LylyraHelper.Components
             }
         }
 
+        public static void HandleStaticMover(Scene scene, Vector2 direction, Solid cb1, Solid cb2, StaticMover mover)
+        {
+            HandleStaticMover(scene, direction, cb1, cb2, mover, Vector2.Zero, Vector2.Zero);
+        }
+
+
         //currently handles vanilla static movers (basically just spikes and springs). Welcome to hell.
         //scene = current map
         //direction = direction of the cut
         //cb1/cb2 = child blocks spawned
         //mover = static mover attempting to be handled
+        //b1Offset/b2Offset = if the block is spawned offset from where the cut happened to the block.
 
         //orientation = orientation of the static mover's Entity, only used with custom slicing actions on
-        public static void HandleStaticMover(Scene scene, Vector2 direction, Solid cb1, Solid cb2, StaticMover mover)
+        public static void HandleStaticMover(Scene scene, Vector2 direction, Solid cb1, Solid cb2, StaticMover mover, Vector2 b1Offset, Vector2 b2Offset)
         {
 
             bool cb1Added = cb1 != null;
             bool cb2Added = cb2 != null;
             if (cb1Added || cb2Added)
             {
-
+                mover.Entity.Position += b1Offset;
                 AttachedSliceableComponent comp = mover.Entity.Get<AttachedSliceableComponent>();
                 if (comp != null)
                 {
@@ -922,18 +929,18 @@ namespace Celeste.Mod.LylyraHelper.Components
                                 break;
                         }
                     }
-                } 
+                }
                 else
                 {
                     scene.Remove(mover.Entity);
                 }
 
-            } else
+            }
+            else
             {
                 scene.Remove(mover.Entity);
             }
         }
-
         public static Vector2[] CalcCuts(Solid blockToBeCut, Vector2 cutPosition, Vector2 cutDir, int gapWidth, int cutsize = 8)
         {
             return CalcCuts(blockToBeCut.Position, new Vector2(blockToBeCut.Width, blockToBeCut.Height), cutPosition, cutDir, gapWidth, cutsize);
