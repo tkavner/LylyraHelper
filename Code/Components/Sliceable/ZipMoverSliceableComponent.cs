@@ -57,14 +57,30 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
             origLerp = (float) (Math.Acos(1 - original.percent) * 2 / Math.PI);
 
-            Logger.Log(LogLevel.Error, "LylyraHelper", "" + origLerp + "|" + original.percent + "|" + (1 - Ease.SineIn(origLerp)));
             useOrigLerp = true;
 
-            foreach (StaticMover sm in (Entity as Solid).staticMovers)
-            {
-                sm.Entity.Position -= Entity.Position + actualStartingPosition;
-            }
             Entity.Position = actualStartingPosition;
+
+            //copy of the StaticMover attach code from Solid.Awake
+            //normally not needed, but since zipmovers have some creative placement to keep the ZipTrackRenderer in place, we have to manually do it here
+            Solid solid = Entity as Solid;
+            foreach (StaticMover component in Entity.Scene.Tracker.GetComponents<StaticMover>())
+            {
+                component.Platform = null;
+            }
+            solid.staticMovers.Clear();
+            foreach (StaticMover component in Entity.Scene.Tracker.GetComponents<StaticMover>())
+            {
+                if (component.Platform == null && component.IsRiding(solid))
+                {
+                    (Entity as Solid).staticMovers.Add(component);
+                    component.Platform = solid;
+                    if (component.OnAttach != null)
+                    {
+                        component.OnAttach(solid);
+                    }
+                }
+            }
 
             (Entity as ZipMover).start = original.start + actualStartingPosition - original.Position;
             (Entity as ZipMover).target = original.target + actualStartingPosition - original.Position;
@@ -119,19 +135,11 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                 if (b1 != null)
                 {
                     Logger.Log(LogLevel.Error, "LylyraHelper", "nummovers b1" + (b1.staticMovers.Count));
-                    foreach (StaticMover sm in b1.staticMovers)
-                    {
-                        sm.Entity.Position += original.start + new Vector2(original.Width - b1Width, original.Height - b1Height) / 2 - b1.Position;
-                    }
-                    b1.Position = original.start + new Vector2(original.Width - b1Width, original.Height - b1Height) / 2;
+                    b1.Position = original.pathRenderer.from + new Vector2(original.Width - b1Width, original.Height - b1Height) / 2;
                 }
                 if (b2 != null)
                 {
-                    foreach (StaticMover sm in b2.staticMovers)
-                    {
-                        sm.Entity.Position += original.start + new Vector2(original.Width - b2Width, original.Height - b2Height) / 2 - b2.Position;
-                    }
-                    b2.Position = original.start + new Vector2(original.Width - b2Width, original.Height - b2Height) / 2;
+                    b2.Position = original.pathRenderer.from + new Vector2(original.Width - b2Width, original.Height - b2Height) / 2;
                 }
             }
             AddParticles(
