@@ -134,7 +134,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
                 if (b1 != null)
                 {
-                    Logger.Log(LogLevel.Error, "LylyraHelper", "nummovers b1" + (b1.staticMovers.Count));
                     b1.Position = original.pathRenderer.from + new Vector2(original.Width - b1Width, original.Height - b1Height) / 2;
                 }
                 if (b2 != null)
@@ -226,7 +225,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                         if (comp != null && comp.useOrigLerp)
                         {
                             comp.useOrigLerp = false;
-                            Logger.Log(LogLevel.Error, "LylyraHelper", "!!" + comp.useOrigLerp + "|" + comp.origLerp);
                             return comp.origLerp;
                         }
                         return 0f;
