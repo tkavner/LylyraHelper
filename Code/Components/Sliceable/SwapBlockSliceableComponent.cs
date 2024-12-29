@@ -18,7 +18,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 
         public override void Activate(Slicer slicer, Slicer.NewlySlicedEntityWrapper secondFrameEntityCombo)
         {
-            (secondFrameEntityCombo.child as SwapBlock).OnDash(Vector2.UnitX); //parameter passed is irrelevant in this case, but we do need one
         }
 
         public override void OnSliceStart(Slicer slicer)
@@ -52,19 +51,25 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                 b1.maxBackwardSpeed = original.maxBackwardSpeed;
                 b1.maxForwardSpeed = original.maxForwardSpeed;
                 b1.moveRect = original.moveRect;
+                b1.lerp = original.lerp;
+                b1.Swapping = original.Swapping;
                 b1.returnTimer = original.returnTimer;
+                b1.target = original.target;
                 Scene.Add(b1);
             }
             if (b2Width >= 16 && b2Height >= 16)
             {
-                Vector2 b2origdiff = original.start + (b2Pos - original.Position);
+                Vector2 b2origdiff = (b2Pos - original.Position);
                 b2 = new SwapBlock(b2Pos, b2Width, b2Height, original.end, original.Theme);
                 b2.start = original.start + b2origdiff;
                 b2.end = original.end + b2origdiff;
                 b2.maxBackwardSpeed = original.maxBackwardSpeed;
                 b2.maxForwardSpeed = original.maxForwardSpeed;
                 b2.moveRect = original.moveRect;
+                b2.lerp = original.lerp;
+                b2.Swapping = original.Swapping;
                 b2.returnTimer = original.returnTimer;
+                b2.target = original.target;
                 Scene.Add(b2);
             }
             AddParticles(original.Position, new Vector2(original.Width, original.Height), Calc.HexToColor("FFFFFF"));
