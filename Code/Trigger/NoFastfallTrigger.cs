@@ -18,11 +18,13 @@ namespace Celeste.Mod.LylyraHelper.Triggers
     {
         private static bool hooksLoaded;
         private bool invert;
+        private bool persistent;
         private LylyraHelperSession session => LylyraHelperModule.Session;
 
         public NoFastfallTrigger(EntityData data, Vector2 offset) : base(data, offset)
         {
             invert = data.Bool("invert", false);
+            persistent = data.Bool("persistent", false);
         }
 
         public override void OnEnter(Player player)
@@ -40,7 +42,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         public override void OnLeave(Player player)
         {
             base.OnLeave(player);
-            session.NoFastfall = invert;
+            if (!persistent) session.NoFastfall = invert;
         }
 
         public static void Load()

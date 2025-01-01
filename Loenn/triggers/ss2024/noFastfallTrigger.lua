@@ -6,7 +6,8 @@ noFastfallTrigger.placements = {
 	name = "No Fastfall Trigger",
 	data = 
 			helpers.createPlacementData(1, {
-		invert=false
+		invert=false,
+		persistent=false
 	})
 }
 
