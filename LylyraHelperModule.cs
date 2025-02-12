@@ -45,7 +45,7 @@ namespace Celeste.Mod.LylyraHelper
 
         public override void Load()
         {
-            Logger.SetLogLevel("LylyraHelper", LogLevel.Info);
+            Logger.SetLogLevel("LylyraHelper", LogLevel.Verbose);
             Logger.Log("LylyraHelper", "LylyraHelper Loaded!");
             Scissors.Load();
             PaperHitbox.Load();

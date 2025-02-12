@@ -18,12 +18,15 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
     {
         private string[] mutedSounds;
         private bool unmute;
+        private bool muteActiveSourcesOnEnter;
+
         private static LylyraHelperSession session => LylyraHelperModule.Session;
 
         public MuteSoundSourceTrigger(EntityData data, Vector2 offset) : base(data, offset)
         {
             mutedSounds = data.Attr("sound", "").Split(',');
             unmute = data.Bool("unmute", false);
+            muteActiveSourcesOnEnter = data.Bool("muteActiveSourcesOnEnter", false);
         }
 
         public override void OnEnter(Player player)
@@ -31,11 +34,33 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
             base.OnEnter(player);
             if (unmute)
             {
-                foreach (var sound in mutedSounds) { if (session.mutedSoundSources.Contains(sound)) session.mutedSoundSources.Remove(sound); }
+                foreach (var sound in mutedSounds) 
+                {
+                    if (session.mutedSoundSources.Contains(sound))
+                    {
+                        session.mutedSoundSources.Remove(sound);
+                    }
+                }
             }
             else
             {
-                foreach(var sound in mutedSounds) { if (!session.mutedSoundSources.Contains(sound)) session.mutedSoundSources.Add(sound); }
+                foreach(var sound in mutedSounds) 
+                {
+                    if (!session.mutedSoundSources.Contains(sound))
+                    {
+                        session.mutedSoundSources.Add(sound);
+                    }
+                    if (muteActiveSourcesOnEnter)
+                    {
+                        foreach (SoundSource source in Scene.Tracker.GetComponents<SoundSource>())
+                        {
+                            if (sound == source.EventName)
+                            {
+                                source.Stop();
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -68,7 +93,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
                     // replace IL_0016: ldloc.0 with a null if the sound source is in the list of muted sources
                     cursor.EmitDelegate((EventDescription passBack, SoundSource soundsource) =>
                     {
-                        Logger.Log(LogLevel.Error, "LylyraHelper", soundsource.EventName);
                         return session.mutedSoundSources.Contains(soundsource.EventName)  ? null : passBack;
                     });
                     while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdarg(0)) && cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<SoundSource>("instance")))
@@ -77,13 +101,15 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
                         cursor.Emit(OpCodes.Ldarg_0);
                         cursor.EmitDelegate((EventInstance passBack, SoundSource soundsource) =>
                         {
-                            Logger.Log(LogLevel.Error, "LylyraHelper", soundsource.EventName);
                             return session.mutedSoundSources.Contains(soundsource.EventName) ? null : passBack;
                         });
                         break;
                     }
                     break;
                 }
+            } else
+            {
+                Logger.Log("LylyraHelper", "MuteSoundSourceTrigger failed to find target for ILHook.");
             }
         }
 
