@@ -181,6 +181,6 @@ entities.LylyraHelper/SS2024/WhimsyKey.attributes.description.spritePath=(Option
 entities.LylyraHelper/SS2024/WhimsyKey.attributes.description.optimized=Reduces computational demands of the key in exchange for slightly less accurate collision checks.\nUseful if you want a room with 50+ keys, or your room is suffering from performance issues.
 
 #Mute Sound Source Trigger
-triggers.LylyraHelper/MuteSoundSourceTrigger.attributes.description.unmute =If checked, will unmute previously muted sound(s).
-triggers.LylyraHelper/MuteSoundSourceTrigger.attributes.description.sound =The sound(s) to mute or unmute. You may specify multiple sounds using commas.\nExample: event:/game/06_reflection/crushblock_move_loop,event:/game/06_reflection/crushblock_move_loop_covert\n\nSounds that you specify will be added/removed from a persistent session list.
+triggers.LylyraHelper/MuteSoundSourceTrigger.attributes.description.unmute=If checked, will unmute previously muted sound(s).
+triggers.LylyraHelper/MuteSoundSourceTrigger.attributes.description.sound=The sound(s) to mute or unmute. You may specify multiple sounds using commas.\nExample: event:/game/06_reflection/crushblock_move_loop,event:/game/06_reflection/crushblock_move_loop_covert\n\nSounds that you specify will be added/removed from a persistent session list.
 triggers.LylyraHelper/MuteSoundSourceTrigger.attributes.description.muteActiveSourcesOnEnter=If checked, the game will attempt to forcibly mute active sound sources making the sound that you want muted when the trigger is entered.\nHas no effect if unmute is also checked.

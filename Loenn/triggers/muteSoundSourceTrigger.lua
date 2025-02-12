@@ -3,7 +3,7 @@ muteSoundSourceTrigger.name = "LylyraHelper/MuteSoundSourceTrigger"
 muteSoundSourceTrigger.placements = {
 	name = "Mute Sound Source Trigger",
 	data = {
-		sound = "event:/game/06_reflection/crushblock_move_loop",
+		sound = "",
 		unmute = false,
 		muteActiveSourcesOnEnter = false
 	}}
