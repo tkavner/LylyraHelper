@@ -6,6 +6,7 @@ Kataiser for the scissor sound effects.
 TiltTheStars for coming up with the idea for Honeycomb Godrays.
 SJCord and CelesteCord for generalized help and nudges along the way. I can't really list everything people have helped with here but know that I appreciate everyone in #coding-general in CelesteCord and every Coder from Strawberry Jam for the immense amount of help and encouragment!
 Samah for version stamping entities.
+evie requested the Mute Sound Source Triggers.
 
 Secret Santa Collab 2024 items:
 
