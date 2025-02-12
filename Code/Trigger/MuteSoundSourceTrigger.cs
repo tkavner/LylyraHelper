@@ -16,12 +16,13 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
     [CustomEntity("LylyraHelper/MuteSoundSourceTrigger")]
     public class MuteSoundSourceTrigger : Trigger
     {
-        private string mutedSound;
+        private string[] mutedSounds;
         private bool unmute;
+        private static LylyraHelperSession session => LylyraHelperModule.Session;
 
         public MuteSoundSourceTrigger(EntityData data, Vector2 offset) : base(data, offset)
         {
-            mutedSound = data.Attr("sound", "");
+            mutedSounds = data.Attr("sound", "").Split(',');
             unmute = data.Bool("unmute", false);
         }
 
@@ -30,11 +31,11 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
             base.OnEnter(player);
             if (unmute)
             {
-                LylyraHelperModule.Session.mutedSoundSources.Remove(mutedSound);
+                foreach (var sound in mutedSounds) { if (session.mutedSoundSources.Contains(sound)) session.mutedSoundSources.Remove(sound); }
             }
             else
             {
-                LylyraHelperModule.Session.mutedSoundSources.Add("event:/game/06_reflection/crushblock_move_loop");
+                foreach(var sound in mutedSounds) { if (!session.mutedSoundSources.Contains(sound)) session.mutedSoundSources.Add(sound); }
             }
         }
 
@@ -61,14 +62,26 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
             if (target != null)
             {
                 cursor = new ILCursor(il);
-                while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<SoundSource>("Stop")) && cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(out int _)))
+                while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdarg(1)) && cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(0)) && cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdloc(0)))
                 {
                     cursor.Emit(OpCodes.Ldarg_0);
-                    cursor.EmitDelegate((SoundSource soundsource) =>
+                    // replace IL_0016: ldloc.0 with a null if the sound source is in the list of muted sources
+                    cursor.EmitDelegate((EventDescription passBack, SoundSource soundsource) =>
                     {
-                        return LylyraHelperModule.Session.mutedSoundSources.Contains(soundsource.EventName);
+                        Logger.Log(LogLevel.Error, "LylyraHelper", soundsource.EventName);
+                        return session.mutedSoundSources.Contains(soundsource.EventName)  ? null : passBack;
                     });
-                    cursor.Emit(OpCodes.Brtrue_S, target.Offset);
+                    while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdarg(0)) && cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<SoundSource>("instance")))
+                    {
+
+                        cursor.Emit(OpCodes.Ldarg_0);
+                        cursor.EmitDelegate((EventInstance passBack, SoundSource soundsource) =>
+                        {
+                            Logger.Log(LogLevel.Error, "LylyraHelper", soundsource.EventName);
+                            return session.mutedSoundSources.Contains(soundsource.EventName) ? null : passBack;
+                        });
+                        break;
+                    }
                     break;
                 }
             }
