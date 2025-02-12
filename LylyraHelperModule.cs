@@ -5,6 +5,7 @@ using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta;
 using Celeste.Mod.LylyraHelper.Code.Entities.SS2024;
+using Celeste.Mod.LylyraHelper.Code.Triggers;
 using Celeste.Mod.LylyraHelper.Code.Triggers.SS2024;
 using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Effects;
@@ -59,6 +60,7 @@ namespace Celeste.Mod.LylyraHelper
             CursedRefill.Load();
             SetFlagStatesOnRespawnTrigger.Load();
             ZipMoverSliceableComponent.Load();
+            MuteSoundSourceTrigger.Load();
 
             //MOD INTEROP TESTING
             /*
@@ -87,6 +89,7 @@ namespace Celeste.Mod.LylyraHelper
             WhimsyKey.Unload();
             CursedRefill.Unload();
             ZipMoverSliceableComponent.Unload();
+            MuteSoundSourceTrigger.Unload();
         }
 
         public override void LoadContent(bool firstLoad)

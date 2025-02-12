@@ -31,5 +31,7 @@ namespace LylyraHelper
         public bool NoFastfall { get; set; }
 
         public Dictionary<string, bool> respawnFlagMonitor = new();
+
+        public List<string> mutedSoundSources = new();
     }
 }
