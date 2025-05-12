@@ -7,7 +7,22 @@ style.effects.LylyraHelper/HexagonalGodray.description.speedX=The speed at which
 style.effects.LylyraHelper/HexagonalGodray.description.speedY=The speed at which godrays should travel vertically.
 style.effects.LylyraHelper/HexagonalGodray.description.rotation=How many degrees to rotate each godray by.
 style.effects.LylyraHelper/HexagonalGodray.description.rotationRandomness=Adds a random amount to the rotation of each godray in degrees to each hexagon between -randomness and +randomness. Set to 0 to not add randomness to rotations.
-style.effects.LylyraHelper/HexagonalGodray.description.blendingMode=What color format to use when blending color and fadeColor. Different formats will achieve different effects.\nHSV:Best when you have dissimilar colors (example: red and green)\nRGB: Good when your colors are similar (example: red and dark red)
+style.effects.LylyraHelper/HexagonalGodray.description.blendingMode=What color format to use when blending color and fadeColor. Different formats will achieve different effects.\nHSV:Best when you have vibrant dissimilar colors (example: red and green) and want to maintain that vibrancy.\nRGB: Good when your colors are similar (example: red and dark red), or when you want two dissimilar colors to grey out during blending.
+style.effects.LylyraHelper/HexagonalGodray.description.renderBorderExtendX=Increases the distance from the camera that godrays can form in the horizontal (x) direction.\nUseful for things where you have fast camera movement or are using Extended Camera Dynamics for zoom out.
+style.effects.LylyraHelper/HexagonalGodray.description.renderBorderExtendY=Increases the distance from the camera that godrays can form in the vertical (y) direction.\nUseful for things where you have fast camera movement or are using Extended Camera Dynamics for zoom out.
+
+#Star Godray
+
+style.effects.LylyraHelper/StarGodray.description.color=The colour the godrays should start as.
+style.effects.LylyraHelper/StarGodray.description.fadeColor=The colour godrays should end as.
+style.effects.LylyraHelper/StarGodray.description.numberOfRays=The number of godrays that will attempted to be rendered simultaneously.
+style.effects.LylyraHelper/StarGodray.description.speedX=The speed at which godrays should travel horizontally.
+style.effects.LylyraHelper/StarGodray.description.speedY=The speed at which godrays should travel vertically.
+style.effects.LylyraHelper/StarGodray.description.rotation=How many degrees to rotate each godray by.
+style.effects.LylyraHelper/StarGodray.description.rotationRandomness=Adds a random amount to the rotation of each godray in degrees to each hexagon between -randomness and +randomness. Set to 0 to not add randomness to rotations.
+style.effects.LylyraHelper/StarGodray.description.blendingMode=What color format to use when blending color and fadeColor. Different formats will achieve different effects.\nHSV:Best when you have vibrant dissimilar colors (example: red and green) and want to maintain that vibrancy.\nRGB: Good when your colors are similar (example: red and dark red), or when you want two dissimilar colors to grey out during blending.
+style.effects.LylyraHelper/StarGodray.description.renderBorderExtendX=Increases the distance from the camera that godrays can form in the horizontal (x) direction.\nUseful for things where you have fast camera movement or are using Extended Camera Dynamics for zoom out.
+style.effects.LylyraHelper/StarGodray.description.renderBorderExtendY=Increases the distance from the camera that godrays can form in the vertical (y) direction.\nUseful for things where you have fast camera movement or are using Extended Camera Dynamics for zoom out.
 
 #Atmospheric Wind
 style.effects.LylyraHelper/SS2024/AtmosphericWind.description.hsvBlending=Use HSV coordinates when blending color and fadeColor. If off, will use RGB coordinates. \nHSV:Best when you have dissimilar colors (example: red and green)\nRGB: Good when your colors are similar (example: red and dark red)

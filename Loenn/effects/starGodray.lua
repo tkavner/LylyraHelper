@@ -20,6 +20,12 @@ starGodray.fieldInformation = {
     blendingMode = {
         options = blendingModes,
         editable = false
+    },
+    renderBorderExtendX = {
+        minimumValue = 0
+    },
+    renderBorderExtendY = {
+        minimumValue = 0
     }
 }
 
@@ -31,7 +37,9 @@ starGodray.defaultData = {
     speedY = 8.0,
     rotation = 0.0,
     rotationRandomness = 0.0,
-    blendingMode="HSV"
+    blendingMode="HSV",
+    renderBorderExtendX=0.0,
+    renderBorderExtendY=0.0
 }
 
 return starGodray

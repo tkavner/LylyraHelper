@@ -32,11 +32,15 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
             public Vector2[] points;
 
+            public float xExtend;
+
+            public float yExtend;
+
             public void Reset(float minRotation, float maxRotation)
             {
                 Percent = 0f;
-                X = Calc.Random.NextFloat(384f);
-                Y = Calc.Random.NextFloat(244f);
+                X = Calc.Random.NextFloat(384f + xExtend);
+                Y = Calc.Random.NextFloat(244f + yExtend);
                 Duration = 4f + Calc.Random.NextFloat() * 8f;
                 float randRotate = minRotation - maxRotation + (Calc.Random.NextFloat() * maxRotation) * 2;
                 angle = (float)(Math.PI / 180F * (randRotate));
@@ -68,15 +72,17 @@ namespace Celeste.Mod.LylyraHelper.Effects
         private bool hsvBlending;
         private float minRotation;
         private float maxRotation;
+        private float yExtend;
+        private float xExtend;
 
 
         public HexagonalGodray(BinaryPacker.Element child) : this(child.Attr("color"), child.Attr("fadeColor"), child.AttrInt("numberOfRays"), child.AttrFloat("speedX"), 
-            child.AttrFloat("speedY"), child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.Attr("blendingMode", "HSV"))
+            child.AttrFloat("speedY"), child.AttrFloat("rotation"), child.AttrFloat("rotationRandomness"), child.Attr("blendingMode", "HSV"), child.AttrFloat("renderBorderExtendX", 0F), child.AttrFloat("renderBorderExtendY", 0F))
         {
 
         }
            
-        public HexagonalGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, string blendingMode)
+        public HexagonalGodray(string color, string fadeToColor, int numRays, float speedx, float speedy, float minRotation, float maxRotation, string blendingMode, float xExtend, float yExtend)
         {
             vertices = new VertexPositionColor[12 * numRays];
             rays = new HexRay[numRays];
@@ -95,10 +101,14 @@ namespace Celeste.Mod.LylyraHelper.Effects
 
             this.minRotation = minRotation;
             this.maxRotation = Math.Max(0, maxRotation);
+            this.xExtend = xExtend;
+            this.yExtend = yExtend;
 
             for (int i = 0; i < rays.Length; i++)
             {
                 rays[i] = new HexRay();
+                rays[i].xExtend = xExtend; //At this point, this is barely a struct. maybe a full class is justified at this point
+                rays[i].yExtend = yExtend;
                 rays[i].Reset(minRotation, maxRotation);
                 rays[i].Percent = Calc.Random.NextFloat();
             }
@@ -130,8 +140,8 @@ namespace Celeste.Mod.LylyraHelper.Effects
                 rays[i].X += speedX * Engine.DeltaTime;
                 rays[i].Y += speedY * Engine.DeltaTime;
                 float percent = rays[i].Percent;
-                float num2 = -32f + Mod(rays[i].X - level.Camera.X * 0.9f, 384f);
-                float num3 = -32f + Mod(rays[i].Y - level.Camera.Y * 0.9f, 244f);
+                float num2 = -32f + Mod(rays[i].X - level.Camera.X * 0.9f, 384f + xExtend);
+                float num3 = -32f + Mod(rays[i].Y - level.Camera.Y * 0.9f, 244f + yExtend);
                 float angle = rays[i].angle;
                 int length = rays[i].length;
                 Vector2 vector3 = new Vector2((int)num2, (int)num3);
