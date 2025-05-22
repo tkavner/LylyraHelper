@@ -160,7 +160,11 @@ entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.flag=Sessio
 entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.cycle=Whether or not the the emitter should stop after the last wave is reached or if it should cycle.
 entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.absoluteMaxGlobs=Render optimization option. Controls the detail level on the back of the shockwaves.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
 entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.renderPointsOnMesh=Render optimization option. Controls the quality of the render mesh used for the shockwave.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
-entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.ignorePlayerSpeedChecks=Shockwaves track potential maximum speed the player can have to detect teleports and other modded entities. On slow moving /non-nyoom maps, this same code can lead to clipping through the shockwaves. Check if you don't use teleportation of any sort.
+entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.ignorePlayerSpeedChecks=Shockwaves track potential maximum speed the player can have to detect teleports and other modded entities. On slow moving /non-nyoom maps, this same code can lead to clipping through the shockwaves. Check if you don't use teleportation or fast movement of any sort.
+entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.launchPower=(Knockback Mode Only) Multiplier to the knockback speed applied by shockwave.\nCan be specified as a comma seperated list to control it on a per shockwave basis.
+entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.mode=What to do when the player is hit by a shockwave.
+entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.renderMode=Energy wave: Will look like the shockwaves originally seen in Secret Santa 2024's map ??? by Hydro0.\nDisplacement: Looks like the big eyeball's shockwaves at the end of Ch. 5
+entities.LylyraHelper/SS2024/ShockwaveEmitter.attributes.description.noSprite=Remove generator sprite.
 
 #Auto Return Falling Block
 
