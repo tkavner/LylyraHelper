@@ -2,6 +2,20 @@ local shockwaveEmitter = {}
 
 shockwaveEmitter.name = "LylyraHelper/SS2024/ShockwaveEmitter"
 shockwaveEmitter.depth = 100
+
+modes = {"Kill", "Knockback"}
+drawModes = {"energyWave", "displacement"}
+
+shockwaveEmitter.fieldInformation = {
+	mode = {
+		options = modes,
+        editable = false
+	},
+	drawModes = {
+		options = modes,
+        editable = false
+	}
+}
 shockwaveEmitter.placements = {
     {
         name = "Shockwave Emitter",
@@ -16,7 +30,11 @@ shockwaveEmitter.placements = {
             cycle = false,
             absoluteMaxGlobs = "4000",
             renderPointsOnMesh = "2000",
-            ignorePlayerSpeedChecks=false
+            launchPower = "1",
+            ignorePlayerSpeedChecks=false,
+            mode="Kill",
+            noSprite = false,
+            renderMode="energyWave"
         }
 
     }

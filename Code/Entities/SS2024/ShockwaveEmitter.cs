@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Celeste.Mod.LylyraHelper.Code.Entities.SS2024.EllipticalShockwave;
 
 namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
 {
@@ -31,6 +32,12 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         private bool finished;
         private Sprite sprite;
 
+        private PlayerInteractMode mode;
+
+        private bool invisibleGenerator;
+        private float[] launchPower;
+        private DrawMode drawMode;
+
         public ShockwaveEmitter(EntityData data, Vector2 offset) : base(data.Position + offset)
         {
             var focalRatio = data.Attr("focalRatio", "1.5").Split(',');
@@ -41,6 +48,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
             var breakoutSpeeds = data.Attr("breakoutSpeeds", "1000").Split(',');
             var absoluteMaxGlobs = data.Attr("absoluteMaxGlobs", "4000").Split(',');
             var renderPointsOnMesh = data.Attr("renderPointsOnMesh", "2000").Split(',');
+            var launchPower = data.Attr("launchPower", "1").Split(',');
             IgnorePlayerSpeedChecks = data.Bool("ignorePlayerSpeedChecks", false);
             normalizedFocalRatio = new Vector2[focalRatio.Length];
             for (int i = 0; i < focalRatio.Length; i++)
@@ -84,10 +92,47 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
             {
                 this.renderPointsOnMesh[i] = int.Parse(renderPointsOnMesh[i]);
             }
+            this.launchPower = new float[launchPower.Length];
+            for (int i = 0; i < launchPower.Length; i++)
+            {
+                this.launchPower[i] = float.Parse(launchPower[i]);
+            }
+
+            invisibleGenerator = data.Bool("noSprite", false);
+
+            if (!invisibleGenerator)
+            {
+
+            }
             flag = data.Attr("flag", "");
             cycle = data.Bool("cycle", false);
             Add(sprite = LylyraHelperModule.SpriteBank.Create("shockwaveEmitter"));
             sprite.Play("idle");
+
+            if (invisibleGenerator) sprite.Visible = false;
+
+            string strmode = data.Attr("mode", "Kill");
+            switch (strmode)
+            {
+                case "Knockback":
+                    mode = PlayerInteractMode.KNOCKBACK; 
+                    break;
+                case "Kill":
+                default:
+                    mode = PlayerInteractMode.KILL;
+                    break;
+            }
+            string strDrawMode = data.Attr("mode", "energyWave");
+            switch (strDrawMode)
+            {
+                case "displacement":
+                    drawMode = DrawMode.DISPLACEMENT;
+                    break;
+                case "energyWave":
+                default:
+                    drawMode = DrawMode.ENERGY_WAVE;
+                    break;
+            }
         }
 
         public override void Update()
@@ -120,7 +165,8 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                     var breakoutSpeed = GetElementCapped(this.breakoutSpeeds);
                     var absoluteMaxGlobs = GetElementCapped(this.absoluteMaxGlobs);
                     var renderPointsOnMesh = GetElementCapped(this.renderPointsOnMesh);
-                    Scene.Add(new EllipticalShockwave(Position, focalRatio.X, focalRatio.Y, initialSize, expandRate, shockwaveThickness, breakoutSpeed, absoluteMaxGlobs, renderPointsOnMesh, IgnorePlayerSpeedChecks));
+                    var launchPower = GetElementCapped(this.launchPower);
+                    Scene.Add(new EllipticalShockwave(Position, focalRatio.X, focalRatio.Y, initialSize, expandRate, shockwaveThickness, breakoutSpeed, absoluteMaxGlobs, renderPointsOnMesh, IgnorePlayerSpeedChecks, mode, launchPower, drawMode));
                     currentWave++;
                     if (cycle && currentWave >= timers.Length)
                     {

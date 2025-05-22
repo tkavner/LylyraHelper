@@ -66,10 +66,25 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         public int currentMaxGlobs { get { return (int)Math.Min(absoluteMaxGlobs, (200 + expand * expand / 4)); } }
         private Random random = new Random();
 
+        private PlayerInteractMode mode;
+        private DrawMode drawMode;
+
+        public enum PlayerInteractMode
+        {
+            KILL, KNOCKBACK
+        }
+        public enum DrawMode
+        {
+            DISPLACEMENT, ENERGY_WAVE
+        }
 
         private void UpdateShockwave()
         {
+            
             expand += expandRate * Engine.DeltaTime;
+
+            if (drawMode == DrawMode.DISPLACEMENT) return;
+
             if (innerShockwaveVertecies == null) innerShockwaveVertecies = new VertexPositionColor[NumVerteces];
             float transparency = 0.7F;
             Color innerShockwaveColor = new Color(0, 1, 1F, 0.5f); //half transparent cyan
@@ -201,6 +216,10 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         private int innerRingTriangleCounter;
         private Vector2 previousPlayerPos;
         private bool IgnorePlayerSpeedChecks;
+        private float launchPower;
+        private bool hasHitPlayer;
+        private MTexture distortionTexture;
+        private float distortionAlpha;
 
         public int NumVerteces
         {
@@ -208,7 +227,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         }
 
 
-        public EllipticalShockwave(Vector2 Position, float a, float b, float initialSize, float expandRate, float shockwaveThickness, float breakoutSpeed, int absoluteMaxGlobs, int renderPointsOnMesh, bool ignorePlayerSpeedChecks) : base(Position)
+        public EllipticalShockwave(Vector2 Position, float a, float b, float initialSize, float expandRate, float shockwaveThickness, float breakoutSpeed, int absoluteMaxGlobs, int renderPointsOnMesh, bool ignorePlayerSpeedChecks, PlayerInteractMode mode, float launchPower, DrawMode drawMode) : base(Position)
         {
             this.b = b;
             this.a = a;
@@ -220,7 +239,11 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
             Depth = Depths.Above;
             this.absoluteMaxGlobs = absoluteMaxGlobs;
             this.numPoints = renderPointsOnMesh;
+            this.mode = mode;
+            this.drawMode = drawMode;
+
             shockwave = GFX.Game["objects/ss2024/ellipticalShockwave/shockwave"];
+
 
             ellipsePoints = new Vector2[numPoints];
             for (int i = 0; i < numPoints; i++)
@@ -229,6 +252,19 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                 ellipsePoints[i] = new Vector2((float)(b * Math.Cos(angle)), (float)(a * Math.Sin(angle)));
             }
             IgnorePlayerSpeedChecks = ignorePlayerSpeedChecks;
+            this.launchPower = launchPower;
+
+            if (drawMode == DrawMode.DISPLACEMENT)
+            {
+                MTexture mTexture = GFX.Game["util/displacementcirclehollow"];
+                distortionTexture = mTexture.GetSubtexture(0, 0, mTexture.Width / 2, mTexture.Height);
+                Add(new DisplacementRenderHook(RenderDisplacement));
+            }
+        }
+
+        private void RenderDisplacement()   
+        {
+            distortionTexture.DrawCentered(Position, Color.White * 0.8f * distortionAlpha, new Vector2(0.9f, 1.5f));
         }
 
         public override void Awake(Scene scene)
@@ -246,6 +282,8 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         /// </summary>
         public void RenderWave()
         {
+            if (drawMode != DrawMode.ENERGY_WAVE) return;
+
             if (innerShockwaveVertecies != null)
             {
                 GFX.DrawVertices(Matrix.Identity, outerVerts, outerRingTriangleCounter * 3);
@@ -323,6 +361,12 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         {
             base.Update();
             Player player = Scene.Tracker.GetEntity<Player>();
+
+            if (drawMode == DrawMode.DISPLACEMENT)
+            {
+                base.X -= 300f * Engine.DeltaTime;
+                distortionAlpha = Calc.Approach(distortionAlpha, 1f, Engine.DeltaTime * 4f);
+            }
             if (player == null)
             {
                 return;
@@ -334,7 +378,29 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
             }
             if (killPlayer)
             {
-                player.Die(new Vector2(1, 0));
+                switch (mode)
+                {
+                    case PlayerInteractMode.KILL:
+                        player.Die(new Vector2(1, 0));
+                        break;
+                    case PlayerInteractMode.KNOCKBACK:
+                        if (player.StateMachine.State != Player.StDash)
+                        {
+                            player.Speed.X = -100f * launchPower;
+                            if (player.Speed.Y > 30f)
+                            {
+                                player.Speed.Y = 30f;
+                            }
+                            if (!hasHitPlayer)
+                            {
+                                Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
+                                Audio.Play("event:/game/05_mirror_temple/eye_pulse", player.Position);
+                                hasHitPlayer = true;
+                            }
+                        }
+                        killPlayer = false;
+                        break;
+                }
                 previousPlayerPos = player.Position;
             }
             UpdateShockwave();
