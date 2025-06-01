@@ -256,15 +256,14 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
 
             if (drawMode == DrawMode.DISPLACEMENT)
             {
-                MTexture mTexture = GFX.Game["util/displacementcirclehollow"];
-                distortionTexture = mTexture.GetSubtexture(0, 0, mTexture.Width / 2, mTexture.Height);
+                distortionTexture = GFX.Game["util/displacementcirclehollow"];
                 Add(new DisplacementRenderHook(RenderDisplacement));
             }
         }
 
         private void RenderDisplacement()   
         {
-            distortionTexture.DrawCentered(Position, Color.White * 0.8f * distortionAlpha, new Vector2(0.9f, 1.5f));
+            distortionTexture.DrawCentered(Position, Color.White * 0.8f * distortionAlpha, new Vector2(b, a).SafeNormalize() * expand / (290F / 2));
         }
 
         public override void Awake(Scene scene)
