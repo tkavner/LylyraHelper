@@ -364,7 +364,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
 
             if (drawMode == DrawMode.DISPLACEMENT)
             {
-                base.X -= 300f * Engine.DeltaTime;
                 distortionAlpha = Calc.Approach(distortionAlpha, 1f, Engine.DeltaTime * 4f);
             }
             if (player == null)

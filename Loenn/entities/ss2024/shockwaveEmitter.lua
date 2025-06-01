@@ -11,8 +11,8 @@ shockwaveEmitter.fieldInformation = {
 		options = modes,
         editable = false
 	},
-	drawModes = {
-		options = modes,
+	renderMode = {
+		options = drawModes,
         editable = false
 	}
 }
@@ -34,7 +34,8 @@ shockwaveEmitter.placements = {
             ignorePlayerSpeedChecks=false,
             mode="Kill",
             noSprite = false,
-            renderMode="energyWave"
+            renderMode="energyWave",
+            customSound=""
         }
 
     }

@@ -122,7 +122,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                     mode = PlayerInteractMode.KILL;
                     break;
             }
-            string strDrawMode = data.Attr("mode", "energyWave");
+            string strDrawMode = data.Attr("renderMode", "energyWave");
             switch (strDrawMode)
             {
                 case "displacement":
