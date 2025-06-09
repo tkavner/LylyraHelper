@@ -62,6 +62,8 @@ namespace Celeste.Mod.LylyraHelper
             ZipMoverSliceableComponent.Load();
             MuteSoundSourceTrigger.Load();
 
+            DisableEntityPreservationTrigger.Load();
+
             //MOD INTEROP TESTING
             /*
             Slicer.CustomSlicingActionHolder holder = new Slicer.CustomSlicingActionHolder();//test to see if Delegate can be cast to Func and back
@@ -90,6 +92,7 @@ namespace Celeste.Mod.LylyraHelper
             CursedRefill.Unload();
             ZipMoverSliceableComponent.Unload();
             MuteSoundSourceTrigger.Unload();
+            DisableEntityPreservationTrigger.Unload();
         }
 
         public override void LoadContent(bool firstLoad)
