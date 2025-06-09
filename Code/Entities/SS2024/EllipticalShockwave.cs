@@ -382,8 +382,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                         player.Die(new Vector2(1, 0));
                         break;
                     case PlayerInteractMode.KNOCKBACK:
-                        if (player.StateMachine.State != Player.StDash)
-                        {
                             player.Speed.X = -100f * launchPower;
                             if (player.Speed.Y > 30f)
                             {
@@ -395,7 +393,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                                 Audio.Play("event:/game/05_mirror_temple/eye_pulse", player.Position);
                                 hasHitPlayer = true;
                             }
-                        }
                         killPlayer = false;
                         break;
                 }

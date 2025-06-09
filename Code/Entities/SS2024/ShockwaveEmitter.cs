@@ -37,6 +37,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
         private bool invisibleGenerator;
         private float[] launchPower;
         private DrawMode drawMode;
+        private string soundFilePath;
 
         public ShockwaveEmitter(EntityData data, Vector2 offset) : base(data.Position + offset)
         {
@@ -108,6 +109,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
             cycle = data.Bool("cycle", false);
             Add(sprite = LylyraHelperModule.SpriteBank.Create("shockwaveEmitter"));
             sprite.Play("idle");
+            soundFilePath = data.Attr("customSound", "event:/Kataiser/sfx/hydro_ancientgenerator_explosion");
 
             if (invisibleGenerator) sprite.Visible = false;
 
@@ -157,7 +159,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                 }
                 if (timers[currentWave] <= 0)
                 {
-                    Audio.Play("event:/Kataiser/sfx/hydro_ancientgenerator_explosion");
+                    Audio.Play(soundFilePath);
                     var focalRatio = GetElementCapped(this.normalizedFocalRatio);
                     var initialSize = GetElementCapped(this.initialSize);
                     var shockwaveThickness = GetElementCapped(this.shockwaveThickness);
