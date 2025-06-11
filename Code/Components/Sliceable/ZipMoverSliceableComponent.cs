@@ -221,7 +221,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
             if (zipMover.Get<ZipMoverSliceableComponent>() is not { } comp)
                 return zipMover.HasPlayerRider();
 
-            //we use a "not" on the should activate since the ILCode we are working with is optimized to brfalse
             bool toReturn = comp.shouldActivate || zipMover.HasPlayerRider();
             if (comp.shouldActivate)
                 zipMover.Position = comp.actualStartingPosition;
