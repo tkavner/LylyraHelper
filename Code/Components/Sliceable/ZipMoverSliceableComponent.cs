@@ -17,6 +17,8 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
 {
     public class ZipMoverSliceableComponent : SliceableComponent 
     {
+        private const string LogId = $"{nameof(LylyraHelper)}/{nameof(ZipMoverSliceableComponent)}";
+
         private static bool hooksLoaded;
         private static ILHook hook_zipmover_sequence;
         private bool shouldActivate = false;
@@ -166,45 +168,53 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         }
         private static void ZipMoverPatch(ILContext il)
         {
-            ILCursor cursor = new ILCursor(il);
-            FieldReference fieldLabel = null;
+            ILCursor cursor = new(il);
 
-            while (cursor.TryGotoNext(MoveType.After, i1 => i1.MatchLdloc(1)))
+            FieldReference zipMoverStartField = null;
+            if (!cursor.TryGotoNext(MoveType.After,
+                static instr => instr.MatchLdloc1(),
+                static instr => instr.MatchLdfld<Entity>(nameof(Entity.Position)),
+                instr => instr.MatchStfld(out zipMoverStartField)))
             {
-                while (cursor.TryGotoNext(instr => instr.MatchStfld(out fieldLabel)))
-                {
-                    break;
-                }
-                break;
+                Logger.Error(LogId, $"Could not find \"start = Position\" variable assignment in {il.Method.FullName}!");
+                return;
             }
 
-            while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt("Celeste.Solid", "HasPlayerRider")))
+            if (!cursor.TryGotoNext(MoveType.After,
+                static instr => instr.MatchCallvirt<Solid>(nameof(Solid.HasPlayerRider))))
             {
-                cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldarg_0);
-                cursor.Emit(OpCodes.Ldloc_1);
-
-                // keeping the rest the same even though all this method does is return ZipMover.start
-                // to not introduce unnecessary il patch changes
-                cursor.EmitDelegate(GetZipMoverStart);
-                cursor.Emit(OpCodes.Stfld, fieldLabel);
-
-                cursor.Emit(OpCodes.Ldloc_1);
-                cursor.EmitDelegate(HasPlayerRiderHook);
-                break;
+                Logger.Error(LogId, $"Could not find {nameof(Solid)}.{nameof(Solid.HasPlayerRider)} in {il.Method.FullName}!");
+                return;
             }
 
-            while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<Sprite>("SetAnimationFrame")))
+            // position the cursor first, so that we don't suddenly abort without emitting all the IL
+            ILCursor useOrigLerpCursor = cursor.Clone();
+            if (!useOrigLerpCursor.TryGotoNext(MoveType.After,
+                static instr => instr.MatchCallvirt<Sprite>(nameof(Sprite.SetAnimationFrame))))
             {
-                while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0F)))
-                {
-                    cursor.Emit(OpCodes.Pop);
-                    cursor.Emit(OpCodes.Ldloc_1);
-                    cursor.EmitDelegate(UseOrigLerp);
-                    break;
-                }
-                break;
+                Logger.Error(LogId, $"Could not find {nameof(Sprite)}.{nameof(Sprite.SetAnimationFrame)} in {il.Method.FullName}!");
+                return;
             }
+
+            if (!useOrigLerpCursor.TryGotoNext(MoveType.After,
+                static instr => instr.MatchLdcR4(0f)))
+            {
+                Logger.Error(LogId, $"Could not find \"at = 0f\" variable assignment in {il.Method.FullName}!");
+                return;
+            }
+
+            cursor.EmitPop();
+            cursor.EmitLdarg0();
+            cursor.EmitLdloc1();
+            cursor.EmitDelegate(GetZipMoverStart);
+            cursor.EmitStfld(zipMoverStartField);
+
+            cursor.EmitLdloc1();
+            cursor.EmitDelegate(HasPlayerRiderHook);
+
+            useOrigLerpCursor.EmitPop();
+            useOrigLerpCursor.EmitLdloc1();
+            useOrigLerpCursor.EmitDelegate(UseOrigLerp);
         }
 
         private static float UseOrigLerp(ZipMover zipMover)
