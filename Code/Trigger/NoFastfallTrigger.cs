@@ -72,10 +72,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                     {
                         cursor.Emit(OpCodes.Pop);
                         cursor.Emit(OpCodes.Ldarg_0);
-                        cursor.EmitDelegate((Player player) =>
-                        {
-                            return (LylyraHelperModule.Session.NoFastfall) ? 10000F : 1f;
-                        });
+                        cursor.EmitDelegate(OverrideFastFall);
                         break;
                     }
                     break;
@@ -83,5 +80,8 @@ namespace Celeste.Mod.LylyraHelper.Triggers
                 break;
             }
         }
+
+        private static float OverrideFastFall(Player player)
+            => LylyraHelperModule.Session.NoFastfall ? 10000F : 1f;
     }
 }

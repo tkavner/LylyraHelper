@@ -91,18 +91,11 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
                 {
                     cursor.Emit(OpCodes.Ldarg_0);
                     // replace IL_0016: ldloc.0 with a null if the sound source is in the list of muted sources
-                    cursor.EmitDelegate((EventDescription passBack, SoundSource soundsource) =>
-                    {
-                        return session.mutedSoundSources.Contains(soundsource.EventName)  ? null : passBack;
-                    });
+                    cursor.EmitDelegate(ReplaceEventDescription);
                     while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdarg(0)) && cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<SoundSource>("instance")))
                     {
-
                         cursor.Emit(OpCodes.Ldarg_0);
-                        cursor.EmitDelegate((EventInstance passBack, SoundSource soundsource) =>
-                        {
-                            return session.mutedSoundSources.Contains(soundsource.EventName) ? null : passBack;
-                        });
+                        cursor.EmitDelegate(ReplaceEventInstance);
                         break;
                     }
                     break;
@@ -112,6 +105,12 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
                 Logger.Log("LylyraHelper", "MuteSoundSourceTrigger failed to find target for ILHook.");
             }
         }
+
+        private static EventInstance ReplaceEventInstance(EventInstance passBack, SoundSource soundSource)
+            => session.mutedSoundSources.Contains(soundSource.EventName) ? null : passBack;
+
+        private static EventDescription ReplaceEventDescription(EventDescription passBack, SoundSource soundSource)
+            => session.mutedSoundSources.Contains(soundSource.EventName) ? null : passBack;
 
         public static void Unload()
         {

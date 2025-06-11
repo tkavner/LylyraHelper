@@ -166,7 +166,6 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
         }
         private static void ZipMoverPatch(ILContext il)
         {
-            
             ILCursor cursor = new ILCursor(il);
             FieldReference fieldLabel = null;
 
@@ -184,56 +183,53 @@ namespace Celeste.Mod.LylyraHelper.Code.Components.Sliceable
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldarg_0);
                 cursor.Emit(OpCodes.Ldloc_1);
-                
-                cursor.EmitDelegate<Func<ZipMover, Vector2>>((ZipMover zipMover) => {
-                    ZipMoverSliceableComponent comp;
-                    if ((comp = zipMover.Get<ZipMoverSliceableComponent>()) != null && comp.shouldActivate)
-                    {
-                        return zipMover.start;
-                    } else
-                    {
-                        return zipMover.start;
-                    }
-                });
+
+                // keeping the rest the same even though all this method does is return ZipMover.start
+                // to not introduce unnecessary il patch changes
+                cursor.EmitDelegate(GetZipMoverStart);
                 cursor.Emit(OpCodes.Stfld, fieldLabel);
 
-
                 cursor.Emit(OpCodes.Ldloc_1);
-                cursor.EmitDelegate((ZipMover zipMover) =>
-                {
-                    ZipMoverSliceableComponent comp;
-                    if ((comp = zipMover.Get<ZipMoverSliceableComponent>()) != null)
-                    {
-                        bool toReturn = comp.shouldActivate || zipMover.HasPlayerRider(); //we use a "not" on the should activate since the ILCode we are working with is optimized to brfalse
-                        if (comp.shouldActivate) zipMover.Position = comp.actualStartingPosition;
-                        comp.shouldActivate = false;
-                        return toReturn ? true : false;
-                    }
-                    return zipMover.HasPlayerRider() ? true : false;
-                });
+                cursor.EmitDelegate(HasPlayerRiderHook);
                 break;
             }
 
-            while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<Sprite>("SetAnimationFrame"))) 
+            while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<Sprite>("SetAnimationFrame")))
             {
                 while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0F)))
                 {
                     cursor.Emit(OpCodes.Pop);
                     cursor.Emit(OpCodes.Ldloc_1);
-                    cursor.EmitDelegate<Func<ZipMover, float>>((ZipMover zipMover) => {
-                        ZipMoverSliceableComponent comp = zipMover.Get<ZipMoverSliceableComponent>();
-                        if (comp != null && comp.useOrigLerp)
-                        {
-                            comp.useOrigLerp = false;
-                            return comp.origLerp;
-                        }
-                        return 0f;
-
-                    });
+                    cursor.EmitDelegate(UseOrigLerp);
                     break;
                 }
                 break;
             }
         }
+
+        private static float UseOrigLerp(ZipMover zipMover)
+        {
+            if (zipMover.Get<ZipMoverSliceableComponent>() is not { useOrigLerp: true } comp)
+                return 0f;
+
+            comp.useOrigLerp = false;
+            return comp.origLerp;
+        }
+
+        private static bool HasPlayerRiderHook(ZipMover zipMover)
+        {
+            if (zipMover.Get<ZipMoverSliceableComponent>() is not { } comp)
+                return zipMover.HasPlayerRider();
+
+            //we use a "not" on the should activate since the ILCode we are working with is optimized to brfalse
+            bool toReturn = comp.shouldActivate || zipMover.HasPlayerRider();
+            if (comp.shouldActivate)
+                zipMover.Position = comp.actualStartingPosition;
+            comp.shouldActivate = false;
+            return toReturn;
+        }
+
+        private static Vector2 GetZipMoverStart(ZipMover zipMover)
+            => zipMover.start;
     }
 }
