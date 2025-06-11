@@ -7,35 +7,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Celeste.Mod.LylyraHelper.Code.Effects.SS2024
+namespace Celeste.Mod.LylyraHelper.Code.Effects.SS2024;
+
+//legit the only fast way to get the shockwaves to render on top
+[CustomBackdrop("LylyraHelper/SS2024/ShockwaveRenderer")]
+public class ShockwaveRenderer : Backdrop
 {
-    //legit the only fast way to get the shockwaves to render on top
-    [CustomBackdrop("LylyraHelper/SS2024/ShockwaveRenderer")]
-    public class ShockwaveRenderer : Backdrop
+    public ShockwaveRenderer(BinaryPacker.Element child)
     {
-        public ShockwaveRenderer(BinaryPacker.Element child)
-        {
 
-        }
-        public ShockwaveRenderer()
-        {
+    }
+    public ShockwaveRenderer()
+    {
 
-        }
+    }
 
-        public override void Render(Scene scene)
+    public override void Render(Scene scene)
+    {
+        base.Render(scene);
+        if (!Visible) return;
+        foreach (EllipticalShockwave shockwave in scene.Tracker.GetEntities<EllipticalShockwave>())
         {
-            base.Render(scene);
-            if (!Visible) return;
-            foreach (EllipticalShockwave shockwave in scene.Tracker.GetEntities<EllipticalShockwave>())
+            shockwave.RenderWave();
+            //this makes the debug hitbox more visible in debug
+            if (Engine.Commands.Open)
             {
-                shockwave.RenderWave();
-                //this makes the debug hitbox more visible in debug
-                if (Engine.Commands.Open)
-                {
-                    shockwave.DebugRenderWave(((Level)scene).Camera);
-                }
+                shockwave.DebugRenderWave(((Level)scene).Camera);
             }
-
         }
+
     }
 }

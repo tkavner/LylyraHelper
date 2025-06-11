@@ -10,29 +10,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LylyraHelper.Entities
+namespace LylyraHelper.Entities;
+
+[CustomEntity("LylyraHelper/SlicerController")]
+public class SlicerController : Entity
 {
-    [CustomEntity("LylyraHelper/SlicerController")]
-    public class SlicerController : Entity
+    private string settings;
+    private bool limitToController;
+
+    public SlicerController(EntityData data, Vector2 offset) {
+        settings = data.Attr("sliceableEntityTypes", "");
+
+
+    }
+
+    public override void Added(Scene scene)
     {
-        private string settings;
-        private bool limitToController;
+        Slicer.SlicerSettings.DefaultSettings = new Slicer.SlicerSettings(settings);
+    }
 
-        public SlicerController(EntityData data, Vector2 offset) {
-            settings = data.Attr("sliceableEntityTypes", "");
-
-
-        }
-
-        public override void Added(Scene scene)
-        {
-            Slicer.SlicerSettings.DefaultSettings = new Slicer.SlicerSettings(settings);
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (Scene!=null)Scene.Remove(this);
-        }
+    public override void Update()
+    {
+        base.Update();
+        if (Scene!=null)Scene.Remove(this);
     }
 }

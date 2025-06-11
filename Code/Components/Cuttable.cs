@@ -8,14 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Celeste.Mod.LylyraHelper.Components
+namespace Celeste.Mod.LylyraHelper.Components;
+
+public class Cuttable 
 {
-    public class Cuttable 
-    {
-        private Paper Parent;
-        private Color Color = Calc.HexToColor("cac7e3");
-        public static ParticleType paperScraps;
+    private Paper Parent;
+    private Color Color = Calc.HexToColor("cac7e3");
+    public static ParticleType paperScraps;
 
 
-    }
 }

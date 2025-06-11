@@ -6,17 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Celeste.Mod.LylyraHelper.Code.Entities
+namespace Celeste.Mod.LylyraHelper.Code.Entities;
+
+public class CustomPaper : Paper
 {
-    public class CustomPaper : Paper
+
+    public CustomPaper(EntityData data, Vector2 offset) :
+        base(data, offset,
+            texture: "objects/LylyraHelper/dashPaper/dashpaper",
+            gapTexture: "objects/LylyraHelper/dashPaper/dashpapergap")
     {
 
-        public CustomPaper(EntityData data, Vector2 offset) :
-            base(data, offset,
-             texture: "objects/LylyraHelper/dashPaper/dashpaper",
-             gapTexture: "objects/LylyraHelper/dashPaper/dashpapergap")
-        {
-
-        }
     }
 }

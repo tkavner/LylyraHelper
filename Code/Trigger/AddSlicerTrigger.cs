@@ -11,178 +11,177 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Celeste.Mod.LylyraHelper.Triggers
+namespace Celeste.Mod.LylyraHelper.Triggers;
+
+[Tracked(false)]
+[CustomEntity("LylyraHelper/AddSlicerTrigger")]
+public class AddSlicerTrigger : Trigger
 {
-    [Tracked(false)]
-    [CustomEntity("LylyraHelper/AddSlicerTrigger")]
-    public class AddSlicerTrigger : Trigger
+    private string direction;
+    private bool sliceOnImpact;
+    private bool oneUse;
+    private bool fragile;
+    private List<string> entityTypes;
+    private float pluginVersion;
+    private bool matchLength;
+    private bool allTypes;
+    private bool roomwide;
+    private int slicerLength;
+    private int cutSize;
+    private bool onLoad;
+    private bool used;
+    private bool invert;
+    private string sliceableEntityTypes;
+    private string flag;
+
+    public AddSlicerTrigger(EntityData data, Vector2 offset) : base(data, offset)
     {
-        private string direction;
-        private bool sliceOnImpact;
-        private bool oneUse;
-        private bool fragile;
-        private List<string> entityTypes;
-        private float pluginVersion;
-        private bool matchLength;
-        private bool allTypes;
-        private bool roomwide;
-        private int slicerLength;
-        private int cutSize;
-        private bool onLoad;
-        private bool used;
-        private bool invert;
-        private string sliceableEntityTypes;
-        private string flag;
+        direction = data.Attr("direction", "All");
+        sliceOnImpact = data.Bool("sliceOnImpact", false);
+        oneUse = data.Bool("singleUse", false);
+        fragile = data.Bool("fragileSlicer", false);
+        roomwide = data.Bool("roomwide", false);
+        slicerLength = data.Int("slicerLength", 8);
+        onLoad = data.Bool("onLoadOnly", false);
+        flag = data.Attr("flag", "");
+        invert = data.Bool("invert", false);
+        sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
+        entityTypes = LyraUtils.GetFullNames(data.Attr("entityTypes", ""));
+        pluginVersion = data.Float("pluginVersion");
+        matchLength = data.Bool("matchCutSizeToLength", false);
+        cutSize = data.Int("cutSize", 16);
+    }
 
-        public AddSlicerTrigger(EntityData data, Vector2 offset) : base(data, offset)
+
+    public override void Update()
+    {
+        base.Update();
+        if (!used && CheckFlag())
         {
-            direction = data.Attr("direction", "All");
-            sliceOnImpact = data.Bool("sliceOnImpact", false);
-            oneUse = data.Bool("singleUse", false);
-            fragile = data.Bool("fragileSlicer", false);
-            roomwide = data.Bool("roomwide", false);
-            slicerLength = data.Int("slicerLength", 8);
-            onLoad = data.Bool("onLoadOnly", false);
-            flag = data.Attr("flag", "");
-            invert = data.Bool("invert", false);
-            sliceableEntityTypes = data.Attr("sliceableEntityTypes", "");
-            entityTypes = LyraUtils.GetFullNames(data.Attr("entityTypes", ""));
-            pluginVersion = data.Float("pluginVersion");
-            matchLength = data.Bool("matchCutSizeToLength", false);
-            cutSize = data.Int("cutSize", 16);
-        }
-
-
-        public override void Update()
-        {
-            base.Update();
-            if (!used && CheckFlag())
+            foreach (Entity e in Scene.Entities)
             {
-                foreach (Entity e in Scene.Entities)
+                if (e.Collider == null) continue;
+                if (HasMatchingDirectionalSlicer(e)) continue;
+                TryAddSlicer(e);
+            }
+        }
+        if (onLoad) Scene.Remove(this);
+    }
+
+    public static void Load()
+    {
+        On.Monocle.Entity.Awake += SlicerTriggerCheck;
+    }
+    public static void Unload()
+    {
+        On.Monocle.Entity.Awake -= SlicerTriggerCheck;
+    }
+
+    private static void SlicerTriggerCheck(On.Monocle.Entity.orig_Awake orig, Entity self, Scene scene)
+    {
+
+        orig(self, scene);
+        if (scene == null || scene.Tracker == null) return;
+        if (!scene.Tracker.IsEntityTracked<AddSlicerTrigger>()) return; //this stops load crash bugs apparently
+        foreach (AddSlicerTrigger trigger in scene.Tracker.GetEntities<AddSlicerTrigger>())
+        {
+            if (trigger.used) continue;
+            if (trigger.CheckFlag())
+            {
+                if (self.Collider == null) continue;
+                if (trigger.HasMatchingDirectionalSlicer(self)) continue;
+                if ((self.Collider != null && self.CollideCheck(trigger)))
+                    trigger.TryAddSlicer(self);
+
+            }
+        }
+    }
+
+    private bool HasMatchingDirectionalSlicer(Entity entity)
+    {
+        foreach (Component component in entity.Components) {
+            if (component is Slicer slicer)
+            {
+                if (pluginVersion > 0)
                 {
-                    if (e.Collider == null) continue;
-                    if (HasMatchingDirectionalSlicer(e)) continue;
-                    TryAddSlicer(e);
+                    if (slicer.Direction == DirectionalVector() && pluginVersion > 0) return true;
                 }
+                else return true;
             }
-            if (onLoad) Scene.Remove(this);
         }
+        return false;
+    }
 
-        public static void Load()
+    private Vector2 DirectionalVector()
+    {
+        switch(direction.ToLower())
         {
-            On.Monocle.Entity.Awake += SlicerTriggerCheck;
+            case "up":
+                return -Vector2.UnitY;
+            case "down":
+                return Vector2.UnitY;
+            case "right":
+                return Vector2.UnitX;
+            case "left":
+                return -Vector2.UnitX;
         }
-        public static void Unload()
-        {
-            On.Monocle.Entity.Awake -= SlicerTriggerCheck;
-        }
+        return Vector2.Zero;
+    }
 
-        private static void SlicerTriggerCheck(On.Monocle.Entity.orig_Awake orig, Entity self, Scene scene)
-        {
+    public bool CheckFlag()
+    {
+        return flag == "" || (SceneAs<Level>().Session.GetFlag(flag) ^ invert);
+    }
 
-            orig(self, scene);
-            if (scene == null || scene.Tracker == null) return;
-            if (!scene.Tracker.IsEntityTracked<AddSlicerTrigger>()) return; //this stops load crash bugs apparently
-            foreach (AddSlicerTrigger trigger in scene.Tracker.GetEntities<AddSlicerTrigger>())
+    private void TryAddSlicer(Entity entity)
+    {
+        string entityName = entity.GetType().FullName;
+        if (allTypes || entityTypes.Contains(entityName))
+        {
+            bool tempCollide = this.Collidable;
+            this.Collidable = true;
+            bool collide = this.CollideCheck(entity);
+            this.Collidable = tempCollide;
+            if (collide || roomwide)
             {
-                if (trigger.used) continue;
-                if (trigger.CheckFlag())
-                {
-                    if (self.Collider == null) continue;
-                    if (trigger.HasMatchingDirectionalSlicer(self)) continue;
-                    if ((self.Collider != null && self.CollideCheck(trigger)))
-                        trigger.TryAddSlicer(self);
+                used = oneUse;
+                Collider cUp = new Hitbox(entity.Width, slicerLength, 0, 0);
+                cUp.BottomCenter = entity.Collider.TopCenter;
 
+                Collider cDown = new Hitbox(entity.Width, slicerLength, 0, 0);
+                cDown.TopCenter = entity.Collider.BottomCenter;
+
+                Collider cRight = new Hitbox(slicerLength, entity.Height, 0, 0);
+                cRight.CenterLeft = entity.Collider.CenterRight;
+
+                Collider cLeft = new Hitbox(slicerLength, entity.Height, 0, 0);
+                cLeft.CenterRight = entity.Collider.CenterLeft;
+
+                int horizCutSize = (int) (matchLength ? entity.Width : cutSize);
+                int vertCutSize = (int)(matchLength ? entity.Height : cutSize);
+
+                if (direction == "All")
+                {
+                    entity.Add(new Slicer(-Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings:sliceableEntityTypes));
+                    entity.Add(new Slicer(Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                    entity.Add(new Slicer(Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                    entity.Add(new Slicer(-Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                 }
-            }
-        }
-
-        private bool HasMatchingDirectionalSlicer(Entity entity)
-        {
-            foreach (Component component in entity.Components) {
-                if (component is Slicer slicer)
+                else if (direction == "Up")
                 {
-                    if (pluginVersion > 0)
-                    {
-                        if (slicer.Direction == DirectionalVector() && pluginVersion > 0) return true;
-                    }
-                    else return true;
+                    entity.Add(new Slicer(-Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                 }
-            }
-            return false;
-        }
-
-        private Vector2 DirectionalVector()
-        {
-            switch(direction.ToLower())
-            {
-                case "up":
-                    return -Vector2.UnitY;
-                case "down":
-                    return Vector2.UnitY;
-                case "right":
-                    return Vector2.UnitX;
-                case "left":
-                    return -Vector2.UnitX;
-            }
-            return Vector2.Zero;
-        }
-
-        public bool CheckFlag()
-        {
-            return flag == "" || (SceneAs<Level>().Session.GetFlag(flag) ^ invert);
-        }
-
-        private void TryAddSlicer(Entity entity)
-        {
-            string entityName = entity.GetType().FullName;
-            if (allTypes || entityTypes.Contains(entityName))
-            {
-                bool tempCollide = this.Collidable;
-                this.Collidable = true;
-                bool collide = this.CollideCheck(entity);
-                this.Collidable = tempCollide;
-                if (collide || roomwide)
+                else if (direction == "Down")
                 {
-                    used = oneUse;
-                    Collider cUp = new Hitbox(entity.Width, slicerLength, 0, 0);
-                    cUp.BottomCenter = entity.Collider.TopCenter;
-
-                    Collider cDown = new Hitbox(entity.Width, slicerLength, 0, 0);
-                    cDown.TopCenter = entity.Collider.BottomCenter;
-
-                    Collider cRight = new Hitbox(slicerLength, entity.Height, 0, 0);
-                    cRight.CenterLeft = entity.Collider.CenterRight;
-
-                    Collider cLeft = new Hitbox(slicerLength, entity.Height, 0, 0);
-                    cLeft.CenterRight = entity.Collider.CenterLeft;
-
-                    int horizCutSize = (int) (matchLength ? entity.Width : cutSize);
-                    int vertCutSize = (int)(matchLength ? entity.Height : cutSize);
-
-                    if (direction == "All")
-                    {
-                        entity.Add(new Slicer(-Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings:sliceableEntityTypes));
-                        entity.Add(new Slicer(Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                        entity.Add(new Slicer(Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                        entity.Add(new Slicer(-Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                    }
-                    else if (direction == "Up")
-                    {
-                        entity.Add(new Slicer(-Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cUp, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                    }
-                    else if (direction == "Down")
-                    {
-                        entity.Add(new Slicer(Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                    }
-                    else if (direction == "Right")
-                    {
-                        entity.Add(new Slicer(Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                    }
-                    else if (direction == "Left")
-                    {
-                        entity.Add(new Slicer(-Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
-                    }
+                    entity.Add(new Slicer(Vector2.UnitY, horizCutSize, SceneAs<Level>(), slicerLength, cDown, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                }
+                else if (direction == "Right")
+                {
+                    entity.Add(new Slicer(Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cRight, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
+                }
+                else if (direction == "Left")
+                {
+                    entity.Add(new Slicer(-Vector2.UnitX, vertCutSize, SceneAs<Level>(), slicerLength, cLeft, sliceOnImpact: sliceOnImpact, fragile: fragile, settings: sliceableEntityTypes));
                 }
             }
         }
