@@ -35,7 +35,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers.SS2024
 
         private static void Level_LoadLevel(On.Celeste.Level.orig_LoadLevel orig, Level self, Player.IntroTypes playerIntro, bool isFromLoader)
         {
-            orig.Invoke(self, playerIntro, isFromLoader);
+            orig(self, playerIntro, isFromLoader);
             foreach (KeyValuePair<string, bool> kvp in session.respawnFlagMonitor)
                 self.Session.SetFlag(kvp.Key, kvp.Value);
         }

@@ -126,7 +126,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta
         }
         private static void CustomDashInitialize(On.Celeste.LevelLoader.orig_LoadingThread orig, LevelLoader self)
         {
-            orig.Invoke(self);
+            orig(self);
             if (session != null)
             {
                 session.ResetCurse();
@@ -136,7 +136,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta
         private static void Player_Update(On.Celeste.Player.orig_Update orig, Player self)
         {
             //add smoke particles
-            orig.Invoke(self);
+            orig(self);
             if (session.playerCursed && particleRandom.NextFloat() < ChanceOfParticle) self.SceneAs<Level>().ParticlesBG.Emit(ParticleTypes.Steam, 1, self.Center, self.Collider.HalfSize, smokeColor);
             if (session.killPlayerWhenSafe && PlayerCanSafelyDie(self))
             {
@@ -161,7 +161,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta
             {
                 session.SetCurse(false);
             }
-            orig.Invoke(self);
+            orig(self);
         }
 
 
@@ -176,7 +176,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta
         private static PlayerDeadBody Player_Die(On.Celeste.Player.orig_Die orig, Player self, Vector2 direction, bool evenIfInvincible, bool registerDeathInStats)
         {
             session.ResetCurse();
-            return orig.Invoke(self, direction, evenIfInvincible, registerDeathInStats);
+            return orig(self, direction, evenIfInvincible, registerDeathInStats);
         }
     }
 }

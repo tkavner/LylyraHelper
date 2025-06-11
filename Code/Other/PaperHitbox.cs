@@ -122,7 +122,7 @@ namespace LylyraHelper.Entities
                 }
                 return false;
             }
-            return orig.Invoke(self, collider);
+            return orig(self, collider);
         }
 
         public override void Render(Camera camera, Color color)

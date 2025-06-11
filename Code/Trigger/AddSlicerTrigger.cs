@@ -80,7 +80,7 @@ namespace Celeste.Mod.LylyraHelper.Triggers
         private static void SlicerTriggerCheck(On.Monocle.Entity.orig_Awake orig, Entity self, Scene scene)
         {
 
-            orig.Invoke(self, scene);
+            orig(self, scene);
             if (scene == null || scene.Tracker == null) return;
             if (!scene.Tracker.IsEntityTracked<AddSlicerTrigger>()) return; //this stops load crash bugs apparently
             foreach (AddSlicerTrigger trigger in scene.Tracker.GetEntities<AddSlicerTrigger>())

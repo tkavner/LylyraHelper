@@ -500,11 +500,8 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
 
         private static void Player_RedDashEnd(On.Celeste.Player.orig_RedDashEnd orig, Player self)
         {
-
-            orig.Invoke(self);
+            orig(self);
             OnDashEnd(self);
-
-
         }
 
         private static void OnDashEnd(Player self)
@@ -583,7 +580,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
                     return false;
                 }
             }
-            return orig.Invoke(self, player);
+            return orig(self, player);
         }
 
         public override void SceneEnd(Scene scene)
@@ -593,7 +590,7 @@ namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024
 
         private static void Player_DashEnd(On.Celeste.Player.orig_DashEnd orig, Player self)
         {
-            orig.Invoke(self);
+            orig(self);
             OnDashEnd(self);
         }
 

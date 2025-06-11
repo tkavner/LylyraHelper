@@ -323,7 +323,7 @@ namespace Celeste.Mod.LylyraHelper.Entities
 
         private static void BumperSlice(On.Celeste.Bumper.orig_Update orig, Bumper self)
         {
-            orig.Invoke(self);
+            orig(self);
             if (self == null) return;
             self.CollideDo<Scissors>(
                 scissors => {
