@@ -1,15 +1,8 @@
-﻿using Celeste;
-using Celeste.Mod.Entities;
-using Celeste.Mod.LylyraHelper.Entities;
+﻿using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Celeste.Mod.LylyraHelper.Entities.DashPaper;
 
 namespace Celeste.Mod.LylyraHelper.Entities;
 

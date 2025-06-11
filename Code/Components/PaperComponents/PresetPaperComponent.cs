@@ -1,13 +1,8 @@
 ﻿using Celeste.Mod.LylyraHelper.Entities;
-using FMOD;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Celeste.Mod.LylyraHelper.Entities.Paper;
 
 namespace Celeste.Mod.LylyraHelper.Code.Components.PaperComponents;

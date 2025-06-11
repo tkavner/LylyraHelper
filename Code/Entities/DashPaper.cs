@@ -1,14 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Celeste.Mod.LylyraHelper.Components;
-using FMOD.Studio;
-using global::Celeste;
-using global::Celeste.Mod;
 using global::Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;

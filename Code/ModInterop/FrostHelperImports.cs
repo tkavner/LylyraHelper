@@ -1,7 +1,5 @@
 ﻿using MonoMod.ModInterop;
 using System;
-using System.Linq;
-using System.Reflection;
 
 namespace Celeste.Mod.LylyraHelper.Entities;
 

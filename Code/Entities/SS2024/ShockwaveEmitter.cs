@@ -3,10 +3,7 @@ using Celeste.Mod.LylyraHelper.Code.Effects.SS2024;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Celeste.Mod.LylyraHelper.Code.Entities.SS2024.EllipticalShockwave;
 
 namespace Celeste.Mod.LylyraHelper.Code.Entities.SS2024;

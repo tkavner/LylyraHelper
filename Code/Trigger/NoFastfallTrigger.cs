@@ -1,11 +1,4 @@
-﻿using Celeste;
-using MonoMod.Cil;
-using Monocle;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using Microsoft.Xna.Framework;
 using LylyraHelper;

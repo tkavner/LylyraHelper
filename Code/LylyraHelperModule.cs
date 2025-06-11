@@ -1,27 +1,20 @@
-﻿using Celeste;
-using Celeste.Mod;
-using Celeste.Mod.LylyraHelper.Code.Components.Sliceable;
+﻿using Celeste.Mod.LylyraHelper.Code.Components.Sliceable;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
-using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Code.Entities.SecretSanta;
 using Celeste.Mod.LylyraHelper.Code.Entities.SS2024;
 using Celeste.Mod.LylyraHelper.Code.Triggers;
 using Celeste.Mod.LylyraHelper.Code.Triggers.SS2024;
 using Celeste.Mod.LylyraHelper.Components;
-using Celeste.Mod.LylyraHelper.Effects;
 using Celeste.Mod.LylyraHelper.Entities;
 using Celeste.Mod.LylyraHelper.Triggers;
 using LylyraHelper;
 using LylyraHelper.Entities;
-using LylyraHelper.Other;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.ModInterop;
 using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using static Celeste.GaussianBlur;
 
 namespace Celeste.Mod.LylyraHelper;
 

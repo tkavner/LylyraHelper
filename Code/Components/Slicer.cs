@@ -1,28 +1,17 @@
-﻿using Celeste.Mod.Entities;
-using Celeste.Mod.Helpers;
-using Celeste.Mod.LylyraHelper.Code.Components.Sliceable;
+﻿using Celeste.Mod.LylyraHelper.Code.Components.Sliceable;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceable.Attached;
 using Celeste.Mod.LylyraHelper.Code.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Code.Entities.SS2024;
-using Celeste.Mod.LylyraHelper.Components;
 using Celeste.Mod.LylyraHelper.Components.Sliceables;
 using Celeste.Mod.LylyraHelper.Entities;
-using Celeste.Mod.LylyraHelper.Intefaces;
 using Celeste.Mod.LylyraHelper.Other;
-using FMOD.Studio;
 using LylyraHelper;
-using LylyraHelper.Other;
 using Microsoft.Xna.Framework;
 using Monocle;
-using MonoMod.Cil;
-using MonoMod.ModInterop;
 using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using static Celeste.GaussianBlur;
-using static Celeste.Tentacles;
 
 namespace Celeste.Mod.LylyraHelper.Components;
 

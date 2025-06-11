@@ -1,21 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Celeste.Mod.Helpers;
 using Celeste.Mod.LylyraHelper.Components;
-using Celeste.Mod.LylyraHelper.Intefaces;
 using FMOD.Studio;
-using global::Celeste;
-using global::Celeste.Mod;
-using global::Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
-using MonoMod.Utils;
-using static Celeste.Mod.LylyraHelper.Entities.Paper;
 
 namespace Celeste.Mod.LylyraHelper.Entities;
 
