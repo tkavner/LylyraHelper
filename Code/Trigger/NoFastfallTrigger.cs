@@ -63,8 +63,6 @@ public class NoFastfallTrigger : Trigger
             {
                 while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(1)))
                 {
-                    cursor.Emit(OpCodes.Pop);
-                    cursor.Emit(OpCodes.Ldarg_0);
                     cursor.EmitDelegate(OverrideFastFall);
                     break;
                 }
@@ -73,7 +71,13 @@ public class NoFastfallTrigger : Trigger
             break;
         }
     }
-
-    private static float OverrideFastFall(Player player)
-        => LylyraHelperModule.Session.NoFastfall ? 10000F : 1f;
+    //This trigger started as a port of an identical trigger in Santa's Gifts.
+    //Both triggers work by setting the condition for the input of the move value to be equal to 10000 instead of the expected value of 1
+    //We don't know which loads first, so both triggers grab the value from the stack and simply pass it back if it has been modified (that is, not equal to 1).
+    //This way both triggers can exist in the same codespace.
+    private static float OverrideFastFall(float f)
+    {
+        if (f > 1) return f;
+        return LylyraHelperModule.Session.NoFastfall ? 10000F : f;
+    } 
 }
