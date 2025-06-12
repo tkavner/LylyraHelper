@@ -47,13 +47,13 @@ public class LylyraHelperModule : EverestModule
         AttachedTriggerSpikesSliceable.Load();
         typeof(ModExports).ModInterop();
 
-
-        NoFastfallTrigger.Load();
         WhimsyKey.Load();
         CursedRefill.Load();
         SetFlagStatesOnRespawnTrigger.Load();
         ZipMoverSliceableComponent.Load();
         MuteSoundSourceTrigger.Load();
+        
+        DisableEntityPreservationTrigger.Load();
 
         //MOD INTEROP TESTING
         /*
@@ -83,6 +83,8 @@ public class LylyraHelperModule : EverestModule
         CursedRefill.Unload();
         ZipMoverSliceableComponent.Unload();
         MuteSoundSourceTrigger.Unload();
+        
+        DisableEntityPreservationTrigger.Unload();
     }
 
     public override void LoadContent(bool firstLoad)

@@ -22,6 +22,7 @@ public class EntitySpammer : Entity
         if (SceneAs<Level>().Session.GetFlag(flag))
         {
             Scene.Add(new DreamBlock(Position + new Vector2(offset % 300, -8 * (offset / 300f)), 8, 8, null, false, false, false));
+            offset += increment;
         }
     }
 }

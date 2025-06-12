@@ -29,19 +29,20 @@ namespace Celeste.Mod.LylyraHelper.Code.Triggers
 
         public static void Load()
         {
-            On.Monocle.Scene.End += Scene_End;
+            On.Celeste.Level.UnloadLevel += UnloadHook;
         }
 
         public static void Unload()
         {
 
-            On.Monocle.Scene.End -= Scene_End;
+            On.Celeste.Level.UnloadLevel -= UnloadHook;
         }
 
-        private static void Scene_End(On.Monocle.Scene.orig_End orig, Monocle.Scene self)
+        private static void UnloadHook(On.Celeste.Level.orig_UnloadLevel orig, Level self)
         {
-            orig(self);
             if (Session != null && Session.DisableEntityPreservation) self.Entities.ToAdd.Clear();
+            
+            orig(self);
         }
     }
 }
