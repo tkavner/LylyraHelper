@@ -29,4 +29,6 @@ public class LylyraHelperSession : EverestModuleSession
     public Dictionary<string, bool> respawnFlagMonitor = new();
 
     public List<string> mutedSoundSources = new();
+    
+    public bool DisableEntityPreservation { get; set; } = false;
 }
