@@ -316,8 +316,27 @@ public class WhimsyKey : Actor
         float f1 = Engine.DeltaTime * Calc.Clamp(speedMagnitude, 10000, float.MaxValue);
         var approach = this.ExactPosition + JUMPTHROUGH_OFFSET;
         if ((keySolid.Position - approach).LengthSquared() > 0.1F)
-            keySolid.MoveTo(Calc.Approach(keySolid.Position, approach, f1), LiftSpeed.SafeNormalize() * 100);
+        {
+                
+            Player player = Scene.Tracker.GetEntity<Player>();
+            Vector2 newPos = Calc.Approach(keySolid.Position, approach, f1);
+            bool movePlayer = false;
+            if (!optimizedKey)
+            {
+                //check if we will collide the player
+                //the player can fall through the key in this case, so we need to manually move and attach them after moving.
+                if (player != null && Speed.Y <= 0 && player.Speed.Y >= Speed.Y)
+                {
+                    movePlayer = keySolid.CollideCheck<Player>(newPos);
+                }
+            }
+            keySolid.MoveTo(newPos, new Vector2(0));
 
+            if (movePlayer)
+            {
+                player.Bottom = keySolid.Top - 1;
+            }
+        }
         //teleport catchup code code
         if ((Position - previousPosition).Length() > speedMagnitude * 3 && speedMagnitude != 0)
         {
