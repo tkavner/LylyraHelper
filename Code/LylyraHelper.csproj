@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <AssemblyName>LylyraHelper</AssemblyName>
         <RootNamespace>Celeste.Mod.LylyraHelper</RootNamespace>
         <LangVersion>latest</LangVersion>
