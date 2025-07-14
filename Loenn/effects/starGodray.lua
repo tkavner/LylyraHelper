@@ -1,7 +1,7 @@
 local starGodray = {}
 
 starGodray.name = "LylyraHelper/StarGodray"
-starGodray.canBackground = false
+starGodray.canBackground = true
 starGodray.canForeground = true
 
 blendingModes = {"HSV", "RGB"}

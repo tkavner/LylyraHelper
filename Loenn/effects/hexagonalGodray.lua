@@ -1,7 +1,7 @@
 local hexGodray = {}
 
 hexGodray.name = "LylyraHelper/HexagonalGodray"
-hexGodray.canBackground = false
+hexGodray.canBackground = true
 hexGodray.canForeground = true
 
 blendingModes = {"HSV", "RGB"}
