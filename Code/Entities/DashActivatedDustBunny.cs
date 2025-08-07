@@ -45,7 +45,11 @@ public class DashActivatedDustBunny : Entity
         Add(new PlayerCollider(OnPlayer));
         Add(new DashListener(OnDash));
         this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (Nodes[NextNode] - Nodes[CurrentNode]).SafeNormalize();
-        
+        this.Collider = new ColliderList(new Collider[2]
+        {
+            new Circle(6f),
+            new Hitbox(16f, 4f, -8f, -3f)
+        });
     }
 
     public void OnPlayer(Player player)
