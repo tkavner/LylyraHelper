@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
 using Celeste.Mod.Entities;
+using Celeste.Mod.LylyraHelper.Entities.DashActivatedDustBunnies;
 using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Celeste.Mod.LylyraHelper.Entities;
 
-[CustomEntity("LylyraHelper/DashActivatedDustBunny")]
 //adapted from DustTrackSpinner and TrackSpinner
-public class DashActivatedDustBunny : Entity
+public abstract class DashActivatedDustBunny : Entity
 {
     private float TravelTime;
-    private DustGraphic dusty;
-    private Tween tween;
+    public DustGraphic dusty;
+    public Tween tween;
     private Vector2 outwards;
     private bool Up = false;
     private bool Moving 
@@ -25,31 +25,37 @@ public class DashActivatedDustBunny : Entity
 
     private bool Hit = false;
 
-    private Vector2 Start { get; set; }
+    protected Vector2 Start { get; private set; }
 
     private Vector2 End { get; set; }
 
-    private int CurrentNode = 0;
+    protected int TargetIndex { get; private set; }
 
-    private int NextNode => (CurrentNode + 1) % Nodes.Length;
-    private Vector2[] Nodes;
+    private int NextNode => (TargetIndex + 1);
 
     public DashActivatedDustBunny(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
-        this.Add((Component)(this.dusty = new DustGraphic(true)));
+        this.Add((this.dusty = new DustGraphic(true)));
         this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (this.End - this.Start).SafeNormalize();
         this.dusty.OnEstablish = new Action(this.Establish);
         this.Depth = -50;
         TravelTime = data.Float("TravelTime", 0.15f);
-        Nodes = data.NodesWithPosition(offset);
         Add(new PlayerCollider(OnPlayer));
         Add(new DashListener(OnDash));
-        this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (Nodes[NextNode] - Nodes[CurrentNode]).SafeNormalize();
+        Active = true;
+        Visible = true;
         this.Collider = new ColliderList(new Collider[2]
         {
             new Circle(6f),
             new Hitbox(16f, 4f, -8f, -3f)
         });
+    }
+
+    public override void Added(Scene scene)
+    {
+        this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (GetTarget(1) - GetTarget(0)).SafeNormalize();
+        Visible = true;
+        Active = true;
     }
 
     public void OnPlayer(Player player)
@@ -67,16 +73,21 @@ public class DashActivatedDustBunny : Entity
         base.Update();
         if (Moving)
         {
-            Position = Vector2.Lerp(Start, End, tween.Eased);
-            this.SceneAs<Level>().ParticlesBG.Emit(DustStaticSpinner.P_Move, 1, this.Position, Vector2.One * 4f);
+            GoToNextPosition();
+            //this.SceneAs<Level>().ParticlesBG.Emit(DustStaticSpinner.P_Move, 1, this.Position, Vector2.One * 4f);
         }
     }
+
+    public Ease.Easer MotionEaser = Ease.CubeInOut;
+    public abstract Vector2 GetTarget(int index);
+
+    public abstract void GoToNextPosition();
 
     private void OnDash(Vector2 direction)
     {
         Start = Position;
-        CurrentNode = (CurrentNode + 1) % Nodes.Length;
-        End = Nodes[CurrentNode];
+        TargetIndex++;
+        End = GetTarget(TargetIndex);
         tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeInOut, TravelTime, false);
         tween.OnComplete = OnComplete;
         Add (tween);
@@ -89,11 +100,11 @@ public class DashActivatedDustBunny : Entity
         tween = null;
         if (this.outwards != Vector2.Zero)
         {
-            this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (Nodes[NextNode] - Nodes[CurrentNode]).SafeNormalize();
+            this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (GetTarget(NextNode) - GetTarget(TargetIndex)).SafeNormalize();
         }
         else
         {
-            this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (Nodes[NextNode] - Nodes[CurrentNode]).SafeNormalize();
+            this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (GetTarget(NextNode) - GetTarget(TargetIndex)).SafeNormalize();
             this.dusty.EyeFlip = -this.dusty.EyeFlip;
         }
     }
