@@ -189,6 +189,14 @@ entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.inver
 entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.returnMaxSpeed=The maximum speed in pixels per second that the block should move on its return journey.
 entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.returnAcceleration=The acceleration of the block in pixels per second squared on its return journey.
 
+#Dash Activated Dust Bunnies
+
+entities.LylyraHelper/DashActivatedDustBunny.attributes.description.TravelTime=The time taken to move to the next location.
+entities.LylyraHelper/DashActivatedDustBunnies/Noded.attributes.description.TravelTime=The time taken to move to the next location.
+entities.LylyraHelper/DashActivatedDustBunnies/Rotate.attributes.description.TravelTime=The time taken to move to the next location.
+entities.LylyraHelper/DashActivatedDustBunnies/Rotate.attributes.description.DashesPerFullCycle=Number of dashes for the dust bunny to complete a full circle.
+
+
 #Set Flag States On Respawn Trigger
 
 entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.flags=The set of flags to monitor and record states for when this trigger is entered.
