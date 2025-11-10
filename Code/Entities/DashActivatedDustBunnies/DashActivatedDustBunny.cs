@@ -35,8 +35,10 @@ public abstract class DashActivatedDustBunny : Entity
 
     public DashActivatedDustBunny(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
+        var Nodes = data.NodesWithPosition(offset);
+        
         this.Add((this.dusty = new DustGraphic(true)));
-        this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (this.End - this.Start).SafeNormalize();
+        this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (Nodes[1] - Nodes[0]).SafeNormalize();
         this.dusty.OnEstablish = new Action(this.Establish);
         this.Depth = -50;
         TravelTime = data.Float("TravelTime", 0.15f);
@@ -53,6 +55,7 @@ public abstract class DashActivatedDustBunny : Entity
 
     public override void Added(Scene scene)
     {
+        base.Added(scene);
         this.dusty.EyeDirection = this.dusty.EyeTargetDirection = (GetTarget(1) - GetTarget(0)).SafeNormalize();
         Visible = true;
         Active = true;

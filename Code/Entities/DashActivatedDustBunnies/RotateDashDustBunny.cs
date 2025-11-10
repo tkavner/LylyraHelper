@@ -19,11 +19,11 @@ public class RotateDashDustBunny : DashActivatedDustBunny
     
     public RotateDashDustBunny(EntityData data, Vector2 offset) : base(data, offset)
     {
-        Pivot = data.Position + offset;
-        Radius = data.Float("Radius", 10f);
-        DistancePerDash = 2 * (float) Math.PI * data.Float("DashesPerFullCycle", 1f);
-        InitialAngle = data.Float("InitialAngle", 0f);
-        
+        var nodes = data.NodesWithPosition(offset);
+        Radius = (nodes[0] - nodes[1]).Length(); //position - pivot
+        DistancePerDash = 2 * (float) Math.PI / data.Float("DashesPerFullCycle", 1f);
+        InitialAngle = (nodes[0] - nodes[1]).Angle();//position - pivot
+        Pivot = nodes[1];
     }
 
     public override Vector2 GetTarget(int index)
@@ -33,7 +33,9 @@ public class RotateDashDustBunny : DashActivatedDustBunny
 
     public override void GoToNextPosition()
     {
-        CurrentAngle = float.Lerp(StartAngle, EndAngle, tween.Eased);
+        var end = EndAngle;
+        if (EndAngle < StartAngle) end += (float) Math.PI * 2; //stops reversing due to swapping branch
+        CurrentAngle = float.Lerp(StartAngle, end, tween.Eased);
         Position = Pivot + Radius * Vector2.UnitX.Rotate(CurrentAngle);
     }
 
