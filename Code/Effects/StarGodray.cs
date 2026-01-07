@@ -147,7 +147,7 @@ public class StarGodray : Backdrop
             float num2 = -32f + Mod(rays[i].X - level.Camera.X * 0.9f, 384f + xExtend);
             float num3 = -32f + Mod(rays[i].Y - level.Camera.Y * 0.9f, 244f + yExtend);
             int length = rays[i].length;
-            Vector2 vector3 = new Vector2((int)num2, (int)num3);
+            Vector2 vector3 = Calc.Floor(new Vector2(num2, num3));
 
             Color color = Color.White;
             if (hsvBlending)
