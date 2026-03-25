@@ -53,7 +53,7 @@ VertexShaderOutput VertexShaderFunction(float4 position:POSITION0, float3 normal
 {
     VertexShaderOutput output;
 
-    output.position = mul(position + float4(normal.xy * GetHeightOrig(normal.z) * 2.0, 0, 0), World);
+    output.position = mul(position + float4(normal.xy * GetHeightOrig(normal.z) * 1.0, 0, 0), World);
     return output;
 }
 
@@ -144,13 +144,13 @@ float4 PixelShaderFunction(VertexShaderOutput input) : SV_TARGET0
     float3 windColor = color.rgb;
     if (hsvBlending > 0.5)
     {
-        windColor = HSVLerp(color.rgb, fadeColor.rgb, CubeInOut(windPercent));
+        windColor = HSVLerp(color.rgb, fadeColor.rgb, windPercent);
     }
     else
     {
-        windColor = lerp(color.rgb, fadeColor.rgb, CubeInOut(windPercent));
+        windColor = lerp(color.rgb, fadeColor.rgb, windPercent);
     }
-    return float4(windColor , 1.0);
+    return float4(windColor *transparency1, transparency1 * CubeInOut(1 - clamp(((windPercent < 0.5) ? windPercent : (1.0 - windPercent)) * 2.0, 0, 1)));
 }
 
 technique NormalTechnique

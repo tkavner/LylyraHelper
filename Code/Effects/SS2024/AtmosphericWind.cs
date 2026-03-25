@@ -131,7 +131,7 @@ public class AtmosphericWind : Backdrop
         color = Calc.HexToColor(child.Attr("color", "FFFFFF"));
         fadeColor = Calc.HexToColor(child.Attr("fadeColor", "FFFFFF"));
         transparency = child.AttrFloat("transparency", 0.3F);
-        hsvBlending = child.AttrBool("hsvBlending", true);
+        hsvBlending = child.AttrBool("hsvBlending", true) && !color.Equals(fadeColor); //turn off hsv blending if the colors are equal because its more computationally costly
         scrollX = child.AttrFloat("scrollX", 0.0F);
         scrollY = child.AttrFloat("scrollY", 0.0F);
         int vertecies = GetVertecies(); 
@@ -332,8 +332,8 @@ public class WindBuilder
             Vector2 nextPoint = Wind.curve[i];
             Vector2 nextTangentPoint = Wind.curve[i] - Wind.curve[i - 1];
             Vector2 nextNormal = nextTangentPoint.Perpendicular().SafeNormalize();
-            Vector2 nextV1 = nextPoint + nextNormal * 0.1f;
-            Vector2 nextV2 = nextPoint - nextNormal * 0.1f;
+            Vector2 nextV1 = nextPoint + nextNormal * 0.0f;
+            Vector2 nextV2 = nextPoint - nextNormal * 0.0f;
 
             VertexPositionNormalTexture vertexPositionColor =
                 new VertexPositionNormalTexture(new Vector3(prevV1, 0f), new Vector3(-prevNormal, i / (float)Wind.curve.Length), Vector2.Zero);
