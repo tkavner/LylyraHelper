@@ -3,27 +3,34 @@ using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Celeste.Mod.LylyraHelper.Other.Helpers;
 using Celeste.Mod.Backdrops;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
+using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace Celeste.Mod.LylyraHelper.Effects.SecretSanta;
 
 [CustomBackdrop("LylyraHelper/SS2024/AtmosphericWind")]
 public class AtmosphericWind : Backdrop
 {
-    private class Wind
+    public class Wind
     {
         private static Vector2 endPoint;
-        private float thicc;
+        public float thicc;
         public Vector2[] curve;
         public float percent = 75F;
         public Vector2 startingPoint;
         public int pointsPerWind;
         public Vector2 startingCamera;
+        public VertexPositionNormalTexture[] Vertices;
+        public WindBuilder builder;
 
-        public static Wind MakeWind(Vector2 startingPoint, Vector2 startingCamera, Random rand, float initAngle, float speed, float twist, float bend, int pointsPerWind, float maxBend)
+        public static Wind MakeWind(Vector2 startingPoint, Vector2 startingCamera, Random rand, float initAngle,
+            float speed, float twist, float bend, int pointsPerWind, float maxBend)
         {
-            initAngle *= (float) Math.PI / 180F;
+            initAngle *= (float)Math.PI / 180F;
             Wind wind = new Wind();
             wind.pointsPerWind = pointsPerWind;
             Vector2[] curve = wind.curve = new Vector2[pointsPerWind];
@@ -39,7 +46,6 @@ public class AtmosphericWind : Backdrop
                 nextAngle += nextBend;
                 nextBend = Calc.Clamp(nextBend, -maxBend, maxBend);
                 nextBend += rand.NextFloat() * twist - twist / 2;
-
             }
 
             nextPoint = startingPoint;
@@ -53,11 +59,12 @@ public class AtmosphericWind : Backdrop
                 nextBend = Calc.Clamp(nextBend, -maxBend, maxBend);
                 points.Insert(0, nextPoint);
             }
+
             wind.curve = points.ToArray();
 
             wind.thicc = rand.Next(10) == 0 ? 2 : 1;
             endPoint = nextPoint;
-
+            wind.builder = new WindBuilder(wind);
 
             return wind;
         }
@@ -75,7 +82,8 @@ public class AtmosphericWind : Backdrop
             }
             else
             {
-                var num1 = Calc.Clamp(percent - indexWeight + indexWeight * (pointsPerWind - v) / pointsPerWind, 0, 100) / 100;
+                var num1 =
+                    Calc.Clamp(percent - indexWeight + indexWeight * (pointsPerWind - v) / pointsPerWind, 0, 100) / 100;
                 num1 = num1 < 0.3 ? 0 : num1;
                 num1 = num1 > 0.5 ? 0.5F : num1;
                 return num1 * thicc;
@@ -89,7 +97,8 @@ public class AtmosphericWind : Backdrop
     }
 
     //twist = jerk / acceleration change, bend = starting acceleration
-    public AtmosphericWind(float initAngle, float angleVariance, float speed, float speedVariance, float twist, float bend, float frequency, float lifespan, float maxBend, int pointsPointWind)
+    public AtmosphericWind(float initAngle, float angleVariance, float speed, float speedVariance, float twist,
+        float bend, float frequency, float lifespan, float maxBend, int pointsPointWind)
     {
         rand = Calc.Random;
         this.initAngle = initAngle;
@@ -119,13 +128,13 @@ public class AtmosphericWind : Backdrop
         windLifespan = child.AttrFloat("windLifespan", 7.5F);
         maxBend = Calc.ToRad(child.AttrFloat("maxAngularAcceleration", 0.01F)); //in radians
         pointsPerWind = child.AttrInt("pointsPerWind", 600);
-        color = Calc.HexToColor(child.Attr("color", "FFFFFF"));
+        color = Calc.HexToColor("FFFFFF");
         fadeColor = Calc.HexToColor(child.Attr("fadeColor", "FFFFFF"));
         transparency = child.AttrFloat("transparency", 0.3F);
         hsvBlending = child.AttrBool("hsvBlending", true);
         scrollX = child.AttrFloat("scrollX", 0.0F);
         scrollY = child.AttrFloat("scrollY", 0.0F);
-        int vertecies = GetVertecies();
+        int vertecies = GetVertecies(); 
         vertices = new VertexPositionColor[vertecies];
     }
 
@@ -168,104 +177,186 @@ public class AtmosphericWind : Backdrop
 
         Player player = level.Tracker.GetEntity<Player>();
         if (player == null) return;
-        Vector2 vector = Calc.AngleToVector(-1.67079639f, 1f); //probably supposed to be -pi/2. but isn't that isn't that just <0,-1>?
         int vertexCounter = 0;
         List<Wind> oldWinds = new List<Wind>();
         Vector2 cameraPosition = -level.Camera.Position;
         foreach (Wind wind in winds)
         {
-            Vector2 parallax = -new Vector2((1 - scrollX) * (cameraPosition.X + wind.startingCamera.X), (1 - scrollY) * (cameraPosition.Y + wind.startingCamera.Y));
-            wind.percent += Engine.DeltaTime * 75 * 6.5F / windLifespan;
-            Vector2 startingPoint = wind.startingPoint;
-            float xRenderPosBase = level.Camera.X; //this gun need to change
-            float yRenderPosBase = level.Camera.Y;
-
-
-            Vector2 prevPoint = wind.curve[0];
-            Vector2 prevTangentPoint = wind.curve[1] - wind.curve[0];
-            Vector2 prevV1 = prevPoint + wind.GetHeight(0) * prevTangentPoint.Perpendicular().SafeNormalize();
-            Vector2 prevV2 = prevPoint - wind.GetHeight(0) * prevTangentPoint.Perpendicular().SafeNormalize();
-            for (int i = 1; i < wind.curve.Length - 1; i++)
+            if (wind.Vertices != null)
             {
-                Vector2 nextPoint = wind.curve[i];
-                Vector2 nextTangentPoint = wind.curve[i] - wind.curve[i - 1];
-                Vector2 nextV1 = nextPoint + wind.GetHeight(i) * nextTangentPoint.Perpendicular().SafeNormalize();
-                Vector2 nextV2 = nextPoint - wind.GetHeight(i) * nextTangentPoint.Perpendicular().SafeNormalize();
-                float transparency = this.transparency;
-                if (wind.GetPercent() / MAXPERCENT > 0.5F)
+                wind.percent += Engine.DeltaTime * 75 * 6.5F / windLifespan;
+            }
+            else
+            {
+                if (wind.builder.Build(73, level))
                 {
-                    transparency = transparency - (wind.GetPercent() / MAXPERCENT - 0.5F) * transparency / (1 - 0.5F);
+                    wind.Vertices = wind.builder.Vertices;
                 }
-
-                Color windColor = Color.White;
-                if (hsvBlending)
-                {
-                    windColor = ColorHelper.HSVLerp(color, fadeColor, wind.percent / MAXPERCENT) * Ease.CubeInOut(Calc.Clamp(((wind.percent / MAXPERCENT < 0.5f) ? wind.percent / MAXPERCENT : (1f - wind.percent / MAXPERCENT)) * 2f, 0f, 1f));
-                }
-                else
-                {
-                    windColor = Color.Lerp(color, fadeColor, wind.percent / MAXPERCENT) * Ease.CubeInOut(Calc.Clamp(((wind.percent / MAXPERCENT < 0.5f) ? wind.percent / MAXPERCENT : (1f - wind.percent / MAXPERCENT)) * 2f, 0f, 1f));
-                }
-
-                VertexPositionColor vertexPositionColor = new VertexPositionColor(new Vector3(prevV1 + cameraPosition + parallax , 0f), windColor * transparency);
-                VertexPositionColor vertexPositionColor2 = new VertexPositionColor(new Vector3(prevV2 + cameraPosition + parallax, 0f), windColor * transparency);
-                VertexPositionColor vertexPositionColor3 = new VertexPositionColor(new Vector3(nextV1 + cameraPosition + parallax, 0f), windColor * transparency);
-                VertexPositionColor vertexPositionColor4 = new VertexPositionColor(new Vector3(nextV2 + cameraPosition + parallax, 0f), windColor * transparency);
-
-                vertices[vertexCounter++] = vertexPositionColor;
-                vertices[vertexCounter++] = vertexPositionColor2;
-                vertices[vertexCounter++] = vertexPositionColor3;
-
-                vertices[vertexCounter++] = vertexPositionColor2;
-                vertices[vertexCounter++] = vertexPositionColor3;
-                vertices[vertexCounter++] = vertexPositionColor4;
-
-                prevV1 = nextV1;
-                prevV2 = nextV2;
             }
             if (wind.percent > MAXPERCENT)
             {
                 oldWinds.Add(wind);
             }
         }
-        winds.RemoveAll(w =>
-            {
-                return oldWinds.Contains(w);
-            }
+
+        winds.RemoveAll(w => { return oldWinds.Contains(w); }
         );
         windCounter += Engine.DeltaTime;
         if (windCounter > 1.0F / frequency)
         {
             windCounter = 0;
             float angle = initAngle + rand.NextFloat() * angleVariance - angleVariance / 2F;
-            var num1 = EllipseHelper.PointOnEllipseFromAngle(screenDimensions, angle);
-            float pointRangeTLLength = (float) (320 - 140 * Math.Cos(angle)); //what we should do is map the ellipse to a rectangle using parametric coordinates
-            var pointRangeOnTangentLine = EllipseHelper.TangentToEllipseAtPoint(screenDimensions, angle) * (rand.NextFloat() * pointRangeTLLength - pointRangeTLLength / 2);
+            var pointAtScreenEdge = EllipseHelper.PointOnEllipseFromAngle(screenDimensions, angle);
+            float pointRangeTLLength =
+                (float)(320 -
+                        140 * Math.Cos(
+                            angle)); //what we should do is map the ellipse to a rectangle using parametric coordinates
+            var pointRangeOnTangentLine = EllipseHelper.TangentToEllipseAtPoint(screenDimensions, angle) *
+                                          (rand.NextFloat() * pointRangeTLLength - pointRangeTLLength / 2);
             var normal = EllipseHelper.NormalToEllipseAtPoint(screenDimensions, angle);
             var randomStartingOffsetInDirectionOfWind = -normal * (rand.NextFloat() * screenDimensions.X / 2);
             var cameraPos = level.Camera.Position;
-            Vector2 startPoint = screenDimensions / 2 + num1 + pointRangeOnTangentLine + cameraPos + randomStartingOffsetInDirectionOfWind;
+            Vector2 startPoint = screenDimensions / 2 + pointAtScreenEdge + pointRangeOnTangentLine +
+                                 randomStartingOffsetInDirectionOfWind;
             Vector2 playerSpeed = player == null ? Vector2.Zero : player.Speed;
 
-            float cosineInBase = (playerSpeed.X * normal.X + playerSpeed.Y * normal.Y);//normal.Length() = 1, guarenteed.
+            float cosineInBase =
+                (playerSpeed.X * normal.X + playerSpeed.Y * normal.Y); //normal.Length() = 1, guarenteed.
 
             float playerSpeedAdjustment = -cosineInBase;
-            if (playerSpeedAdjustment < 0) { playerSpeedAdjustment = 0; }
-            winds.Add(Wind.MakeWind(startPoint, level.Camera.Position, rand, angle + 180F, speed + rand.NextFloat() * speedVarience - speedVarience / 2 + playerSpeedAdjustment / 60, twist, bend, pointsPerWind, maxBend));
-        }
-        vertexCount = vertexCounter;
+            if (playerSpeedAdjustment < 0)
+            {
+                playerSpeedAdjustment = 0;
+            }
 
+            winds.Add(Wind.MakeWind(startPoint, level.Camera.Position, rand, angle + 180F,
+                speed + rand.NextFloat() * speedVarience - speedVarience / 2 + playerSpeedAdjustment / 60, twist, bend,
+                pointsPerWind, maxBend));
+        }
+
+        vertexCount = vertexCounter;
     }
 
 
     public override void Render(Scene scene)
     {
         base.Render(scene);
-        if (vertexCount > 0)
+        if (!Visible) return;
+        var prev = Engine.Graphics.GraphicsDevice.RasterizerState.CullMode;
+        Engine.Graphics.GraphicsDevice.RasterizerState.CullMode = CullMode.None;
+        var effect = LylyraHelperGFX.atmosphericWind;
+        var technique = effect.Techniques[0];
+        
+            
+            
+        foreach (Wind wind in winds)
         {
-            GFX.DrawVertices(Matrix.Identity, vertices, vertexCount);
+            if (wind.Vertices != null)
+            {
+                ApplyEffect((Level)scene, effect, wind);
+                foreach (var pass in technique.Passes)
+                {
+                    pass.Apply();
+                    Engine.Graphics.GraphicsDevice.DrawUserPrimitives
+                    (
+                        PrimitiveType.TriangleList,
+                        wind.Vertices, 0, wind.Vertices.Length / 3
+                    );
+                }
+
+            }
         }
+
+        Engine.Graphics.GraphicsDevice.RasterizerState.CullMode = prev;
+    }
+    
+    public void ApplyEffect(Level level, Effect eff, Wind wind)
+    {
+        
+        Vector2 vector = new Vector2(GameplayBuffers.Gameplay?.Width ?? 320, GameplayBuffers.Gameplay?.Height ?? 180);
+        Matrix matrix = level.Camera.Matrix * Matrix.CreateTranslation(new Vector3(level.Camera.Position, 0f));
+        matrix *= Matrix.CreateScale(1f / vector.X * 2f, (0f - 1f / vector.Y) * 2f, 1f);
+        matrix *= Matrix.CreateTranslation(-1f, 1f, 0f); //why do we need this offset? I couldn't tell you. but we do.
+        eff.Parameters["World"].SetValue(matrix);
+        Vector2 CameraPosition = level.Camera.Position;
+        
+        eff.Parameters["cameraPos"].SetValue(new Vector4(CameraPosition.X, - CameraPosition.Y,  0f, 0f));
+        
+        
+        Vector4 parallax = -new Vector4((1 - scrollX) * (CameraPosition.X + wind.startingCamera.X),
+            (1 - scrollY) * (CameraPosition.Y + wind.startingCamera.Y), 0f, 0f);
+        eff.Parameters["parallax"].SetValue(parallax);
+        
+        eff.Parameters["windPercent"]?.SetValue(wind.percent / MAXPERCENT);
+        eff.Parameters["color"]?.SetValue(color.ToVector4());
+        eff.Parameters["fadeColor"]?.SetValue(fadeColor.ToVector4());
+        eff.Parameters["transparency"]?.SetValue(transparency);
+        eff.Parameters["thickness"]?.SetValue(wind.thicc);
+        eff.Parameters["pointsPerWind"]?.SetValue(wind.pointsPerWind);
+    }
+}
+
+public class WindBuilder
+{
+    public VertexPositionNormalTexture[] Vertices;
+    public bool Done;
+    private AtmosphericWind.Wind Wind;
+    private int buildPoint;
+    private int vertexCounter;
+
+    public WindBuilder(AtmosphericWind.Wind wind)
+    {
+        Wind = wind;
+        Vertices = new VertexPositionNormalTexture[Wind.curve.Length * 6];
     }
 
+    public bool Build(int maxBuild, Level level)
+    {
+        /*
+        Vector2 parallax = -new Vector2((1 - scrollX) * (cameraPosition.X + wind.startingCamera.X),
+            (1 - scrollY) * (cameraPosition.Y + wind.startingCamera.Y));
+        wind.percent += Engine.DeltaTime * 75 * 6.5F / windLifespan;*/
 
+        Logger.Log(LogLevel.Error, "LylyraHelper", "" + Wind.curve.Length);
+        Logger.Log(LogLevel.Error, "LylyraHelper", "buildPoint: " + buildPoint);
+        Vector2 prevPoint = Wind.curve[buildPoint];
+        Vector2 prevTangentPoint = Wind.curve[buildPoint + 1] - Wind.curve[buildPoint];
+        Vector2 prevNormal = prevTangentPoint.Perpendicular().SafeNormalize();
+        Vector2 prevV1 = prevPoint;
+        Vector2 prevV2 = prevPoint;
+        for (int i = buildPoint + 1; i < Math.Min(Wind.curve.Length - 1, buildPoint + maxBuild); i++)
+        {
+            Vector2 nextPoint = Wind.curve[i];
+            Vector2 nextTangentPoint = Wind.curve[i] - Wind.curve[i - 1];
+            Vector2 nextNormal = nextTangentPoint.Perpendicular().SafeNormalize();
+            Vector2 nextV1 = nextPoint + nextNormal * 0.1f;
+            Vector2 nextV2 = nextPoint - nextNormal * 0.1f;
+
+            VertexPositionNormalTexture vertexPositionColor =
+                new VertexPositionNormalTexture(new Vector3(prevV1, 0f), new Vector3(-prevNormal, i / (float)Wind.curve.Length), Vector2.Zero);
+            VertexPositionNormalTexture vertexPositionColor2 =
+                new VertexPositionNormalTexture(new Vector3(prevV2, 0f), new Vector3(prevNormal, i / (float)Wind.curve.Length), Vector2.Zero);
+            VertexPositionNormalTexture vertexPositionColor3 =
+                new VertexPositionNormalTexture(new Vector3(nextV1, 0f), new Vector3(-nextNormal, i / (float)Wind.curve.Length), Vector2.Zero);
+            VertexPositionNormalTexture vertexPositionColor4 =
+                new VertexPositionNormalTexture(new Vector3(nextV2, 0f), new Vector3(nextNormal, i / (float)Wind.curve.Length), Vector2.Zero);
+
+            Vertices[vertexCounter++] = vertexPositionColor;
+            Vertices[vertexCounter++] = vertexPositionColor2;
+            Vertices[vertexCounter++] = vertexPositionColor3;
+
+            Vertices[vertexCounter++] = vertexPositionColor2;
+            Vertices[vertexCounter++] = vertexPositionColor3;
+            Vertices[vertexCounter++] = vertexPositionColor4;
+
+            prevV1 = nextV1;
+            prevV2 = nextV2;
+            prevNormal = nextNormal;
+
+        }
+
+        buildPoint += maxBuild - 1;
+
+        return buildPoint >= Wind.curve.Length;
+    }
 }

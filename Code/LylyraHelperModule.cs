@@ -87,15 +87,19 @@ public class LylyraHelperModule : EverestModule
         MuteSoundSourceTrigger.Unload();
         
         DisableEntityPreservationTrigger.Unload();
+        
+        LylyraHelperGFX.UnloadContent();
     }
 
     public override void LoadContent(bool firstLoad)
     {
         base.LoadContent(firstLoad);
+        LylyraHelperGFX.LoadContent();
         FrostHelperImports.Load();
         _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
         typeof(ModExports).ModInterop();
     }
+    
 
 
     [ModExportName("LylyraHelper")]
