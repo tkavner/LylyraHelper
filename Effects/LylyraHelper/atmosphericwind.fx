@@ -150,7 +150,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : SV_TARGET0
     {
         windColor = lerp(color.rgb, fadeColor.rgb, windPercent);
     }
-    return float4(windColor *transparency1, transparency1 * CubeInOut(1 - clamp(((windPercent < 0.5) ? windPercent : (1.0 - windPercent)) * 2.0, 0, 1)));
+    transparency1 *= CubeInOut(1 - clamp(((windPercent < 0.5) ? windPercent : (1.0 - windPercent)) * 2.0, 0, 1));
+    return float4(windColor *transparency1, transparency1 );
 }
 
 technique NormalTechnique
