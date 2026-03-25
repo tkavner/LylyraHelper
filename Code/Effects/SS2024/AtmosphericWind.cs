@@ -128,7 +128,7 @@ public class AtmosphericWind : Backdrop
         windLifespan = child.AttrFloat("windLifespan", 7.5F);
         maxBend = Calc.ToRad(child.AttrFloat("maxAngularAcceleration", 0.01F)); //in radians
         pointsPerWind = child.AttrInt("pointsPerWind", 600);
-        color = Calc.HexToColor("FFFFFF");
+        color = Calc.HexToColor(child.Attr("color", "FFFFFF"));
         fadeColor = Calc.HexToColor(child.Attr("fadeColor", "FFFFFF"));
         transparency = child.AttrFloat("transparency", 0.3F);
         hsvBlending = child.AttrBool("hsvBlending", true);
@@ -169,6 +169,8 @@ public class AtmosphericWind : Backdrop
     private float scrollX;
     private float scrollY;
 
+    private static int MAXBUILD = 100;
+
     public override void Update(Scene scene)
     {
         base.Update(scene);
@@ -188,7 +190,7 @@ public class AtmosphericWind : Backdrop
             }
             else
             {
-                if (wind.builder.Build(73, level))
+                if (wind.builder.Build(MAXBUILD, level))
                 {
                     wind.Vertices = wind.builder.Vertices;
                 }
@@ -293,6 +295,7 @@ public class AtmosphericWind : Backdrop
         eff.Parameters["transparency"]?.SetValue(transparency);
         eff.Parameters["thickness"]?.SetValue(wind.thicc);
         eff.Parameters["pointsPerWind"]?.SetValue(wind.pointsPerWind);
+        eff.Parameters["hsvBlending"]?.SetValue(hsvBlending ? 1f : 0f);
     }
 }
 

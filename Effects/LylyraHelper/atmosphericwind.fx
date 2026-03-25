@@ -9,6 +9,7 @@ float4 fadeColor;
 float transparency;
 float thickness;
 float pointsPerWind;
+float hsvBlending;
 
 struct VertexShaderOutput
 {
@@ -23,14 +24,14 @@ float GetHeightOrig(float v)
     //percents are out of a 200 point system right?! this actually occurs at 150% progress on our 200 point system
     if (percent - indexWeight + indexWeight * (pointsPerWind - v * pointsPerWind) / pointsPerWind > 100)
     {
-        float num1 = clamp(200 - percent + (indexWeight * v), 0, 100) / 100;
+        float num1 = clamp(200 - percent + (indexWeight * v), 0, 100) / 100.0;
         if (num1 < 0.3) num1 = 0;
         if (num1 > 0.5) num1 = 0.5;
         return num1 * thickness;
     }
     else
     {
-        float num1 = clamp(percent - indexWeight + indexWeight * (pointsPerWind - v * pointsPerWind) / pointsPerWind, 0, 100) / 100;
+        float num1 = clamp(percent - indexWeight + indexWeight * (pointsPerWind - v * pointsPerWind) / pointsPerWind, 0, 100) / 100.0;
 
         if (num1 < 0.3) num1 = 0;
         if (num1 > 0.5) num1 = 0.5;
@@ -52,7 +53,7 @@ VertexShaderOutput VertexShaderFunction(float4 position:POSITION0, float3 normal
 {
     VertexShaderOutput output;
 
-    output.position = mul(position + float4(normal.xy * GetHeightOrig(normal.z), 0, 0), World);
+    output.position = mul(position + float4(normal.xy * GetHeightOrig(normal.z) * 2.0, 0, 0), World);
     return output;
 }
 
@@ -102,20 +103,20 @@ float3 HSVLerp(float3 c1, float c2, float amount)
 {
     float3 hsv1 = RGBtoHSV(c1);
     float3 hsv2 = RGBtoHSV(c2);
-    if (abs(hsv2.x - hsv1.x) > 3)
+    if (abs(hsv2.x - hsv1.x) * 6 > 3)
     {
         if (hsv2.x > hsv1.x)
         {
-            hsv1.x += 6;
+            hsv1.x += 1;
         }
         else
         {
-            hsv2.x += 6;
+            hsv2.x += 1;
         }
     }
-    float3 lerped = hsv1.xyz * amount + (1.0 - amount) * hsv2;
+    float3 lerped = hsv1 * amount + (1.0 - amount) * hsv2;
+    lerped = frac(lerped);
     float3 vector3 = HSVtoRGB(lerped);
-    vector3.x = fmod(fmod(vector3.x, 6) + 6, 6);
     return float3(vector3.x, vector3.y, vector3.z);
 }
 
@@ -124,27 +125,32 @@ float CubeIn(float f) {
 }
 
 float CubeOut(float f) {
-    return 1.0 - CubeIn(1 - f);
+    return 1.0 - CubeIn(1.0 - f);
 }
 
 float CubeInOut(float f) {
-    if (f >= 0.5) return CubeOut(f);
-    else return CubeIn(f);
+    if (f > 0.5) return CubeOut(f * 2.0 - 1.0) * 0.5 + 0.5;
+    else return CubeIn(f * 2.0) * 0.5;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : SV_TARGET0
 {
     float transparency1 = transparency;
-    if (windPercent > 0.5)
+    if (windPercent / 250 > 0.5)
     {
-        transparency1 = transparency1 - (windPercent - 0.5) * transparency1 * 2.0;
+        transparency1 = transparency1 - (windPercent / 250 - 0.5) * transparency1 * 2.0;
     }
-    float3 windColor = HSVLerp(color.xyz, fadeColor.xyz, windPercent) *
-                            CubeInOut(clamp(
-                                ((windPercent  < 0.5)
-                                    ? windPercent
-                                    : (1 - windPercent)) * 2, 0, 1));
-    return float4(windColor *transparency1 , transparency1);
+
+    float3 windColor = color.rgb;
+    if (hsvBlending > 0.5)
+    {
+        windColor = HSVLerp(color.rgb, fadeColor.rgb, CubeInOut(windPercent));
+    }
+    else
+    {
+        windColor = lerp(color.rgb, fadeColor.rgb, CubeInOut(windPercent));
+    }
+    return float4(windColor , 1.0);
 }
 
 technique NormalTechnique
