@@ -53,7 +53,7 @@ VertexShaderOutput VertexShaderFunction(float4 position:POSITION0, float3 normal
 {
     VertexShaderOutput output;
 
-    output.position = mul(position + float4(normal.xy * GetHeightOrig(normal.z) * 1.0, 0, 0), World);
+    output.position = mul(position + float4(normal.xy * GetHeightOrig(normal.z) * 1.0, 0, 0) + parallax, World);
     return output;
 }
 
