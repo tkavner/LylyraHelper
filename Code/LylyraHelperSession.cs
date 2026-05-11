@@ -31,4 +31,7 @@ public class LylyraHelperSession : EverestModuleSession
     public List<string> mutedSoundSources = new();
     
     public bool DisableEntityPreservation { get; set; } = false;
+    
+    public bool CursedColorGrade { get; set; } = false;
+    
 }

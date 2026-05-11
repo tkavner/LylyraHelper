@@ -291,7 +291,7 @@ public class AtmosphericWind : Backdrop
         Vector4 parallax2 = new Vector4(1f * (CameraPosition.X - wind.startingCamera.X),
             1f * (CameraPosition.Y - wind.startingCamera.Y), 0f, 0f);//natural offset due to gpu rendering now occurs
         eff.Parameters["parallax"].SetValue(parallax);
-
+        
         parallax += parallax2;
         
         eff.Parameters["windPercent"]?.SetValue(wind.percent / MAXPERCENT);

@@ -57,6 +57,8 @@ public class LylyraHelperModule : EverestModule
         
         DisableEntityPreservationTrigger.Load();
 
+        DynamicColorGrade.Load();
+
         //MOD INTEROP TESTING
         /*
         Slicer.CustomSlicingActionHolder holder = new Slicer.CustomSlicingActionHolder();//test to see if Delegate can be cast to Func and back
@@ -88,6 +90,8 @@ public class LylyraHelperModule : EverestModule
         
         DisableEntityPreservationTrigger.Unload();
         
+        DynamicColorGrade.Unload();
+        
         LylyraHelperGFX.UnloadContent();
     }
 
@@ -95,6 +99,7 @@ public class LylyraHelperModule : EverestModule
     {
         base.LoadContent(firstLoad);
         LylyraHelperGFX.LoadContent();
+        DynamicColorGrade.LoadContent();
         FrostHelperImports.Load();
         _CustomEntitySpriteBank = new SpriteBank(GFX.Game, "Graphics/LylyraHelper/CustomEntitySprites.xml");
         typeof(ModExports).ModInterop();
