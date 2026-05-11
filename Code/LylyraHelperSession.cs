@@ -31,4 +31,7 @@ public class LylyraHelperSession : EverestModuleSession
     public List<string> mutedSoundSources = new();
     
     public bool DisableEntityPreservation { get; set; } = false;
+    
+    //kuwahara filtering
+    public bool KuwaharaBlur { get; set; } = false;
 }

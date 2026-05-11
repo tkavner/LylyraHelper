@@ -56,6 +56,8 @@ public class LylyraHelperModule : EverestModule
         MuteSoundSourceTrigger.Load();
         
         DisableEntityPreservationTrigger.Load();
+        
+        KuwaharaBlurController.Load();
 
         //MOD INTEROP TESTING
         /*
@@ -87,6 +89,8 @@ public class LylyraHelperModule : EverestModule
         MuteSoundSourceTrigger.Unload();
         
         DisableEntityPreservationTrigger.Unload();
+        
+        KuwaharaBlurController.Unload();
         
         LylyraHelperGFX.UnloadContent();
     }
