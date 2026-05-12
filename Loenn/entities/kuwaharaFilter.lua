@@ -9,7 +9,10 @@ controller.placements = {
         name = "Kuwahara Blur Controller",
         data =
         helpers.createPlacementData(1, {
-            flag = "LylyraHelperKuwaharaBlurFlag"
+            flag = "",
+            on = true,
+            oneTime = false
+
         })
     }
 }

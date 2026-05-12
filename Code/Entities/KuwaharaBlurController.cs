@@ -10,21 +10,36 @@ namespace Celeste.Mod.LylyraHelper.Entities;
 [CustomEntity("LylyraHelper/KuwaharaBlurController")]
 public class KuwaharaBlurController : Entity
 {
-    private string flag;
+    private string Flag;
+    private bool On;
+    private bool OneTime;
     
     public KuwaharaBlurController(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
-        flag = data.String("flag");
+        Flag = data.String("flag", "");
+        On = data.Bool("on", true);
+        OneTime = data.Bool("oneTime", false);
+    }
+
+    public override void Awake(Scene scene)
+    {
+        base.Awake(scene);
+        
+        if (Flag == "") LylyraHelperModule.Session.KuwaharaBlur = On;
     }
 
     public override void Update()
     {
         base.Update();
-        
-        LylyraHelperModule.Session.KuwaharaBlur = SceneAs<Level>().Session.GetFlag(flag);
+
+        if (Flag != "" && SceneAs<Level>().Session.GetFlag(Flag))
+        {
+            LylyraHelperModule.Session.KuwaharaBlur = On;
+            if (OneTime) SceneAs<Level>().Remove(this);
+        }
     }
 
-    public static void ApplyKuwaharaBlur(Level level)
+    private static void ApplyKuwaharaBlur(Level level)
     {
         if (!LylyraHelperModule.Session.KuwaharaBlur) return;
 
