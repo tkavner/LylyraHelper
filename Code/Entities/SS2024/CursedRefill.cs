@@ -29,17 +29,18 @@ public class CursedRefill : Refill
     public CursedRefill(EntityData data, Vector2 offset) : base(data.Position + offset, false, false)
     {
 
+        string idleRefillStr = data.Attr("textureLocation", "objects/LylyraHelper/ss2024/cursedRefill");
         PlayerCollider origCollider = Get<PlayerCollider>();
         Remove(origCollider);
         Add(new PlayerCollider(OnPlayer));
         sprite = Get<Sprite>();
         Remove(sprite);
-        sprite.Reset(GFX.Game, "objects/LylyraHelper/ss2024/cursedRefill/idle");
+        sprite.Reset(GFX.Game, $"{idleRefillStr}/idle");
         sprite.AddLoop("idle", "", 0.1f);
         sprite.Play("idle");
         flash = Get<Sprite>();
         Remove(flash);
-        flash.Reset(GFX.Game, "objects/LylyraHelper/ss2024/cursedRefill/flash");
+        flash.Reset(GFX.Game, $"{idleRefillStr}/flash");
         Remove(Get<Image>());
         Add(sprite);
         Add(flash);
@@ -48,7 +49,7 @@ public class CursedRefill : Refill
         {
             flash.Visible = false;
         };
-        Add(outline = new Image(GFX.Game["objects/LylyraHelper/ss2024/cursedRefill/outline"]));
+        Add(outline = new Image(GFX.Game[$"{idleRefillStr}/outline"]));
         outline.CenterOrigin();
         outline.Visible = false;
         oneUse = data.Bool("oneUse", false);

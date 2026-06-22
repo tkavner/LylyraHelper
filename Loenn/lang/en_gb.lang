@@ -201,6 +201,16 @@ entities.LylyraHelper/DashActivatedDustBunnies/Rotate.attributes.description.Das
 
 entities.LylyraHelper/SS2024/AutoReturnFallingBlock.attributes.description.flags=The set of flags to monitor and record states for when this trigger is entered.
 
+#Cursed Refill
+entities.LylyraHelper/SS2024/CursedRefill.attributes.description.oneUse=Whether or not this item can be used more than once per life.\nIf unchecked, this item will respawn on a timer similar to a vanilla Refill.
+entities.LylyraHelper/SS2024/CursedRefill.attributes.description.textureLocation=A file path to where the textures for the Uncursed Refill are.\nUsed to create a custom reskin of this entity.\n\nUnzip LylyraHelper and look in Graphics/Atlases/Gameplay/objects/LylyraHelper/ss2024/UncursedRefill/ to see what you need to make a reskin.
+
+#Uncursed Refill
+
+
+entities.LylyraHelper/SS2024/UncursedRefill.attributes.description.oneUse=Whether or not this item can be used more than once per life.\nIf unchecked, this item will respawn on a timer similar to a vanilla Refill.
+entities.LylyraHelper/SS2024/UncursedRefill.attributes.description.textureLocation=A file path to where the textures for the Uncursed Refill are.\nUsed to create a custom reskin of this entity.\n\nUnzip LylyraHelper and look in Graphics/Atlases/Gameplay/objects/LylyraHelper/ss2024/UncursedRefill/ to see what you need to make a reskin.
+
 #SMW Key / Whimsy Key
 
 entities.LylyraHelper/SS2024/WhimsyKey.attributes.description.grabbable=Whether or not this key should be grabbable / throwable.

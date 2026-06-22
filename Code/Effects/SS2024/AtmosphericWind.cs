@@ -325,8 +325,6 @@ public class WindBuilder
             (1 - scrollY) * (cameraPosition.Y + wind.startingCamera.Y));
         wind.percent += Engine.DeltaTime * 75 * 6.5F / windLifespan;*/
 
-        Logger.Log(LogLevel.Error, "LylyraHelper", "" + Wind.curve.Length);
-        Logger.Log(LogLevel.Error, "LylyraHelper", "buildPoint: " + buildPoint);
         Vector2 prevPoint = Wind.curve[buildPoint];
         Vector2 prevTangentPoint = Wind.curve[buildPoint + 1] - Wind.curve[buildPoint];
         Vector2 prevNormal = prevTangentPoint.Perpendicular().SafeNormalize();

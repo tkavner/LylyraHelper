@@ -25,22 +25,21 @@ public class UncursedRefill : Refill
 
     public UncursedRefill(EntityData data, Vector2 offset) : base(data.Position + offset, false, false)
     {
+        string idleRefillStr = data.Attr("textureLocation", "objects/LylyraHelper/ss2024/uncursedRefill");
         PlayerCollider origCollider = Get<PlayerCollider>();
         Remove(origCollider);
         Add(new PlayerCollider(OnPlayer));
         sprite = Get<Sprite>();
         respawnTimerField = typeof(Refill).GetField("respawnTimer", BindingFlags.Instance | BindingFlags.NonPublic);
         oneUse = data.Bool("oneUse");
-
-
         sprite = Get<Sprite>();
         Remove(sprite);
-        sprite.Reset(GFX.Game, "objects/LylyraHelper/ss2024/uncursedRefill/idle");
+        sprite.Reset(GFX.Game, $"{idleRefillStr}/idle");
         sprite.AddLoop("idle", "", 0.1f);
         sprite.Play("idle");
         flash = Get<Sprite>();
         Remove(flash);
-        flash.Reset(GFX.Game, "objects/LylyraHelper/ss2024/uncursedRefill/flash");
+        flash.Reset(GFX.Game, $"{idleRefillStr}/flash");
         Remove(Get<Image>());
         Add(sprite);
         Add(flash);
@@ -49,7 +48,7 @@ public class UncursedRefill : Refill
         {
             flash.Visible = false;
         };
-        Add(outline = new Image(GFX.Game["objects/LylyraHelper/ss2024/uncursedRefill/outline"]));
+        Add(outline = new Image(GFX.Game[$"{idleRefillStr}/outline"]));
         outline.CenterOrigin();
         outline.Visible = false;
     }

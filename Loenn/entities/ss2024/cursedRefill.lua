@@ -1,5 +1,6 @@
 local helpers = require("mods").requireFromPlugin("helpers")
 
+local consts = require("mods").requireFromPlugin("consts")
 local refill = {}
 
 refill.name = "LylyraHelper/SS2024/CursedRefill"
@@ -9,10 +10,12 @@ refill.placements = {
         name = "Cursed Refill",
         data = 
 			helpers.createPlacementData(1, {
-            oneUse = false
+            oneUse = false,
+            textureLocation="objects/LylyraHelper/ss2024/cursedRefill"
         })
     }
 }
+refill.ignoredFields = consts.ignoredFields
 
 function refill.texture(room, entity)
     return "objects/LylyraHelper/ss2024/cursedRefill/idle00"
