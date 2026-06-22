@@ -9,7 +9,7 @@ bigCloud.name = "LylyraHelper/BigCloud"
 bigCloud.ignoredFields = consts.ignoredFields
 
 table.insert(bigCloud.placements, {
-		name = "Big Cloud",
+		name = "main",
 		data = helpers.createPlacementData('1', {
 				width = 64,
 				xOffset = 32,
@@ -18,7 +18,7 @@ table.insert(bigCloud.placements, {
 			})
 		})
 table.insert(bigCloud.placements, {
-		name = "Big Cloud (Fragile)",
+		name = "mainfragile",
 		data = helpers.createPlacementData('1', {
 				width = 64,
 				xOffset = 32,

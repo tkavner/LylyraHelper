@@ -6,7 +6,7 @@ controller.name = "LylyraHelper/KuwaharaBlurController"
 controller.depth = -100
 controller.placements = {
     {
-        name = "Kuwahara Blur Controller",
+        name = "main",
         data =
         helpers.createPlacementData(1, {
             flag = "",

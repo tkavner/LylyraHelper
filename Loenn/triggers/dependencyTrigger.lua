@@ -1,7 +1,7 @@
 local dependencyTrigger = {}
 dependencyTrigger.name = "LylyraHelper/DependencyTrigger"
 dependencyTrigger.placements = {
-	name = "Dependency Trigger",
+	name = "main",
 	data = {
 		dependency="",
 		flag="",

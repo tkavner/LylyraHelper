@@ -3,7 +3,7 @@ local disableEntityPreservationTrigger = {}
 disableEntityPreservationTrigger.name = "LylyraHelper/DisableEntityPreservationTrigger"
 
 disableEntityPreservationTrigger.placements = {
-	name = "Disable Entity Preservation Trigger",
+	name = "main",
 	data = {
 		activate = true
 	}

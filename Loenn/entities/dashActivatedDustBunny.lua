@@ -12,7 +12,7 @@ dustBunny.nodeLimits = {1, 999}
 dustBunny.nodeLineRenderType = "line"
 
 dustBunny.placements = {
-    name = "Dash Activated Dust Bunny",
+    name = "main",
     data = helpers.createPlacementData('2',
     {
         TravelTime = 0.15

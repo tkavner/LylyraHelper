@@ -7,7 +7,7 @@ refill.name = "LylyraHelper/SS2024/UncursedRefill"
 refill.depth = -100
 refill.placements = {
     {
-        name = "Uncursed Refill",
+        name = "UncursedRefill",
         data = helpers.createPlacementData('1', {
             oneUse = false,
             textureLocation="objects/LylyraHelper/ss2024/uncursedRefill"

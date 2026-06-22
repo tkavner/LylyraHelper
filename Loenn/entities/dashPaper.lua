@@ -33,7 +33,7 @@ paper.fieldInformation = {
 }
 
 table.insert(paper.placements, {
-	name = "Dash Paper",
+	name = "DashPaper",
     data = helpers.createPlacementData('1', {
 		width = 24,
         height = 24,
@@ -53,7 +53,7 @@ table.insert(paper.placements, {
 
 table.insert(paper.placements,
 {
-	name = "Dash Paper (With Scissors)",
+	name = "DashPaperScissors",
     data = helpers.createPlacementData('1', {
 		width = 24,
         height = 24,

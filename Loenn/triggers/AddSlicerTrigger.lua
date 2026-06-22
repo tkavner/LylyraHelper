@@ -26,7 +26,7 @@ addSlicerOnLoadTrigger.fieldInformation = {
 
 for _, dir in ipairs(directions) do
 	local placement = {
-		name = "Add Slicer Trigger ("..dir..")",
+		name = ""...dir,
 		data = 
 			helpers.createPlacementData(1, {
 			sliceOnImpact = false,

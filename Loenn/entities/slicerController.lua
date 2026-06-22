@@ -18,7 +18,7 @@ slicerController.fieldInformation = {
 }
 
 table.insert(slicerController.placements, {
-		name = "Slicer Controller",
+		name = "SlicerController",
 		data = {
 			width = 48,
 			height = 48,

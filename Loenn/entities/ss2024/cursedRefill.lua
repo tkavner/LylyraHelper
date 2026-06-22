@@ -7,7 +7,7 @@ refill.name = "LylyraHelper/SS2024/CursedRefill"
 refill.depth = -100
 refill.placements = {
     {
-        name = "Cursed Refill",
+        name = "CursedRefill",
         data = 
 			helpers.createPlacementData(1, {
             oneUse = false,

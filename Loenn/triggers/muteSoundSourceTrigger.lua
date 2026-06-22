@@ -1,7 +1,7 @@
 local muteSoundSourceTrigger = {}
 muteSoundSourceTrigger.name = "LylyraHelper/MuteSoundSourceTrigger"
 muteSoundSourceTrigger.placements = {
-	name = "Mute Sound Source Trigger",
+	name = "main",
 	data = {
 		sound = "",
 		unmute = false,

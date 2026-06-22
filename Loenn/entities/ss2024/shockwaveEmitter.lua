@@ -18,7 +18,7 @@ shockwaveEmitter.fieldInformation = {
 }
 shockwaveEmitter.placements = {
     {
-        name = "Shockwave Emitter",
+        name = "ShockwaveEmitter",
         data = {
             focalRatio = "1.5",
             initialSize = "1",

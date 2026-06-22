@@ -11,7 +11,7 @@ fallingBlock.name = "LylyraHelper/SS2024/AutoReturnFallingBlock"
 for _, dir in ipairs(directions) do
     table.insert(fallingBlock.placements, 
         {
-        name = "Auto Return Falling Block ("..dir..")",
+        name = "AutoReturnFallingBlock"..dir,
         data = {
             tiletype = "3",
             climbFall = true,

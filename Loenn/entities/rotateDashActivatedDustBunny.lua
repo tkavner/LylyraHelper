@@ -14,7 +14,7 @@ dustBunny.ignoredFields = consts.ignoredFields
 
 
 dustBunny.placements = {
-    name = "Dash Activated Dust Bunny (Rotate)",
+    name = "main",
     data = helpers.createPlacementData('1',
     {
         TravelTime = 0.15,

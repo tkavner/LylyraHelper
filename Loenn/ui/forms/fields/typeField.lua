@@ -11,7 +11,7 @@ listOfTypeField.fieldType = "LylyraHelper.TypeField"
 local function getEntitiesInBox(room)
     local theEntity = nil
     for _, entity in ipairs(room.entities) do
-        if entity and entity["_name"] and (entity["_name"] == "LylyraHelper/SlicerController" or entity["_name"] == "Slicer Controller") then
+        if entity and entity["_name"] and (entity["_name"] == "LylyraHelper/SlicerController" or entity["_name"] == "SlicerController" or entity["_name"] == "Slicer Controller") then
             theEntity = entity
             break
         end

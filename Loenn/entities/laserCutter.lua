@@ -20,7 +20,7 @@ local modes = {"Pulse", "In Front", "Breakbeam"}
 for _, dir in ipairs(directions) do
 	for __, m in ipairs(modes) do
 		table.insert(laserCutter.placements, {
-			name = "Laser Cutter ("..m..", "..dir..")",
+			name = string.lower(string.gsub(""..dir..""..m, "%s+", "")),
 			data = helpers.createPlacementData('1', {
 				cooldown = 2.0,
 				firingLength = 1.0,

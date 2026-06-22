@@ -102,7 +102,7 @@ function listOfTypeField.getElement(name, value, options)
 
     button.style.padding *= 0.36
     button.style.spacing = 0
-    button.tooltipText = "*FrostHelper required*\nThis field will be set to the names of all FG Decals whose *centers* OF ALL PAPER are overlapped by the paper. This will overwrite any information currently there.\n\nMAKE SURE TO SET "-- tostring(language.ui.lylyrahelper.typeField.tooltip)
+    button.tooltipText = "When clicked, this field will be set to the names of all FG Decals whose *centers* are overlapped by the paper. Clicking this will overwrite any information currently in the text field."-- tostring(language.ui.lylyrahelper.typeField.tooltip)
     formField.field:addChild(button)
     formField.field.button = button
 
