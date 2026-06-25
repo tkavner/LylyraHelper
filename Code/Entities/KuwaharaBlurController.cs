@@ -1,4 +1,5 @@
 using Celeste.Mod.Entities;
+using Celeste.Mod.Helpers;
 using Celeste.Mod.LylyraHelper.Other.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -69,7 +70,7 @@ public class KuwaharaBlurController : Entity
     {
         ILCursor cursor = new ILCursor(il);
 
-        if (cursor.TryGotoNext(MoveType.Before, instruction => instruction.MatchLdfld<Level>("Foreground")))
+        if (cursor.TryGotoNextBestFit(MoveType.Before, instruction => instruction.MatchLdarg0(), instruction => instruction.MatchLdfld<Level>("Foreground")))
         {
             
             cursor.EmitLdarg0();
