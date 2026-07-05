@@ -253,6 +253,7 @@ public class AtmosphericWind : Backdrop
             if (wind.percent > MAXPERCENT)
             {
                 oldWinds.Add(wind);
+                wind.DisposeBuffer();
             }
         }
 
