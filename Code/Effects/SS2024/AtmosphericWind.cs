@@ -37,15 +37,14 @@ public class AtmosphericWind : Backdrop
             initAngle *= (float)Math.PI / 180F;
             Wind wind = new Wind();
             wind.pointsPerWind = pointsPerWind;
-            Vector2[] curve = wind.curve = new Vector2[pointsPerWind];
             Vector2 nextPoint = wind.startingPoint = startingPoint;
             wind.startingCamera = startingCamera;
             float nextAngle = initAngle;
             float nextBend = bend;
-            List<Vector2> points = new List<Vector2>();
+            Vector2[] points = new  Vector2[pointsPerWind];
             for (int i = 0; i < pointsPerWind / 2; i++)
             {
-                points.Add(nextPoint);
+                points[i + pointsPerWind / 2] = nextPoint;
                 nextPoint += new Vector2((float)Math.Cos(nextAngle), (float)Math.Sin(nextAngle)) * speed;
                 nextAngle += nextBend;
                 nextBend = Calc.Clamp(nextBend, -maxBend, maxBend);
@@ -61,10 +60,10 @@ public class AtmosphericWind : Backdrop
                 nextAngle -= nextBend;
                 nextBend -= rand.NextFloat() * twist - twist / 2;
                 nextBend = Calc.Clamp(nextBend, -maxBend, maxBend);
-                points.Insert(0, nextPoint);
+                points[pointsPerWind / 2 - i] = nextPoint;
             }
 
-            wind.curve = points.ToArray();
+            wind.curve = points;
 
             wind.thicc = rand.Next(10) == 0 ? 2 : 1;
             endPoint = nextPoint;
