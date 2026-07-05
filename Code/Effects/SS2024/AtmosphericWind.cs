@@ -4,8 +4,10 @@ using Monocle;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 using Celeste.Mod.LylyraHelper.Other.Helpers;
 using Celeste.Mod.Backdrops;
+using Celeste.Mod.Core;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
@@ -25,7 +27,9 @@ public class AtmosphericWind : Backdrop
         public int pointsPerWind;
         public Vector2 startingCamera;
         public VertexPositionNormalTexture[] Vertices;
+        public VertexBuffer VBuffer;
         public WindBuilder builder;
+        private ValueTask<VertexBuffer> _Vertices_QueuedLoad;
 
         public static Wind MakeWind(Vector2 startingPoint, Vector2 startingCamera, Random rand, float initAngle,
             float speed, float twist, float bend, int pointsPerWind, float maxBend)
@@ -71,6 +75,7 @@ public class AtmosphericWind : Backdrop
 
         internal float GetHeight(int v)
         {
+            
             int indexWeight = 100;
             //percents are out of a 200 point system right?! this actually occurs at 150% progress on our 200 point system
             if (percent - indexWeight + indexWeight * (pointsPerWind - v) / pointsPerWind > 100)
@@ -90,9 +95,59 @@ public class AtmosphericWind : Backdrop
             }
         }
 
+        /// <summary>
+        /// Makes the Vertex Buffer to render this wind with, if possible.
+        ///
+        /// Adapted from ObjModel, although simplified because that's overkill in our case.
+        /// </summary>
+        /// <returns></returns>
+        public bool UploadBuffer()
+        {
+            if (Everest.Flags.IsHeadless)
+                return false;
+            if (VBuffer != null && !VBuffer.IsDisposed && !VBuffer.GraphicsDevice.IsDisposed)
+                return false;
+            if (VBufferReady) 
+                return false;
+            if (Vertices == null)
+                return false;
+            bool? threadedGl = CoreModule.Settings.ThreadedGL;
+            if ((threadedGl == null) || !(bool)threadedGl)
+            {
+                VBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof (VertexPositionNormalTexture), Vertices.Length, BufferUsage.WriteOnly);
+                VBuffer.SetData<VertexPositionNormalTexture>(Vertices);
+                VBufferReady = true;
+                return true;
+            }
+            else
+            {
+                _Vertices_QueuedLoad = MainThreadHelper.Schedule<VertexBuffer>((System.Func<VertexBuffer>) (() =>
+                {
+                    VBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof (VertexPositionTexture), this.Vertices.Length, BufferUsage.None);
+                    VBuffer.SetData<VertexPositionNormalTexture>(Vertices);
+                    VBufferReady = true;
+                    return VBuffer;
+                }));
+            }
+            return true;
+        }
+
+        public bool VBufferReady { get; set; }
+
+        public void DisposeBuffer()
+        {
+            if (VBuffer is { IsDisposed: false })
+                VBuffer.Dispose();
+        }
+
         public float GetPercent()
         {
             return (percent) / 250;
+        }
+
+        public bool CanDraw()
+        {
+            return VBufferReady && VBuffer is { IsDisposed: false };
         }
     }
 
@@ -111,8 +166,8 @@ public class AtmosphericWind : Backdrop
         this.windLifespan = lifespan;
         this.maxBend = maxBend;
         this.pointsPerWind = pointsPointWind;
-        int vertecies = GetVertecies();
-        vertices = new VertexPositionColor[vertecies];
+        int totalVerts = GetTotalVertices();
+        vertices = new VertexPositionColor[totalVerts];
     }
 
     public AtmosphericWind(BinaryPacker.Element child)
@@ -122,11 +177,11 @@ public class AtmosphericWind : Backdrop
         angleVariance = child.AttrFloat("angleVariance"); // in degrees
         speed = child.AttrFloat("speed");
         speedVarience = child.AttrFloat("speedVariance");
-        twist = Calc.ToRad(child.AttrFloat("angularJerk")); //in radians
-        bend = Calc.ToRad(child.AttrFloat("startingAngularAcceleration")); //in radians
+        twist = child.AttrFloat("angularJerk").ToRad(); //in radians
+        bend = child.AttrFloat("startingAngularAcceleration").ToRad(); //in radians
         frequency = child.AttrFloat("frequency", 3F);
         windLifespan = child.AttrFloat("windLifespan", 7.5F);
-        maxBend = Calc.ToRad(child.AttrFloat("maxAngularAcceleration", 0.01F)); //in radians
+        maxBend = child.AttrFloat("maxAngularAcceleration", 0.01F).ToRad(); //in radians
         pointsPerWind = child.AttrInt("pointsPerWind", 600);
         color = Calc.HexToColor(child.Attr("color", "FFFFFF"));
         fadeColor = Calc.HexToColor(child.Attr("fadeColor", "FFFFFF"));
@@ -134,13 +189,13 @@ public class AtmosphericWind : Backdrop
         hsvBlending = child.AttrBool("hsvBlending", true) && !color.Equals(fadeColor); //turn off hsv blending if the colors are equal because its more computationally costly
         scrollX = child.AttrFloat("scrollX", 0.0F);
         scrollY = child.AttrFloat("scrollY", 0.0F);
-        int vertecies = GetVertecies(); 
-        vertices = new VertexPositionColor[vertecies];
+        int totalVerts = GetTotalVertices(); 
+        vertices = new VertexPositionColor[totalVerts];
     }
 
     private VertexPositionColor[] vertices;
 
-    private int GetVertecies()
+    private int GetTotalVertices()
     {
         return (int)(Math.Ceiling(frequency) * Math.Ceiling(windLifespan) * 3 * (pointsPerWind * 2 - 2));
     }
@@ -253,19 +308,16 @@ public class AtmosphericWind : Backdrop
             
         foreach (Wind wind in winds)
         {
-            if (wind.Vertices != null)
+            wind.UploadBuffer();
+            if (wind.CanDraw())
             {
                 ApplyEffect((Level)scene, effect, wind);
-                foreach (var pass in technique.Passes)
+                Engine.Graphics.GraphicsDevice.SetVertexBuffer(wind.VBuffer);
+                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    Engine.Graphics.GraphicsDevice.DrawUserPrimitives
-                    (
-                        PrimitiveType.TriangleList,
-                        wind.Vertices, 0, wind.Vertices.Length / 3
-                    );
+                    Engine.Graphics.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, wind.VBuffer.VertexCount / 3);
                 }
-
             }
         }
 
@@ -281,10 +333,7 @@ public class AtmosphericWind : Backdrop
         matrix *= Matrix.CreateTranslation(-1f, 1f, 0f); //why do we need this offset? I couldn't tell you. but we do.
         eff.Parameters["World"].SetValue(matrix);
         Vector2 CameraPosition = level.Camera.Position;
-        
         eff.Parameters["cameraPos"].SetValue(new Vector4(CameraPosition.X, - CameraPosition.Y,  0f, 0f));
-        
-        
         Vector4 parallax = new Vector4((-scrollX) * (CameraPosition.X - wind.startingCamera.X),
             (-scrollY) * (CameraPosition.Y - wind.startingCamera.Y), 0f, 0f);
         
@@ -293,7 +342,6 @@ public class AtmosphericWind : Backdrop
         eff.Parameters["parallax"].SetValue(parallax);
 
         parallax += parallax2;
-        
         eff.Parameters["windPercent"]?.SetValue(wind.percent / MAXPERCENT);
         eff.Parameters["color"]?.SetValue(color.ToVector4());
         eff.Parameters["fadeColor"]?.SetValue(fadeColor.ToVector4());
@@ -301,6 +349,15 @@ public class AtmosphericWind : Backdrop
         eff.Parameters["thickness"]?.SetValue(wind.thicc);
         eff.Parameters["pointsPerWind"]?.SetValue(wind.pointsPerWind);
         eff.Parameters["hsvBlending"]?.SetValue(hsvBlending ? 1f : 0f);
+    }
+
+    public override void Ended(Scene scene)
+    {
+        base.Ended(scene);
+        foreach (Wind wind in winds)
+        {
+            wind.DisposeBuffer();
+        }
     }
 }
 

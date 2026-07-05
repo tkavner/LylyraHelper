@@ -20,7 +20,7 @@ public static class LyraUtils
         newData.Nodes = original.Nodes;
         newData.Values = new(original.Values);
         newData.Name = original.Name;
-
+        
         newData.Position = position;
         newData.Width = width;
         newData.Height = height;
