@@ -122,7 +122,7 @@ public class AtmosphericWind : Backdrop
             {
                 _Vertices_QueuedLoad = MainThreadHelper.Schedule<VertexBuffer>((System.Func<VertexBuffer>) (() =>
                 {
-                    VBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof (VertexPositionTexture), this.Vertices.Length, BufferUsage.None);
+                    VBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof (VertexPositionNormalTexture), this.Vertices.Length, BufferUsage.WriteOnly);
                     VBuffer.SetData<VertexPositionNormalTexture>(Vertices);
                     VBufferReady = true;
                     return VBuffer;
