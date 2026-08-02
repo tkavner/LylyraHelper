@@ -43,6 +43,7 @@ public class BreakbeamHitboxComponent : Component
 
     private int GetEdgeScreenLength()
     {
+        if (Level.Transitioning) return 0;
         if (Orientation == "up")
         {
             return (int)Math.Abs(Parent.Position.Y - Level.Bounds.Top);
