@@ -1,9 +1,11 @@
 local helpers = require("mods").requireFromPlugin("helpers")
+local consts = require("mods").requireFromPlugin("consts")
 
 local controller = {}
 
 controller.name = "LylyraHelper/KuwaharaBlurController"
 controller.depth = -100
+controller.ignoredFields = consts.ignoredFields
 controller.placements = {
     {
         name = "main",
@@ -11,7 +13,8 @@ controller.placements = {
         helpers.createPlacementData(1, {
             flag = "",
             on = true,
-            oneTime = false
+            oneTime = false,
+            revertable = true
 
         })
     }
